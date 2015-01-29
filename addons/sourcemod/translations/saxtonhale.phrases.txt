@@ -95,6 +95,15 @@
 		"#format" "{1:i}"
 		"en"	"Damage dealt: {1}"
 	}
+	"vsh_damage_own"
+	{
+		"en"	"Damage"
+	}
+	"vsh_damage_others"
+	{
+		"#format" "{1:i},{2:N},{3:i}"
+		"en"	"Damage: {1} - {2}'s Damage: {3}"
+	}
 	"vsh_point_enable"
 	{
 		"#format" "{1:i}"
