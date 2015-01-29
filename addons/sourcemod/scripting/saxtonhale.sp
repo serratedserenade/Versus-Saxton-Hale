@@ -1006,6 +1006,9 @@ AddToDownload()
     //PrecacheSound("weapons/barret_arm_zap.wav", true);
     PrecacheSound("player/doubledonk.wav", true);
 
+    PrecacheParticleSystem("ghost_appearation");
+    PrecacheParticleSystem("yikes_fx");
+
     /*
         Files to download + precache that are not originally part of TF2 or HL2 / etc
     */
@@ -2533,13 +2536,13 @@ public Action:EnableSG(Handle:hTimer, any:iid)
     return Plugin_Continue;
 }
 
-public Action:RemoveEnt(Handle:timer, any:entid)
-{
-    new ent = EntRefToEntIndex(entid);
-    if (ent > 0 && IsValidEntity(ent))
-        AcceptEntityInput(ent, "Kill");
-    return Plugin_Continue;
-}
+// public Action:RemoveEnt(Handle:timer, any:entid)
+// {
+//     new ent = EntRefToEntIndex(entid);
+//     if (ent > 0 && IsValidEntity(ent))
+//         AcceptEntityInput(ent, "Kill");
+//     return Plugin_Continue;
+// }
 
 public Action:MessageTimer(Handle:hTimer, any:allclients)
 {
@@ -4143,7 +4146,7 @@ public Action:HaleTimer(Handle:hTimer)
                     SetEntProp(Hale, Prop_Send, "m_bGlowEnabled", 0);
                     GlowTimer = 0.0;
 
-                    CreateTimer(3.0, RemoveEnt, EntIndexToEntRef(AttachParticle(Hale, "ghost_appearation", _, false)));     // One is parented and one is not
+                    AttachParticle(Hale, "ghost_appearation", 3.0);             // One is parented and one is not
 
                     if (TeleMeToYou(Hale, target)) // This returns true if teleport to a ducking player happened
                     {
@@ -4159,7 +4162,7 @@ public Action:HaleTimer(Handle:hTimer)
                         TF2_StunPlayer(Hale, (bEnableSuperDuperJump ? 4.0 : 2.0), 0.0, TF_STUNFLAGS_GHOSTSCARE|TF_STUNFLAG_NOSOUNDOREFFECT, target);
                     }
 
-                    CreateTimer(3.0, RemoveEnt, EntIndexToEntRef(AttachParticle(Hale, "ghost_appearation")));               // So the teleport smoke appears at both destinations
+                    AttachParticle(Hale, "ghost_appearation", 3.0, _, true);    // So the teleport smoke appears at both destinations
                     
                     // Chdata's HHH teleport rework
                     decl Float:vPos[3];
@@ -4523,7 +4526,7 @@ public Action:UseRage(Handle:hTimer, any:dist)
                 if (Special != VSHSpecial_HHH)
                 {
                     flags |= TF_STUNFLAG_NOSOUNDOREFFECT;
-                    CreateTimer(5.0, RemoveEnt, EntIndexToEntRef(AttachParticle(i, "yikes_fx", 75.0)));
+                    AttachParticle(i, "yikes_fx", 5.0, Float:{0.0,0.0,75.0}, true);
                 }
                 if (VSHRoundState != VSHRState_Waiting) TF2_StunPlayer(i, 5.0, _, flags, (Special == VSHSpecial_HHH ? 0 : Hale));
             }
@@ -4538,7 +4541,7 @@ public Action:UseRage(Handle:hTimer, any:dist)
         if (distance < dist)    //(!mode && (distance < RageDist)) || (mode && (distance < RageDist/2)))
         {
             SetEntProp(i, Prop_Send, "m_bDisabled", 1);
-            CreateTimer(3.0, RemoveEnt, EntIndexToEntRef(AttachParticle(i, "yikes_fx", 75.0)));
+            AttachParticle(i, "yikes_fx", 3.0, Float:{0.0,0.0,75.0}, true);
             if (newRageSentry)
             {
                 SetVariantInt(GetEntProp(i, Prop_Send, "m_iHealth")/2);
@@ -5705,7 +5708,7 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
 
     if (Special == VSHSpecial_HHH)
     {
-        CreateTimer(3.0, RemoveEnt, EntIndexToEntRef(AttachParticle(iEnt, "ghost_appearation", _, false)));
+        AttachParticle(i, "ghost_appearation", 3.0);
         EmitSoundToAll("misc/halloween/spell_teleport.wav", _, _, SNDLEVEL_GUNFIRE, SND_NOFLAGS, SNDVOL_NORMAL, 100, _, vPos, NULL_VECTOR, false, 0.0);
     }
 }*/
@@ -5928,30 +5931,7 @@ ForceTeamWin(team)
     SetVariantInt(team);
     AcceptEntityInput(ent, "SetWinner");
 }
-stock AttachParticle(ent, String:particleType[], Float:offset = 0.0, bool:battach = true)
-{
-    new particle = CreateEntityByName("info_particle_system");
-    decl String:tName[128];
-    decl Float:pos[3];
-    GetEntPropVector(ent, Prop_Send, "m_vecOrigin", pos);
-    pos[2] += offset;
-    TeleportEntity(particle, pos, NULL_VECTOR, NULL_VECTOR);
-    Format(tName, sizeof(tName), "target%i", ent);
-    DispatchKeyValue(ent, "targetname", tName);
-    DispatchKeyValue(particle, "targetname", "tf2particle");
-    DispatchKeyValue(particle, "parentname", tName);
-    DispatchKeyValue(particle, "effect_name", particleType);
-    DispatchSpawn(particle);
-    SetVariantString(tName);
-    if (battach)
-    {
-        AcceptEntityInput(particle, "SetParent", particle, particle, 0);
-        SetEntPropEnt(particle, Prop_Send, "m_hOwnerEntity", ent);
-    }
-    ActivateEntity(particle);
-    AcceptEntityInput(particle, "start");
-    return particle;
-}
+
 public HintPanelH(Handle:menu, MenuAction:action, param1, param2)
 {
     if (!IsValidClient(param1)) return;
@@ -8392,8 +8372,7 @@ stock GetClosestPlayerTo(iEnt, iTeam = 0)
 */
 stock bool:TeleMeToYou(iMe, iYou, bool:bAngles = false)
 {
-    decl Float:vPos[3];
-    new Float:vAng[3];  // This zeroes it out, effectively making it equal to NULL_VECTOR
+    decl Float:vPos[3], Float:vAng[3];
     GetEntPropVector(iYou, Prop_Send, "m_vecOrigin", vPos);
 
     if (bAngles)
@@ -8415,7 +8394,7 @@ stock bool:TeleMeToYou(iMe, iYou, bool:bAngles = false)
         bDucked = true;
     }
     
-    TeleportEntity(iMe, vPos, vAng, NULL_VECTOR);
+    TeleportEntity(iMe, vPos, bAngles ? vAng : NULL_VECTOR, NULL_VECTOR);
 
     return bDucked;
 }
@@ -8438,3 +8417,132 @@ stock GetRandBlockCellEx(Handle:hArray, iBlock = 0, bool:bAsChar = false, iDefau
     decl iIndex;
     return GetRandBlockCell(hArray, iIndex, iBlock, bAsChar, iDefault);
 }
+
+/*
+    Chdata's reworked attachparticle
+*/
+stock AttachParticle(iEnt, const String:szParticleType[], Float:flTimeToDie = -1.0, Float:vOffsets[3] = {0.0,0.0,0.0}, bool:bAttach = false, Float:flTimeToStart = -1.0)
+{
+    new iParti = CreateEntityByName("info_particle_system");
+    if (IsValidEntity(iParti))
+    {
+        decl Float:vPos[3];
+        GetEntPropVector(iEnt, Prop_Send, "m_vecOrigin", vPos);
+        AddVectors(vPos, vOffsets, vPos);
+        TeleportEntity(iParti, vPos, NULL_VECTOR, NULL_VECTOR);
+
+        DispatchKeyValue(iParti, "effect_name", szParticleType);
+        DispatchSpawn(iParti);
+
+        if (bAttach)
+        {
+            SetParent(iEnt, iParti);
+            SetEntPropEnt(iParti, Prop_Send, "m_hOwnerEntity", iEnt);
+        }
+
+        ActivateEntity(iParti);
+
+        if (flTimeToStart > 0.0)
+        {
+            decl String:szAddOutput[32];
+            Format(szAddOutput, sizeof(szAddOutput), "OnUser1 !self,Start,,%0.2f,1", flTimeToStart);
+            SetVariantString(szAddOutput);
+            AcceptEntityInput(iParti, "AddOutput");
+            AcceptEntityInput(iParti, "FireUser1");
+
+            if (flTimeToDie > 0.0)
+            {
+                flTimeToDie += flTimeToStart;
+            }
+        }
+        else
+        {
+            AcceptEntityInput(iParti, "Start");
+        }
+
+        if (flTimeToDie > 0.0) 
+        {
+            killEntityIn(iParti, flTimeToDie); // Interestingly, OnUser1 can be used multiple times, as the code above won't conflict with this.
+        }
+
+        return iParti;
+    }
+    return -1;
+}
+
+stock SetParent(iParent, iChild)
+{
+    SetVariantString("!activator");
+    AcceptEntityInput(iChild, "SetParent", iParent, iChild);
+}
+
+stock killEntityIn(iEnt, Float:flSeconds)
+{
+    decl String:szAddOutput[32];
+    Format(szAddOutput, sizeof(szAddOutput), "OnUser1 !self,Kill,,%0.2f,1", flSeconds);
+    SetVariantString(szAddOutput);
+    AcceptEntityInput(iEnt, "AddOutput");
+    AcceptEntityInput(iEnt, "FireUser1");
+}
+
+/*
+    Start of smlib functions
+*/
+#if !defined _smlib_included
+/* SMLIB
+ * Precaches the given particle system.
+ * It's best to call this OnMapStart().
+ * Code based on Rochellecrab's, thanks.
+ *
+ * @param particleSystem    Name of the particle system to precache.
+ * @return                  Returns the particle system index, INVALID_STRING_INDEX on error.
+ */
+stock PrecacheParticleSystem(const String:particleSystem[])
+{
+    static particleEffectNames = INVALID_STRING_TABLE;
+
+    if (particleEffectNames == INVALID_STRING_TABLE) {
+        if ((particleEffectNames = FindStringTable("ParticleEffectNames")) == INVALID_STRING_TABLE) {
+            return INVALID_STRING_INDEX;
+        }
+    }
+
+    new index = FindStringIndex2(particleEffectNames, particleSystem);
+    if (index == INVALID_STRING_INDEX) {
+        new numStrings = GetStringTableNumStrings(particleEffectNames);
+        if (numStrings >= GetStringTableMaxStrings(particleEffectNames)) {
+            return INVALID_STRING_INDEX;
+        }
+
+        AddToStringTable(particleEffectNames, particleSystem);
+        index = numStrings;
+    }
+
+    return index;
+}
+
+/* SMLIB
+ * Rewrite of FindStringIndex, because in my tests
+ * FindStringIndex failed to work correctly.
+ * Searches for the index of a given string in a string table.
+ *
+ * @param tableidx      A string table index.
+ * @param str           String to find.
+ * @return              String index if found, INVALID_STRING_INDEX otherwise.
+ */
+stock FindStringIndex2(tableidx, const String:str[])
+{
+    decl String:buf[1024];
+
+    new numStrings = GetStringTableNumStrings(tableidx);
+    for (new i=0; i < numStrings; i++) {
+        ReadStringTable(tableidx, i, buf, sizeof(buf));
+
+        if (StrEqual(buf, str)) {
+            return i;
+        }
+    }
+
+    return INVALID_STRING_INDEX;
+}
+#endif
