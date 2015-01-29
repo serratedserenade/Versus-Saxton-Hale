@@ -743,9 +743,9 @@ public OnPluginStart()
     HookEvent("player_hurt", event_hurt, EventHookMode_Pre);
     HookEvent("object_destroyed", event_destroy, EventHookMode_Pre);
     HookEvent("object_deflected", event_deflect, EventHookMode_Pre);
-    // HookEvent( "rocket_jump", OnHookedEvent );
-    // HookEvent( "rocket_jump_landed", OnHookedEvent );
-    // HookEvent( "player_death", OnHookedEvent );
+
+    OnPluginStart_TeleportToMultiMapSpawn(); // Setup adt_array
+
     HookUserMessage(GetUserMessageId("PlayerJarated"), event_jarate);
     HookConVarChange(cvarEnabled, CvarChange);
     HookConVarChange(cvarHaleSpeed, CvarChange);
@@ -985,6 +985,12 @@ public OnMapEnd()
 public OnPluginEnd()
 {
     OnMapEnd();
+
+    if (!g_bReloadVSHOnRoundEnd && VSHRoundState == VSHRState_Active)
+    {
+        ServerCommand("mp_restartround 5");
+        CPrintToChatAll("{olive}[VSH]{default} The plugin has been unexpectedly unloaded!");
+    }
 }
 
 AddToDownload()
@@ -1555,6 +1561,8 @@ bool:CheckNextSpecial()
 
 public Action:event_round_start(Handle:event, const String:name[], bool:dontBroadcast)
 {
+    teamplay_round_start_TeleportToMultiMapSpawn(); // Cache spawns
+
     if (!GetConVarBool(cvarEnabled))
     {
 #if defined _steamtools_included
@@ -3728,7 +3736,7 @@ public Action:ClientTimer(Handle:hTimer)
             if (!IsPlayerAlive(client))
             {
                 new obstarget = GetEntPropEnt(client, Prop_Send, "m_hObserverTarget");
-                if (obstarget != Hale && IsValidClient(obstarget) && obstarget != client)
+                if (obstarget != client && obstarget != Hale && IsValidClient(obstarget))
                 {
                     if (!(GetClientButtons(client) & IN_SCORE)) ShowSyncHudText(client, rageHUD, "%t", "vsh_damage_others", Damage[client], obstarget, Damage[obstarget]);
                 }
@@ -4114,13 +4122,15 @@ public Action:HaleTimer(Handle:hTimer)
             decl Float:pos[3];
             if (Special == VSHSpecial_HHH && (HaleCharge == HALEHHH_TELEPORTCHARGE || bEnableSuperDuperJump))
             {
-                decl target;
+                new target = -1;
+
                 do
                 {
                     target = GetRandomInt(1, MaxClients);
                 }
                 while ((RedAlivePlayers > 0) && (!IsClientInGame(target) || (target == Hale) || !IsPlayerAlive(target) || GetEntityTeamNum(target) != OtherTeam)); // IsValidClient(target, false)
-                if (IsValidClient(target)) // lol well....
+                
+                if (IsValidClient(target)) // Maybe it can fail it we teleport to nobody?
                 {
                     // Chdata's HHH teleport rework
                     if (TF2_GetPlayerClass(target) != TFClass_Scout && TF2_GetPlayerClass(target) != TFClass_Soldier)
@@ -4129,30 +4139,28 @@ public Action:HaleTimer(Handle:hTimer)
                         CreateTimer(bEnableSuperDuperJump ? 4.0:2.0, HHHTeleTimer, _, TIMER_FLAG_NO_MAPCHANGE);
                     }
 
-                    GetClientAbsOrigin(target, pos);
                     SetEntPropFloat(Hale, Prop_Send, "m_flNextAttack", GetGameTime() + (bEnableSuperDuperJump ? 4.0 : 2.0));
-                    if (GetEntProp(target, Prop_Send, "m_bDucked"))
+                    SetEntProp(Hale, Prop_Send, "m_bGlowEnabled", 0);
+                    GlowTimer = 0.0;
+
+                    CreateTimer(3.0, RemoveEnt, EntIndexToEntRef(AttachParticle(Hale, "ghost_appearation", _, false)));     // One is parented and one is not
+
+                    if (TeleMeToYou(Hale, target)) // This returns true if teleport to a ducking player happened
                     {
                         VSHFlags[Hale] |= VSHFLAG_NEEDSTODUCK;
-                        decl Float:collisionvec[3];
-                        collisionvec[0] = 24.0;
-                        collisionvec[1] = 24.0;
-                        collisionvec[2] = 62.0;
-                        SetEntPropVector(Hale, Prop_Send, "m_vecMaxs", collisionvec);
-                        SetEntProp(Hale, Prop_Send, "m_bDucked", 1);
-                        SetEntityFlags(Hale, GetEntityFlags(Hale)|FL_DUCKING);
+
                         new Handle:timerpack;
                         CreateDataTimer(0.2, Timer_StunHHH, timerpack, TIMER_FLAG_NO_MAPCHANGE);
                         WritePackCell(timerpack, bEnableSuperDuperJump);
                         WritePackCell(timerpack, GetClientUserId(target));
                     }
-                    else TF2_StunPlayer(Hale, (bEnableSuperDuperJump ? 4.0 : 2.0), 0.0, TF_STUNFLAGS_GHOSTSCARE|TF_STUNFLAG_NOSOUNDOREFFECT, target);
-                    TeleportEntity(Hale, pos, NULL_VECTOR, NULL_VECTOR);
-                    SetEntProp(Hale, Prop_Send, "m_bGlowEnabled", 0);
-                    GlowTimer = 0.0;
-                    CreateTimer(3.0, RemoveEnt, EntIndexToEntRef(AttachParticle(Hale, "ghost_appearation")));
-                    CreateTimer(3.0, RemoveEnt, EntIndexToEntRef(AttachParticle(Hale, "ghost_appearation", _, false)));
+                    else
+                    {
+                        TF2_StunPlayer(Hale, (bEnableSuperDuperJump ? 4.0 : 2.0), 0.0, TF_STUNFLAGS_GHOSTSCARE|TF_STUNFLAG_NOSOUNDOREFFECT, target);
+                    }
 
+                    CreateTimer(3.0, RemoveEnt, EntIndexToEntRef(AttachParticle(Hale, "ghost_appearation")));               // So the teleport smoke appears at both destinations
+                    
                     // Chdata's HHH teleport rework
                     decl Float:vPos[3];
                     GetEntPropVector(target, Prop_Send, "m_vecOrigin", vPos);
@@ -4162,7 +4170,7 @@ public Action:HaleTimer(Handle:hTimer)
 
                     PriorityCenterText(target, true, "You've been teleported to!");
 
-                    HaleCharge=-1100;
+                    HaleCharge = -1100;
                 }
                 if (bEnableSuperDuperJump)
                     bEnableSuperDuperJump = false;
@@ -5606,17 +5614,19 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                 {
                     // Teleport the boss back to one of the spawns.
                     // And during the first 30 seconds, he can only teleport to his own spawn.
-                    TeleportToSpawn(Hale, (bTenSecStart[1]) ? HaleTeam : 0);
+                    //TeleportToSpawn(Hale, (bTenSecStart[1]) ? HaleTeam : 0);
+                    TeleportToMultiMapSpawn(Hale, (bTenSecStart[1]) ? HaleTeam : 0);
                 }
                 else if (damage >= 250.0)
                 {
-                    if (HaleCharge >= 0)
+                    if (Special == VSHSpecial_HHH)
+                    {
+                        //TeleportToSpawn(Hale, (bTenSecStart[1]) ? HaleTeam : 0);
+                        TeleportToMultiMapSpawn(Hale, (bTenSecStart[1]) ? HaleTeam : 0);
+                    }
+                    else if (HaleCharge >= 0)
                     {
                         bEnableSuperDuperJump = true;
-                    }
-                    else if (Special == VSHSpecial_HHH)
-                    {
-                        TeleportToSpawn(Hale, (bTenSecStart[1]) ? HaleTeam : 0);
                     }
                 }
 
@@ -5663,7 +5673,7 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
  TODO: Make it not HHH specific
 
 */
-stock TeleportToSpawn(iClient, iTeam = 0)
+/*stock TeleportToSpawn(iClient, iTeam = 0)
 {
     new iEnt = -1;
     decl Float:vPos[3];
@@ -5698,16 +5708,7 @@ stock TeleportToSpawn(iClient, iTeam = 0)
         CreateTimer(3.0, RemoveEnt, EntIndexToEntRef(AttachParticle(iEnt, "ghost_appearation", _, false)));
         EmitSoundToAll("misc/halloween/spell_teleport.wav", _, _, SNDLEVEL_GUNFIRE, SND_NOFLAGS, SNDVOL_NORMAL, 100, _, vPos, NULL_VECTOR, false, 0.0);
     }
-
-    /*if (GetArraySize(hArray) <= 0)
-    {
-        // No iEnt was found. This should be impossible.
-    }
-    else
-    {
-        iEnt = GetArrayCell(hArray, GetRandomInt(0, GetArraySize(hArray) - 1))
-    }*/
-}
+}*/
 
 
 SpawnSmallHealthPackAt(client, ownerteam = 0)
@@ -8269,4 +8270,171 @@ stock ClearTimer(&Handle:hTimer)
         KillTimer(hTimer);
         hTimer = INVALID_HANDLE;
     }
+}
+
+/*
+    TeleportToMultiMapSpawn()
+
+    [X][2]
+       [0] = RED spawnpoint entref
+       [1] = BLU spawnpoint entref
+*/
+static Handle:s_hSpawnArray = INVALID_HANDLE;
+
+stock OnPluginStart_TeleportToMultiMapSpawn()
+{
+    s_hSpawnArray = CreateArray(2);
+}
+
+stock teamplay_round_start_TeleportToMultiMapSpawn()
+{
+    ClearArray(s_hSpawnArray);
+
+    new iInt = 0;
+    new iSkip[TF_MAX_PLAYERS] = {0,...};
+
+    new iEnt = MaxClients + 1;
+    while ((iEnt = FindEntityByClassname2(iEnt, "info_player_teamspawn")) != -1)
+    {
+        // if (FindValueInArrayAnyEx(s_hSpawnArray, iEnt) != -1) // If already in the array, don't add it again
+        // {
+        //     //CPrintToChdata("not added spawn %i", iEnt);
+        //     continue;
+        // }
+
+        new iTeam = GetEntityTeamNum(iEnt);
+        new iClient = GetClosestPlayerTo(iEnt, iTeam);
+
+        if (iClient)
+        {
+            new bool:bSkip = false;
+            for (new i = 0; i < TF_MAX_PLAYERS; i++)
+            {
+                if (iSkip[i] == iClient)
+                {
+                    bSkip = true;
+                    break;
+                }
+            }
+            if (bSkip)
+            {
+                continue;
+            }
+            iSkip[iInt++] = iClient;
+            new iIndex = PushArrayCell(s_hSpawnArray, EntIndexToEntRef(iEnt));
+            SetArrayCell(s_hSpawnArray, iIndex, iTeam, 1);       // Opposite team becomes an invalid ent
+            //CPrintToChdata("spawn %i near %N added to team %i", iEnt, iClient, iTeam);
+        }
+    }
+}
+
+/*
+    Teleports a client to spawn, but only if it's a spawn that someone spawned in at the start of the round.
+
+    Useful for multi-stage maps like vsh_megaman
+*/
+stock TeleportToMultiMapSpawn(iClient, iTeam = 0)
+{
+    decl iSpawn, iTeleTeam, iIndex;
+    if (iTeam <= 1)
+    {
+        iSpawn = EntRefToEntIndex(GetRandBlockCellEx(s_hSpawnArray));
+    }
+    else
+    {
+        do
+        {
+            iTeleTeam = GetRandBlockCell(s_hSpawnArray, iIndex, 1);
+        }
+        while (iTeleTeam != iTeam);
+
+        iSpawn = EntRefToEntIndex(GetArrayCell(s_hSpawnArray, iIndex, 0));
+    }
+    TeleMeToYou(iClient, iSpawn);
+    return iSpawn;
+}
+
+/*
+    Returns 0 if no client was found.
+*/
+stock GetClosestPlayerTo(iEnt, iTeam = 0)
+{
+    new iBest;
+    decl Float:flDist, Float:flTemp;
+    decl Float:vLoc[3], Float:vPos[3];
+    GetEntPropVector(iEnt, Prop_Send, "m_vecOrigin", vLoc);
+    for(new iClient = 1; iClient <= MaxClients; iClient++)
+    {
+        if (IsClientInGame(iClient) && IsPlayerAlive(iClient))
+        {
+            if (iTeam && GetEntityTeamNum(iClient) != iTeam)
+            {
+                continue;
+            }
+            
+            GetEntPropVector(iClient, Prop_Send, "m_vecOrigin", vPos);
+            flTemp = GetVectorDistance(vLoc, vPos);
+            if (!iBest || flTemp < flDist)
+            {
+                flDist = flTemp;
+                iBest = iClient;
+            }
+        }
+    }
+    return iBest;
+}
+
+/*
+    Teleports one entity to another.
+    Doesn't necessarily have to be players.
+
+    Returns true if a player teleported to a ducking player
+*/
+stock bool:TeleMeToYou(iMe, iYou, bool:bAngles = false)
+{
+    decl Float:vPos[3];
+    new Float:vAng[3];  // This zeroes it out, effectively making it equal to NULL_VECTOR
+    GetEntPropVector(iYou, Prop_Send, "m_vecOrigin", vPos);
+
+    if (bAngles)
+    {
+        GetEntPropVector(iYou, Prop_Send, "m_angRotation", vAng);
+    }
+
+    new bool:bDucked = false;
+
+    if (IsValidClient(iMe) && IsValidClient(iYou) && GetEntProp(iYou, Prop_Send, "m_bDucked"))
+    {
+        decl Float:vCollisionVec[3];
+        vCollisionVec[0] = 24.0;
+        vCollisionVec[1] = 24.0;
+        vCollisionVec[2] = 62.0;
+        SetEntPropVector(iMe, Prop_Send, "m_vecMaxs", vCollisionVec);
+        SetEntProp(iMe, Prop_Send, "m_bDucked", 1);
+        SetEntityFlags(iMe, GetEntityFlags(iMe) | FL_DUCKING);
+        bDucked = true;
+    }
+    
+    TeleportEntity(iMe, vPos, vAng, NULL_VECTOR);
+
+    return bDucked;
+}
+
+stock GetRandBlockCell(Handle:hArray, &iSaveIndex, iBlock = 0, bool:bAsChar = false, iDefault = 0)
+{
+    new iSize = GetArraySize(hArray);
+    if (iSize > 0)
+    {
+        iSaveIndex = GetRandomInt(0, iSize - 1);
+        return GetArrayCell(hArray, iSaveIndex, iBlock, bAsChar);
+    }
+    iSaveIndex = -1;
+    return iDefault;
+}
+
+// Get a random value while ignoring the save index.
+stock GetRandBlockCellEx(Handle:hArray, iBlock = 0, bool:bAsChar = false, iDefault = 0)
+{
+    decl iIndex;
+    return GetRandBlockCell(hArray, iIndex, iBlock, bAsChar, iDefault);
 }
