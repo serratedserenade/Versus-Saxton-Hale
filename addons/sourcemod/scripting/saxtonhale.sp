@@ -11,11 +11,15 @@
 */
 #define PLUGIN_VERSION "1.52"
 #pragma semicolon 1
-#include <sdkhooks>
 #include <tf2_stocks>
 #include <tf2items>
 #include <regex>
-#if SOURCEMOD_V_MINOR > 6
+#if SOURCEMOD_V_MINOR > 8
+  #define SMEIGHT
+  #pragma newdecls required
+#endif
+#include <sdkhooks>
+#if SOURCEMOD_V_MINOR > 6 && !defined SMEIGHT
   #pragma newdecls required
 #endif
 #include <morecolors>
