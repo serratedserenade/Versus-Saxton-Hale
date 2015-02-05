@@ -1,11 +1,9 @@
 env:
-    - SMVERSION=1.6
     - SMVERSION=1.7
     - SMVERSION=1.8
 matrix:
   fast_finish: true
   allow_failures:
-    - env: SMVERSION=1.7
     - env: SMVERSION=1.8
 before_install:
     - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test > /dev/null
