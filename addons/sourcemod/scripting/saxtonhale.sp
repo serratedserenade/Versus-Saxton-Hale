@@ -9,7 +9,7 @@
     
     New plugin thread on AlliedMods: https://forums.alliedmods.net/showthread.php?p=2167912
 */
-#define PLUGIN_VERSION "1.52"
+#define PLUGIN_VERSION "1.53"
 #pragma semicolon 1
 #include <tf2_stocks>
 #include <tf2items>
@@ -19,7 +19,7 @@
   #pragma newdecls required
 #endif
 #include <sdkhooks>
-#if SOURCEMOD_V_MINOR > 6 && !defined SMEIGHT
+#if !defined SMEIGHT
   #pragma newdecls required
 #endif
 #include <morecolors>
@@ -512,6 +512,7 @@ static const String:haleversiontitles[][] =     //the last line of this is what 
     "1.49",
     "1.50",
     "1.51",
+	"1.52",
     PLUGIN_VERSION
 };
 static const String:haleversiondates[][] =
@@ -6288,6 +6289,9 @@ FindVersionData(Handle:panel, versionindex)
     switch (versionindex) // DrawPanelText(panel, "1) .");
     {
         // Unnerfed the Easter Bunny's rage.
+		case 70: //1.53
+		{
+		}
         case 69: //1.52
         {
             DrawPanelText(panel, "1) Added the new festive/other weapons!");
