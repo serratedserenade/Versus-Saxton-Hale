@@ -6291,6 +6291,7 @@ FindVersionData(Handle:panel, versionindex)
         // Unnerfed the Easter Bunny's rage.
 		case 70: //1.53
 		{
+			DrawPanelText(panel, "1) Ported VSH over to 1.7 syntax.(WildCard65)");
 		}
         case 69: //1.52
         {
