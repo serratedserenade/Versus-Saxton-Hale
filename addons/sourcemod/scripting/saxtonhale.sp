@@ -20,14 +20,10 @@
 #endif
 #include <clientprefs>
 #include <sdkhooks>
-#if SOURCEMOD_V_MINOR > 6 && !defined SMEIGHT
-  #pragma newdecls required
-#endif
 #include <morecolors>
 #include <sourcemod>
 #include <nextmap>
 #include <saxtonhale>
-#pragma newdecls optional
 
 #undef REQUIRE_EXTENSIONS
 #tryinclude <steamtools>
@@ -1253,16 +1249,16 @@ AddToDownload()
 
     // Precache
 
-    PrecacheSoundList(BunnyWin);
-    PrecacheSoundList(BunnyJump);
-    PrecacheSoundList(BunnyRage);
-    PrecacheSoundList(BunnyFail);
-    PrecacheSoundList(BunnyKill);
-    PrecacheSoundList(BunnySpree);
-    PrecacheSoundList(BunnyLast);
-    PrecacheSoundList(BunnyPain);
-    PrecacheSoundList(BunnyStart);
-    PrecacheSoundList(BunnyRandomVoice);
+    PrecacheSoundList(BunnyWin, sizeof(BunnyWin));
+    PrecacheSoundList(BunnyJump, sizeof(BunnyJump));
+    PrecacheSoundList(BunnyRage, sizeof(BunnyRage));
+    PrecacheSoundList(BunnyFail, sizeof(BunnyFail));
+    PrecacheSoundList(BunnyKill, sizeof(BunnyKill));
+    PrecacheSoundList(BunnySpree, sizeof(BunnySpree));
+    PrecacheSoundList(BunnyLast, sizeof(BunnyLast));
+    PrecacheSoundList(BunnyPain, sizeof(BunnyPain));
+    PrecacheSoundList(BunnyStart, sizeof(BunnyStart));
+    PrecacheSoundList(BunnyRandomVoice, sizeof(BunnyRandomVoice));
 
     // Download
 
@@ -1270,7 +1266,7 @@ AddToDownload()
     PrepareModel(EggModel);
     // PrepareModel(ReloadEggModel);
 
-    DownloadMaterialList(BunnyMaterials);
+    DownloadMaterialList(BunnyMaterials, sizeof(BunnyMaterials));
 
     PrepareMaterial("materials/models/props_easteregg/c_easteregg");
     AddFileToDownloadsTable("materials/models/props_easteregg/c_easteregg_gold.vmt");
@@ -3021,7 +3017,7 @@ public Action:MakeNoHale(Handle:hTimer, any:clientid)
         HelpPanel2(client);
 
 #if defined _tf2attributes_included
-    if (IsValidEntity(FindPlayerBack(client, { 444 })))    //  Fixes mantreads to have jump height again
+    if (IsValidEntity(FindPlayerBack(client, { 444 }, 1)))    //  Fixes mantreads to have jump height again
     {
         TF2Attrib_SetByDefIndex(client, 58, 1.8);          //  "self dmg push force increased"
     }
@@ -3111,12 +3107,12 @@ public Action:MakeNoHale(Handle:hTimer, any:clientid)
 //          }
         }
     }
-    if (IsValidEntity(FindPlayerBack(client, { 57 })))
+    if (IsValidEntity(FindPlayerBack(client, { 57 }, 1)))
     {
         RemovePlayerBack(client, { 57 }, 1);
         SpawnWeapon(client, "tf_weapon_smg", 16, 1, 0, "");
     }
-    if (IsValidEntity(FindPlayerBack(client, { 642 })))
+    if (IsValidEntity(FindPlayerBack(client, { 642 }, 1)))
     {
         SpawnWeapon(client, "tf_weapon_smg", 16, 1, 6, "149 ; 1.5 ; 15 ; 0.0 ; 1 ; 0.85");
     }
@@ -3684,7 +3680,8 @@ public Action:event_player_spawn(Handle:event, const String:name[], bool:dontBro
         if (!(VSHFlags[client] & VSHFLAG_HASONGIVED))
         {
             VSHFlags[client] |= VSHFLAG_HASONGIVED;
-            RemovePlayerBack(client, { 57, 133, 231, 405, 444, 608, 642 });
+			new array[] = { 57, 133, 231, 405, 444, 608, 642 };
+            RemovePlayerBack(client, array, sizeof(array));
             RemoveDemoShield(client);
             TF2_RemoveAllWeapons(client);
             TF2_RegeneratePlayer(client);
@@ -3921,7 +3918,7 @@ public Action:ClientTimer(Handle:hTimer)
                     cond = TFCond_Buffed;
                 }
             }
-            if (index == 16 && addthecrit && IsValidEntity(FindPlayerBack(client, { 642 })))
+            if (index == 16 && addthecrit && IsValidEntity(FindPlayerBack(client, { 642 }, 1)))
             {
                 addthecrit = false;
             }
@@ -7532,7 +7529,7 @@ stock bool:RemoveDemoShield(iClient)
 }
 
 // Returns true if at least one was removed
-stock bool:RemovePlayerBack(client, indices[], len = sizeof(indices))
+stock bool:RemovePlayerBack(client, indices[], len)
 {
     if (len <= 0)
     {
@@ -7594,7 +7591,7 @@ stock bool:RemovePlayerBack(client, indices[], len = sizeof(indices))
 }
 
 // Returns entity index as soon as any one is found, -1 if none found
-stock FindPlayerBack(client, indices[], len = sizeof(indices))
+stock FindPlayerBack(client, indices[], len)
 {
     if (len <= 0)
     {
@@ -8099,7 +8096,7 @@ stock PrepareSound(const String:szSoundPath[])
     AddFileToDownloadsTable(s);
 }
 
-stock DownloadSoundList(const String:szFileList[][], iSize = sizeof(szFileList))
+stock DownloadSoundList(const String:szFileList[][], iSize)
 {
     for (new i = 0; i < iSize; i++)
     {
@@ -8107,7 +8104,7 @@ stock DownloadSoundList(const String:szFileList[][], iSize = sizeof(szFileList))
     }
 }
 
-stock PrecacheSoundList(const String:szFileList[][], iSize = sizeof(szFileList))
+stock PrecacheSoundList(const String:szFileList[][], iSize)
 {
     for (new i = 0; i < iSize; i++)
     {
@@ -8125,7 +8122,7 @@ stock PrepareMaterial(const String:szMaterialPath[])
     AddFileToDownloadsTable(s);
 }
 
-stock DownloadMaterialList(const String:szFileList[][], iSize = sizeof(szFileList))
+stock DownloadMaterialList(const String:szFileList[][], iSize)
 {
     decl String:s[PLATFORM_MAX_PATH];
     for (new i = 0; i < iSize; i++)
