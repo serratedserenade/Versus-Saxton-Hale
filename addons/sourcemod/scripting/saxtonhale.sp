@@ -18,6 +18,7 @@
   #define SMEIGHT
   #pragma newdecls required
 #endif
+#include <clientprefs>
 #include <sdkhooks>
 #if SOURCEMOD_V_MINOR > 6 && !defined SMEIGHT
   #pragma newdecls required
@@ -25,9 +26,8 @@
 #include <morecolors>
 #include <sourcemod>
 #include <nextmap>
-#include <clientprefs>
-
 #include <saxtonhale>
+#pragma newdecls optional
 
 #undef REQUIRE_EXTENSIONS
 #tryinclude <steamtools>
