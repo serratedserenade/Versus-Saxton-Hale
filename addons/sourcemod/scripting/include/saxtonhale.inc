@@ -5,7 +5,7 @@
 
 
 // VSH_GetRoundState()
-enum
+enum VSHRState
 {
     VSHRState_Disabled = -1,
     VSHRState_Waiting,
@@ -14,7 +14,7 @@ enum
 }
 
 // VSH_GetSpecialRoundIndex()
-enum
+enum VSHSpecial
 {
     VSHSpecial_None = -1,
     VSHSpecial_Hale,
@@ -51,7 +51,7 @@ native int VSH_GetSaxtonHaleUserId();
  *
  * @return		    	Hale's team number (as in the TFTeam enum)
  */
-native int VSH_GetSaxtonHaleTeam();
+native TFTeam VSH_GetSaxtonHaleTeam();
 
 /**
  * Current special
@@ -61,7 +61,7 @@ native int VSH_GetSaxtonHaleTeam();
  *						2 - HHH
  *						4 - CBS
  */
-native int VSH_GetSpecialRoundIndex();
+native VSHSpecial VSH_GetSpecialRoundIndex();
 
 /**
  * Hale's current health.
@@ -83,7 +83,7 @@ native int VSH_GetSaxtonHaleHealthMax();
  * @param client 		Client index.
  * @return		    	Damage dealt by the client for the current round.
  */
-native int VSH_GetClientDamage(client);
+native int VSH_GetClientDamage(int client);
 
 /**
  * The current round state for VSH.
@@ -93,7 +93,7 @@ native int VSH_GetClientDamage(client);
  *				1 - VSH during round
  *				2 - VSH after round end
  */
-native int VSH_GetRoundState();
+native VSHRState VSH_GetRoundState();
 
 /**
  * When Hale attempts to superjump/teleport.
@@ -101,7 +101,7 @@ native int VSH_GetRoundState();
  * @param bSuperDuper 	Boolean for whether the jump is a superjump.
  * @return		    Change bSuperDuper and return Plugin_Changed to change it. Plugin_Stop or Plugin_Handled to stop the jump.
  */
-forward Action VSH_OnDoJump(&bool:bSuperDuper);
+forward Action VSH_OnDoJump(bool &bSuperDuper);
 
 /**
  * When Hale attemps to use rage.
@@ -109,7 +109,7 @@ forward Action VSH_OnDoJump(&bool:bSuperDuper);
  * @param RageDist 	Distance that the boss's rage reaches.
  * @return		    Plugin_Stop or Plugin_Handled will prevent rage, change RageDist and return Plugin_Changed to change the distance.
  */
-forward Action VSH_OnDoRage(&Float:RageDist);
+forward Action VSH_OnDoRage(float &RageDist);
 
 /**
  * When Hale uses the weighdown.
@@ -124,12 +124,12 @@ forward Action VSH_OnDoWeighdown();
  *
  * @param sound		Sound that is being played for music. Change it and return Plugin_Changed to change.
  *				Set to "" for silence that does not stop the forward firing every <time> seconds.
- * @param time		Duration of the sound (seconds). Must change this to the duration of whatever the music was changed to,
+ * @param mTime		Duration of the sound (seconds). Must change this to the duration of whatever the music was changed to,
  * 				but +2 to 4 seconds so that your song doesn't overlap itself. Set to -1.0 to play the music only once.
  * @return			Plugin_Stop or Plugin_Handled to prevent the music from playing (stops the music/forward for the entire round),
  *				or change the values and return Plugin_Changed to change the music. REMEMBER TO CHANGE THE TIME AS WELL.
  */
-forward Action VSH_OnMusic(String:sound[], &Float:time);
+forward Action VSH_OnMusic(char[] sound, float &mTime);
 
 /**
  * Called when VSH opens a panel to a client, stating they will be hale next round.
@@ -138,7 +138,7 @@ forward Action VSH_OnMusic(String:sound[], &Float:time);
  * 
  * @return 			Plugin_Stop or Plugin_Handled to prevent panel being opened. Plugin_Continue to allow panel to be displayed.
  */
-forward Action VSH_OnHaleNext(client);
+forward Action VSH_OnHaleNext(int client);
 
 public SharedPlugin __pl_SaxtonHale = 
 {

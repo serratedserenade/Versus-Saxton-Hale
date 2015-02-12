@@ -11,33 +11,25 @@
 */
 #define PLUGIN_VERSION "1.53"
 #pragma semicolon 1
-#include <tf2_stocks>
 #include <tf2items>
-#include <regex>
-#if SOURCEMOD_V_MINOR > 8
-  #define SMEIGHT
-  #pragma newdecls required
-#endif
-#include <sdkhooks>
-#if !defined SMEIGHT
-  #pragma newdecls required
-#endif
-#include <morecolors>
-#include <sourcemod>
-#include <nextmap>
-#include <clientprefs>
-
-#include <saxtonhale>
-
 #undef REQUIRE_EXTENSIONS
 #tryinclude <steamtools>
 #define REQUIRE_EXTENSIONS
-
-//  TODO: Use LibraryExists for this
-//#undef REQUIRE_PLUGIN
+#undef REQUIRE_PLUGIN
 #tryinclude <tf2attributes>
-//#define REQUIRE_PLUGIN
-
+#define REQUIRE_PLUGIN
+#if SOURCEMOD_V_MINOR > 8
+  #pragma newdecls required
+#endif
+#include <tf2_stocks>
+#include <regex>
+#include <sdkhooks>
+#include <clientprefs>
+#pragma newdecls required
+#include <morecolors>
+#include <sourcemod>
+#include <nextmap>
+#include <saxtonhale>
 
 #define CBS_MAX_ARROWS 9
 
@@ -54,11 +46,8 @@
 #define MAX_ENTITIES            2049           //  This is probably TF2 specific
 #define MAX_CENTER_TEXT         192            //  PrintCenterText()
 
-// Player team values from Team Fortress 2... but without the annoying enum type thing
-#define TEAM_UNOWEN             0
-#define TEAM_SPEC               1
-#define TEAM_RED                2
-#define TEAM_BLU                3
+#define ITFTEAM(%0) view_as<TFTeam>(%0)
+#define TFTInt(%0) view_as<int>(%0)
 
 #define MAX_INT                 2147483647     //  PriorityCenterText
 #define MIN_INT                 -2147483648    //  PriorityCenterText
@@ -231,7 +220,7 @@ enum
 #define EggModel                "models/player/saxton_hale/w_easteregg.mdl"
 
 // Materials
-static const String:BunnyMaterials[][] = {
+static const char BunnyMaterials[][] = {
     "materials/models/player/easter_demo/demoman_head_red.vmt",
     "materials/models/player/easter_demo/easter_body.vmt",
     "materials/models/player/easter_demo/easter_body.vtf",
@@ -251,7 +240,7 @@ static const String:BunnyMaterials[][] = {
 };
 
 // SFX
-static const String:BunnyWin[][] = {
+static const char BunnyWin[][] = {
     "vo/demoman_gibberish01.wav",
     "vo/demoman_gibberish12.wav",
     "vo/demoman_cheers02.wav",
@@ -260,22 +249,22 @@ static const String:BunnyWin[][] = {
     "vo/demoman_cheers07.wav",
     "vo/demoman_cheers08.wav",
     "vo/taunts/demoman_taunts12.wav"
-};
+}
 
-static const String:BunnyJump[][] = {
+static const char BunnyJump[][] = {
     "vo/demoman_gibberish07.wav",
     "vo/demoman_gibberish08.wav",
     "vo/demoman_laughshort01.wav",
     "vo/demoman_positivevocalization04.wav"
 };
 
-static const String:BunnyRage[][] = {
+static const char BunnyRage[][] = {
     "vo/demoman_positivevocalization03.wav",
     "vo/demoman_dominationscout05.wav",
     "vo/demoman_cheers02.wav"
 };
 
-static const String:BunnyFail[][] = {
+static const char BunnyFail[][] = {
     "vo/demoman_gibberish04.wav",
     "vo/demoman_gibberish10.wav",
     "vo/demoman_jeers03.wav",
@@ -284,14 +273,14 @@ static const String:BunnyFail[][] = {
     "vo/demoman_jeers08.wav"
 };
 
-static const String:BunnyKill[][] = {
+static const char BunnyKill[][] = {
     "vo/demoman_gibberish09.wav",
     "vo/demoman_cheers02.wav",
     "vo/demoman_cheers07.wav",
     "vo/demoman_positivevocalization03.wav"
 };
 
-static const String:BunnySpree[][] = {
+static const char BunnySpree[][] = {
     "vo/demoman_gibberish05.wav",
     "vo/demoman_gibberish06.wav",
     "vo/demoman_gibberish09.wav",
@@ -300,24 +289,24 @@ static const String:BunnySpree[][] = {
     "vo/demoman_autodejectedtie01.wav"
 };
 
-static const String:BunnyLast[][] = {
+static const char BunnyLast[][] = {
     "vo/taunts/demoman_taunts05.wav",
     "vo/taunts/demoman_taunts04.wav",
     "vo/demoman_specialcompleted07.wav"
 };
 
-static const String:BunnyPain[][] = {
+static const char BunnyPain[][] = {
     "vo/demoman_sf12_badmagic01.wav",
     "vo/demoman_sf12_badmagic07.wav",
     "vo/demoman_sf12_badmagic10.wav"
 };
 
-static const String:BunnyStart[][] = {
+static const char BunnyStart[][] = {
     "vo/demoman_gibberish03.wav",
     "vo/demoman_gibberish11.wav"
 };
 
-static const String:BunnyRandomVoice[][] = {
+static const char BunnyRandomVoice[][] = {
     "vo/demoman_positivevocalization03.wav",
     "vo/demoman_jeers08.wav",
     "vo/demoman_gibberish03.wav",
@@ -340,24 +329,14 @@ static const String:BunnyRandomVoice[][] = {
 #define SOUNDEXCEPT_MUSIC 0
 #define SOUNDEXCEPT_VOICE 1
 #if defined _steamtools_included
-new bool:steamtools = false;
+bool steamtools = false;
 #endif
-new OtherTeam = 2;
-new HaleTeam = 3;
-new VSHRoundState = VSHRState_Disabled;
-new playing;
-new healthcheckused;
-new RedAlivePlayers;
-new RoundCount;
-new Special;
-new Incoming;
-
-static bool:g_bReloadVSHOnRoundEnd = false;
-
-new Damage[TF_MAX_PLAYERS];
-new AirDamage[TF_MAX_PLAYERS]; // Air Strike
-new curHelp[TF_MAX_PLAYERS];
-new uberTarget[TF_MAX_PLAYERS];
+TFTeam OtherTeam = TFTeam_Red, HaleTeam = TFTeam_Blue;
+VSHRState VSHRoundState = VSHRState_Disabled;
+VSHSpecial Special;
+int playing, healthcheckused, RedAlivePlayers, RoundCount, Incoming;
+static bool g_bReloadVSHOnRoundEnd = false;
+int Damage[TF_MAX_PLAYERS], AirDamage[TF_MAX_PLAYERS], ourHelp[TF_MAX_PLAYERS], uberTarget[TF_MAX_PLAYERS];
 #define VSHFLAG_HELPED          (1 << 0)
 #define VSHFLAG_UBERREADY       (1 << 1)
 #define VSHFLAG_NEEDSTODUCK (1 << 2)
