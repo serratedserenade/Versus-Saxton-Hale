@@ -372,8 +372,8 @@ new HaleHealthLast;
 new HaleCharge = 0;
 new HaleRage;
 new NextHale;
-new Float:Stabbed;
-new Float:Marketed;
+new Float:g_flStabbed;
+new Float:g_flMarketed;
 new Float:HPTime;
 new Float:KSpreeTimer;
 new Float:WeighDownTimer;
@@ -1717,8 +1717,8 @@ public Action:event_round_start(Handle:event, const String:name[], bool:dontBroa
     CreateTimer(9.6, MessageTimer, true, TIMER_FLAG_NO_MAPCHANGE);
     bNoTaunt = false;
     HaleRage = 0;
-    Stabbed = 0.0;
-    Marketed = 0.0;
+    g_flStabbed = 0.0;
+    g_flMarketed = 0.0;
     HHHClimbCount = 0;
     PointReady = false;
     new ent = -1;
@@ -5355,7 +5355,7 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                             //     TF2_RemoveCondition(attacker, TFCond_BlastJumping);   // Prevent HHH from being market gardened more than once in midair during a teleport
                             // }
 
-                            damage = (Pow(float(HaleHealthMax), (0.74074)) + 512.0 - (Marketed/128*float(HaleHealthMax)) )/3.0;    //divide by 3 because this is basedamage and lolcrits (0.714286)) + 1024.0)
+                            damage = (Pow(float(HaleHealthMax), (0.74074)) + 512.0 - (g_flMarketed/128.0*float(HaleHealthMax)) )/3.0;    //divide by 3 because this is basedamage and lolcrits (0.714286)) + 1024.0)
                             damagetype |= DMG_CRIT;
 
                             if (RemoveCond(attacker, TFCond_Parachute))   // If you parachuted to do this, remove your parachute.
@@ -5363,9 +5363,9 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                                 damage *= 0.67;                       //  And nerf your damage
                             }
 
-                            if (Marketed < 5)
+                            if (g_flMarketed < 5.0)
                             {
-                                Marketed++;
+                                g_flMarketed++;
                             }
 
                             PriorityCenterText(attacker, true, "You market gardened him!");
@@ -5489,7 +5489,7 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                      Weaker against high HP Hale (but still good).
 
                     */
-                    new Float:changedamage = ( (Pow(float(HaleHealthMax)*0.0014, 2.0) + 899.0) - (float(HaleHealthMax)*(Stabbed/100)) );
+                    new Float:changedamage = ( (Pow(float(HaleHealthMax)*0.0014, 2.0) + 899.0) - (float(HaleHealthMax)*(g_flStabbed/100.0)) );
                     //new iChangeDamage = RoundFloat(changedamage);
 
                     damage = changedamage/3;            // You can level "damage dealt" with backstabs
@@ -5573,8 +5573,8 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                             EmitSoundToAllExcept(SOUNDEXCEPT_VOICE, s, _, SNDCHAN_ITEM, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, Hale, NULL_VECTOR, NULL_VECTOR, false, 0.0);
                         }
                     }
-                    if (Stabbed < 4)
-                        Stabbed++;
+                    if (g_flStabbed < 4.0)
+                        g_flStabbed++;
                     /*new healers[TF_MAX_PLAYERS]; // Medic assist unnecessary due to being handled in player_hurt now.
                     new healercount = 0;
                     for (new i = 1; i <= MaxClients; i++)
@@ -7650,8 +7650,94 @@ stock FindPlayerBack(client, indices[], len = sizeof(indices))
     return -1;
 }
 
+enum _:m_flNext
+{
+    m_flNextUnusedFeature = 0
+}
+
+enum _:m_flNext2
+{
+    m_flNextEndPriority = 0
+}
+
+static Float:g_flNext[m_flNext];
+static Float:g_flNext2[m_flNext][TF_MAX_PLAYERS];
+
+stock bool:IsNextTime(iIndex, Float:flAdditional = 0.0)
+{
+    return (GetEngineTime() >= g_flNext[iIndex]+flAdditional);
+}
+
+stock IncNextTime(iIndex, Float:flSeconds)
+{
+    g_flNext[iIndex] = GetEngineTime() + flSeconds;
+}
+
+stock SetNextTime(iIndex, Float:flTime)
+{
+    g_flNext[iIndex] = flTime;
+}
+
+stock GetNextTime(iIndex)
+{
+    return g_flNext[iIndex];
+}
+
+stock Float:GetTimeTilNextTime(iIndex, bool:bNonNegative = true)
+{
+    return bNonNegative ? fmax(g_flNext[iIndex] - GetEngineTime(), 0.0) : (g_flNext[iIndex] - GetEngineTime());
+}
+
 /*
-    PriorityCenterText (Version 0x04)
+    If next time occurs, we also add time on for when it is next allowed.
+*/
+stock bool:IfDoNextTime(iIndex, Float:flThenAdd)
+{
+    if (IsNextTime(iIndex))
+    {
+        IncNextTime(iIndex, flThenAdd);
+        return true;
+    }
+    return false;
+}
+
+// Start of plural NextTime versions
+
+stock bool:IsNextTime2(iClient, iIndex, Float:flAdditional = 0.0)
+{
+    return (GetEngineTime() >= g_flNext2[iIndex][iClient]+flAdditional);
+}
+
+stock IncNextTime2(iClient, iIndex, Float:flSeconds)
+{
+    g_flNext2[iIndex][iClient] = GetEngineTime() + flSeconds;
+}
+
+stock SetNextTime2(iClient, iIndex, Float:flTime)
+{
+    g_flNext2[iIndex][iClient] = flTime;
+}
+
+stock GetNextTime2(iClient, iIndex)
+{
+    return g_flNext2[iIndex][iClient];
+}
+
+/*
+    If next time occurs, we also add time on for when it is next allowed.
+*/
+stock bool:IfDoNextTime2(iClient, iIndex, Float:flThenAdd)
+{
+    if (IsNextTime2(iClient, iIndex))
+    {
+        IncNextTime2(iClient, iIndex, flThenAdd);
+        return true;
+    }
+    return false;
+}
+
+/*
+    PriorityCenterText (Version 0x05)
 
     Only one message can be shown in center text at a time.
     These stocks allow that space to be given different priority levels that prevent new messages from overwriting what's there.
@@ -7660,7 +7746,7 @@ stock FindPlayerBack(client, indices[], len = sizeof(indices))
 
 */
 static s_iLastPriority[TF_MAX_PLAYERS] = {MIN_INT,...};
-static Handle:s_hPCTTimer[TF_MAX_PLAYERS] = {INVALID_HANDLE,...};
+//static Handle:s_hPCTTimer[TF_MAX_PLAYERS] = {INVALID_HANDLE,...};
 
 /*
     An example of how to use this:
@@ -7679,14 +7765,19 @@ stock PriorityCenterText(iClient, iPriority = MIN_INT, const String:szFormat[], 
 
     if (s_iLastPriority[iClient] > iPriority)
     {
-        return;
+        if (IsNextTime2(iClient, m_flNextEndPriority))
+        {
+            s_iLastPriority[iClient] = MIN_INT;
+        }
+        else
+        {
+            return;
+        }
     }
 
     if (iPriority > s_iLastPriority[iClient])
     {
-        ClearTimer(s_hPCTTimer[iClient]);
-        s_hPCTTimer[iClient] = CreateTimer(5.0, RevertPriorityCenterText, iClient);
-
+        IncNextTime2(iClient, m_flNextEndPriority, 5.0);
         s_iLastPriority[iClient] = iPriority;
     }
 
@@ -7732,17 +7823,28 @@ stock PriorityCenterTextAllEx(iPriority = -2147483647, const String:szFormat[], 
 
     if (s_iLastPriority[0] > iPriority)
     {
-        return;
+        if (IsNextTime2(0, m_flNextEndPriority))
+        {
+            s_iLastPriority[0] = MIN_INT;
+
+            for (new i = 1; i <= MaxClients; i++)
+            {
+                s_iLastPriority[i] = MIN_INT;
+            }
+        }
+        else
+        {
+            return;
+        }
     }
 
     if (iPriority > s_iLastPriority[0])
     {
-        ClearTimer(s_hPCTTimer[0]);
-        s_hPCTTimer[0] = CreateTimer(5.0, RevertPriorityCenterText, -1);
+        IncNextTime2(0, m_flNextEndPriority, 5.0);
 
         s_iLastPriority[0] = iPriority;
 
-        for (new i = 1; i <= MaxClients; i++) // Our loop includes [0] (console)
+        for (new i = 1; i <= MaxClients; i++)
         {
             s_iLastPriority[i] = MAX_INT;
         }
@@ -7758,23 +7860,6 @@ stock PriorityCenterTextAllEx(iPriority = -2147483647, const String:szFormat[], 
             VFormat(szBuffer, sizeof(szBuffer), szFormat, 3);
             PrintCenterText(i, "%s", szBuffer);
         }
-    }
-}
-
-public Action:RevertPriorityCenterText(Handle:hTimer, any:Client)
-{
-    if (Client == -1) // "All"
-    {
-        for (new i = 0; i <= MaxClients; i++)
-        {
-            s_iLastPriority[i] = MIN_INT;
-        }
-        s_hPCTTimer[0] = INVALID_HANDLE;
-    }
-    else
-    {
-        s_iLastPriority[Client] = MIN_INT;
-        s_hPCTTimer[Client] = INVALID_HANDLE;
     }
 }
 
