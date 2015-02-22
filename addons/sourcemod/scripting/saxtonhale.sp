@@ -1545,8 +1545,8 @@ public Action event_round_start(Event event, const char[] name, bool dontBroadca
         SetVariantInt(view_as<int>(OtherTeam));
         AcceptEntityInput(ent, "SetTeam");
         AcceptEntityInput(ent, "skin");
-        int skin = view_as<int>(OtherTeam) - 2;
-        SetEntProp(ent, Prop_Send, "m_nSkin", view_as<any>(skin));
+        int skin = view_as<int>(OtherTeam);
+        SetEntProp(ent, Prop_Send, "m_nSkin", skin-2);
     }
     ent = -1;
     while ((ent = FindEntityByClassname2(ent, "mapobj_cart_dispenser")) != -1)
@@ -1578,13 +1578,12 @@ bool FixUnbalancedTeams()
 
 void SearchForItemPacks()
 {
-    new bool:foundAmmo = false, bool:foundHealth = false;
-    new ent = -1;
-    decl Float:pos[3];
+    bool foundAmmo = false, foundHealth = false;
+    int ent = -1;
+    float pos[3];
     while ((ent = FindEntityByClassname2(ent, "item_ammopack_full")) != -1)
     {
-        SetEntProp(ent, Prop_Send, "m_iTeamNum", g_bEnabled?OtherTeam:0, 4);
-
+        SetEntProp(ent, Prop_Send, "m_iTeamNum", g_bEnabled?view_as<int>(OtherTeam):0, 4);
         if (g_bEnabled)
         {
             GetEntPropVector(ent, Prop_Send, "m_vecOrigin", pos);
@@ -1592,16 +1591,14 @@ void SearchForItemPacks()
             new ent2 = CreateEntityByName("item_ammopack_small");
             TeleportEntity(ent2, pos, NULL_VECTOR, NULL_VECTOR);
             DispatchSpawn(ent2);
-            SetEntProp(ent2, Prop_Send, "m_iTeamNum", g_bEnabled?OtherTeam:0, 4);
+            SetEntProp(ent2, Prop_Send, "m_iTeamNum", g_bEnabled?view_as<int>(OtherTeam):0, 4);
             foundAmmo = true;
         }
-
     }
     ent = -1;
     while ((ent = FindEntityByClassname2(ent, "item_ammopack_medium")) != -1)
     {
-        SetEntProp(ent, Prop_Send, "m_iTeamNum", g_bEnabled?OtherTeam:0, 4);
-
+        SetEntProp(ent, Prop_Send, "m_iTeamNum", g_bEnabled?view_as<int>(OtherTeam):0, 4);
         if (g_bEnabled)
         {
             GetEntPropVector(ent, Prop_Send, "m_vecOrigin", pos);
@@ -1609,37 +1606,38 @@ void SearchForItemPacks()
             new ent2 = CreateEntityByName("item_ammopack_small");
             TeleportEntity(ent2, pos, NULL_VECTOR, NULL_VECTOR);
             DispatchSpawn(ent2);
-            SetEntProp(ent2, Prop_Send, "m_iTeamNum", g_bEnabled?OtherTeam:0, 4);
+            SetEntProp(ent2, Prop_Send, "m_iTeamNum", g_bEnabled?view_as<int>(OtherTeam):0, 4);
         }
-
         foundAmmo = true;
     }
     ent = -1;
     while ((ent = FindEntityByClassname2(ent, "Item_ammopack_small")) != -1)
     {
-        SetEntProp(ent, Prop_Send, "m_iTeamNum", g_bEnabled?OtherTeam:0, 4);
+        SetEntProp(ent, Prop_Send, "m_iTeamNum", g_bEnabled?view_as<int>(OtherTeam):0, 4);
         foundAmmo = true;
     }
     ent = -1;
     while ((ent = FindEntityByClassname2(ent, "item_healthkit_small")) != -1)
     {
-        SetEntProp(ent, Prop_Send, "m_iTeamNum", g_bEnabled?OtherTeam:0, 4);
+        SetEntProp(ent, Prop_Send, "m_iTeamNum", g_bEnabled?view_as<int>(OtherTeam):0, 4);
         foundHealth = true;
     }
     ent = -1;
     while ((ent = FindEntityByClassname2(ent, "item_healthkit_medium")) != -1)
     {
-        SetEntProp(ent, Prop_Send, "m_iTeamNum", g_bEnabled?OtherTeam:0, 4);
+        SetEntProp(ent, Prop_Send, "m_iTeamNum", g_bEnabled?view_as<int>(OtherTeam):0, 4);
         foundHealth = true;
     }
     ent = -1;
     while ((ent = FindEntityByClassname2(ent, "item_healthkit_large")) != -1)
     {
-        SetEntProp(ent, Prop_Send, "m_iTeamNum", g_bEnabled?OtherTeam:0, 4);
+        SetEntProp(ent, Prop_Send, "m_iTeamNum", g_bEnabled?view_as<int>(OtherTeam):0, 4);
         foundHealth = true;
     }
-    if (!foundAmmo) SpawnRandomAmmo();
-    if (!foundHealth) SpawnRandomHealth();
+    if (!foundAmmo)
+        SpawnRandomAmmo();
+    if (!foundHealth)
+        SpawnRandomHealth();
 }
 
 SpawnRandomAmmo()
