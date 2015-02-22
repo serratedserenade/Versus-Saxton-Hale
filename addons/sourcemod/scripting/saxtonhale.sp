@@ -2194,7 +2194,7 @@ bool CheckSoundException(int client, int excepttype)
 
 void SetClientSoundOptions(int client, int excepttype, bool on)
 {
-    if (!IsValidClient(client)
+    if (!IsValidClient(client))
         return;
     if (IsFakeClient(client))
         return;
@@ -2223,7 +2223,7 @@ public Action StartRound(Handle hTimer)
     VSHRoundState = VSHRState_Active;
     if (IsValidClient(Hale))
     {
-        if (!IsPlayerAlive(Hale) && view_as<TFTeam>(GetEntityTeamNum(Hale)) != TFTeam_Spectator && view_as<TFTeam>(GetEntityTeamNum(Hale)) != TFTeam_Unassigned)
+        if (!IsPlayerAlive(Hale) && GetEntityTeamNum(Hale) != view_as<int>(TFTeam_Spectator) && GetEntityTeamNum(Hale) != view_as<int>(TFTeam_Unassigned))
             TF2_RespawnPlayer(Hale);
         ChangeTeam(Hale, view_as<int>(HaleTeam));
         if (GetEntityTeamNum(Hale) == view_as<int>(HaleTeam))
