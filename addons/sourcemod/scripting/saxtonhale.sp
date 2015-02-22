@@ -1439,8 +1439,7 @@ public Action event_round_start(Event event, const char[] name, bool dontBroadca
     }
     if (bBluHale)
     {
-        new score1 = GetTeamScore(view_as<int>(OtherTeam));
-        new score2 = GetTeamScore(view_as<int>(HaleTeam));
+        int score1 = GetTeamScore(view_as<int>(OtherTeam)), score2 = GetTeamScore(view_as<int>(HaleTeam));
         SetTeamScore(view_as<int>(TFTeam_Red), score1);
         SetTeamScore(view_as<int>(TFTeam_Blue), score2);
         OtherTeam = TFTeam_Red;
@@ -1449,8 +1448,7 @@ public Action event_round_start(Event event, const char[] name, bool dontBroadca
     }
     else
     {
-        new score1 = GetTeamScore(view_as<int>(OtherTeam));
-        new score2 = GetTeamScore(view_as<int>(HaleTeam));
+        int score1 = GetTeamScore(view_as<int>(OtherTeam)), score2 = GetTeamScore(view_as<int>(HaleTeam));
         SetTeamScore(view_as<int>(TFTeam_Red), score2);
         SetTeamScore(view_as<int>(TFTeam_Blue), score1);
         HaleTeam = TFTeam_Red;
