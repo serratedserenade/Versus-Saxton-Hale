@@ -2006,7 +2006,7 @@ public Action StartHaleTimer(Handle hTimer)
     CreateTimer(0.2, HaleTimer, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
     CreateTimer(0.2, StartRound);
     CreateTimer(0.2, ClientTimer, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
-    if (!PointType && playing > cvarAliveToEnable.IntValue
+    if (!PointType && playing > cvarAliveToEnable.IntValue)
         SetControlPoint(false);
     if (VSHRoundState == VSHRState_Waiting)
         CreateTimer(2.0, Timer_MusicPlay, _, TIMER_FLAG_NO_MAPCHANGE);
@@ -2159,7 +2159,7 @@ void EmitSoundToAllExcept(int exceptiontype = SOUNDEXCEPT_MUSIC, const char[] sa
                  bool updatePos = true,
                  float soundtime = 0.0)
 {
-    int clients[MaxClients], total = 0;
+    int clients = new int[MaxClients], total = 0;
     for (int i = 1; i <= MaxClients; i++)
     {
         if (IsClientInGame(i) && CheckSoundException(i, exceptiontype))
@@ -2191,40 +2191,44 @@ bool CheckSoundException(int client, int excepttype)
         return view_as<bool>(StringToInt(strCookie));
 }
 
-void SetClientSoundOptions(client, excepttype, bool:on)
+void SetClientSoundOptions(int client, int excepttype, bool on)
 {
-    if (!IsValidClient(client)) return;
-    if (IsFakeClient(client)) return;
-    if (!AreClientCookiesCached(client)) return;
-    new String:strCookie[32];
-    if (on) strCookie = "1";
-    else strCookie = "0";
-    if (excepttype == SOUNDEXCEPT_VOICE) SetClientCookie(client, VoiceCookie, strCookie);
-    else SetClientCookie(client, MusicCookie, strCookie);
+    if (!IsValidClient(client)
+        return;
+    if (IsFakeClient(client))
+        return;
+    if (!AreClientCookiesCached(client))
+        return;
+    char strCookie[32];
+    if (on)
+        strCookie = "1";
+    else
+        strCookie = "0";
+    if (excepttype == SOUNDEXCEPT_VOICE)
+        SetClientCookie(client, VoiceCookie, strCookie);
+    else
+        SetClientCookie(client, MusicCookie, strCookie);
 }
-public Action:GottamTimer(Handle:hTimer)
+
+public Action GottamTimer(Handle hTimer)
 {
-    for (new i = 1; i <= MaxClients; i++)
+    for (int i = 1; i <= MaxClients; i++)
         if (IsClientInGame(i) && IsPlayerAlive(i))
             SetEntityMoveType(i, MOVETYPE_WALK);
 }
-public Action:StartRound(Handle:hTimer)
+
+public Action StartRound(Handle hTimer)
 {
     VSHRoundState = VSHRState_Active;
     if (IsValidClient(Hale))
     {
-        if (!IsPlayerAlive(Hale) && TFTeam:GetEntityTeamNum(Hale) != TFTeam_Spectator && TFTeam:GetEntityTeamNum(Hale) != TFTeam_Unassigned)
-        {
+        if (!IsPlayerAlive(Hale) && view_as<TFTeam>(GetEntityTeamNum(Hale)) != TFTeam_Spectator && view_as<TFTeam>(GetEntityTeamNum(Hale)) != TFTeam_Unassigned)
             TF2_RespawnPlayer(Hale);
-        }
-        ChangeTeam(Hale, HaleTeam);
-        if (GetEntityTeamNum(Hale) == HaleTeam)
+        ChangeTeam(Hale, view_as<int>(HaleTeam));
+        if (GetEntityTeamNum(Hale) == view_as<int>(HaleTeam))
         {
-            new bool:pri = IsValidEntity(GetPlayerWeaponSlot(Hale, TFWeaponSlot_Primary));
-            new bool:sec = IsValidEntity(GetPlayerWeaponSlot(Hale, TFWeaponSlot_Secondary));
-            new bool:mel = IsValidEntity(GetPlayerWeaponSlot(Hale, TFWeaponSlot_Melee));
+            bool pri = IsValidEntity(GetPlayerWeaponSlot(Hale, TFWeaponSlot_Primary)), sec = IsValidEntity(GetPlayerWeaponSlot(Hale, TFWeaponSlot_Secondary)), mel = IsValidEntity(GetPlayerWeaponSlot(Hale, TFWeaponSlot_Melee));
             TF2_RemovePlayerDisguise(Hale);
-
             if (pri || sec || !mel)
                 CreateTimer(0.05, Timer_ReEquipSaxton, _, TIMER_FLAG_NO_MAPCHANGE);
             //EquipSaxton(Hale);
@@ -2233,28 +2237,29 @@ public Action:StartRound(Handle:hTimer)
     CreateTimer(10.0, Timer_SkipHalePanel);
     return Plugin_Continue;
 }
-public Action:Timer_ReEquipSaxton(Handle:timer)
+
+public Action Timer_ReEquipSaxton(Handle timer)
 {
     if (IsValidClient(Hale))
-    {
         EquipSaxton(Hale);
-    }
 }
-public Action:Timer_SkipHalePanel(Handle:hTimer)
+
+public Action Timer_SkipHalePanel(Handle hTimer)
 {
-    new bool:added[TF_MAX_PLAYERS];
-    new i, j;
-    new client = Hale;
+    bool added[TF_MAX_PLAYERS];
+    int i, j, client = Hale;
     do
     {
         client = FindNextHale(added);
-        if (client >= 0) added[client] = true;
+        if (client >= 0)
+            added[client] = true;
         if (IsValidClient(client) && client != Hale)
         {
             if (!IsFakeClient(client))
             {
                 CPrintToChat(client, "{olive}[VSH]{default} %t", "vsh_to0_near");
-                if (i == 0) SkipHalePanelNotify(client);
+                if (i == 0)
+                    SkipHalePanelNotify(client);
             }
             i++;
         }
@@ -2263,56 +2268,47 @@ public Action:Timer_SkipHalePanel(Handle:hTimer)
     while (i < 3 && j < TF_MAX_PLAYERS);
 }
 
-SkipHalePanelNotify(client) // , bool:newchoice = true
+void SkipHalePanelNotify(int client) // , bool:newchoice = true
 {
     if (!g_bEnabled || !IsValidClient(client) || IsVoteInProgress())
-    {
         return;
-    }
-
-    new Action:result = Plugin_Continue;
+    Action result = Plugin_Continue;
     Call_StartForward(OnHaleNext);
     Call_PushCell(client);
-    Call_Finish(_:result);
-
+    Call_Finish(result);
     switch(result)
     {
         case Plugin_Stop, Plugin_Handled:
             return;
     }
-
-    new Handle:panel = CreatePanel();
-    decl String:s[256];
-
-    SetPanelTitle(panel, "[VSH] You're Hale next!");
+    Panel panel = new Panel();
+    char s[256];
+    panel.SetTitle("[VSH] You're Hale next!");
     Format(s, sizeof(s), "%t\nAlternatively, use !resetq.", "vsh_to0_near");
     CRemoveTags(s, sizeof(s));
-
     ReplaceString(s, sizeof(s), "{olive}", "");
     ReplaceString(s, sizeof(s), "{default}", "");
-
-    DrawPanelItem(panel, s);
-    SendPanelToClient(panel, client, SkipHalePanelH, 30);
-    CloseHandle(panel);
-
+    panel.DrawItem(s);
+    panel.Send(client, SkipHalePanelH, 30);
+    delete panel;
     return;
 }
 
-public SkipHalePanelH(Handle:menu, MenuAction:action, param1, param2)
+public int SkipHalePanelH(Menu menu, MenuAction action, int param1, int param2)
 {
-    return;
+    return 0;
 }
-public Action:EnableSG(Handle:hTimer, any:iid)
+
+public Action EnableSG(Handle hTimer, any iid)
 {
-    new i = EntRefToEntIndex(iid);
+    int i = EntRefToEntIndex(iid);
     if (VSHRoundState == VSHRState_Active && IsValidEdict(i) && i > MaxClients)
     {
-        decl String:s[64];
+        char s[64];
         GetEdictClassname(i, s, 64);
         if (StrEqual(s, "obj_sentrygun"))
         {
             SetEntProp(i, Prop_Send, "m_bDisabled", 0);
-
             // We destroy this manually now
             /*for (new ent = MaxClients + 1; ent < MAX_ENTITIES; ent++)
             {
@@ -2341,13 +2337,13 @@ public Action:EnableSG(Handle:hTimer, any:iid)
 //     return Plugin_Continue;
 // }
 
-public Action:MessageTimer(Handle:hTimer, any:allclients)
+public Action MessageTimer(Handle hTimer, any allclients)
 {
     if (!IsValidClient(Hale)) // || ((client != 9001) && !IsValidClient(client))
         return Plugin_Continue;
     if (checkdoors)
     {
-        new ent = -1;
+        int ent = -1;
         while ((ent = FindEntityByClassname2(ent, "func_door")) != -1)
         {
             AcceptEntityInput(ent, "Open");
@@ -2356,7 +2352,7 @@ public Action:MessageTimer(Handle:hTimer, any:allclients)
         if (doorchecktimer == INVALID_HANDLE)
             doorchecktimer = CreateTimer(5.0, Timer_CheckDoors, _, TIMER_FLAG_NO_MAPCHANGE|TIMER_REPEAT);
     }
-    decl String:translation[32];
+    char translation[32];
     switch (Special)
     {
         case VSHSpecial_Bunny: strcopy(translation, sizeof(translation), "vsh_start_bunny");
@@ -2374,7 +2370,7 @@ public Action:MessageTimer(Handle:hTimer, any:allclients)
     }
     else
     {
-        for (new i = 1; i <= MaxClients; i++)
+        for (int i = 1; i <= MaxClients; i++)
         {
             if (IsClientInGame(i)) //&& !(GetClientButtons(i) & IN_SCORE)        //try without the scoreboard button check
                 ShowSyncHudText(i, infoHUD, "%T", translation, i, Hale, HaleHealthMax);
@@ -2383,19 +2379,15 @@ public Action:MessageTimer(Handle:hTimer, any:allclients)
     return Plugin_Continue;
 }
 
-public Action:MakeModelTimer(Handle:hTimer)
+public Action MakeModelTimer(Handle hTimer)
 {
     if (!IsValidClient(Hale) || !IsPlayerAlive(Hale) || VSHRoundState == VSHRState_End)
-    {
         return Plugin_Stop;
-    }
-    new body = 0;
+    int body = 0;
     switch (Special)
     {
         case VSHSpecial_Bunny:
-        {
             SetVariantString(BunnyModel);
-        }
         case VSHSpecial_Vagineer:
         {
             SetVariantString(VagineerModel);
@@ -2410,7 +2402,8 @@ public Action:MakeModelTimer(Handle:hTimer)
             SetVariantString(HaleModel);
 //          decl String:steamid[32];
 //          GetClientAuthString(Hale, steamid, sizeof(steamid));
-            if (GetUserFlagBits(Hale) & ADMFLAG_CUSTOM1) body = (1 << 0)|(1 << 1);
+            if (GetUserFlagBits(Hale) & ADMFLAG_CUSTOM1)
+                body = (1 << 0)|(1 << 1);
         }
     }
 //  DispatchKeyValue(Hale, "targetname", "hale");
@@ -2419,10 +2412,11 @@ public Action:MakeModelTimer(Handle:hTimer)
     SetEntProp(Hale, Prop_Send, "m_nBody", body);
     return Plugin_Continue;
 }
-EquipSaxton(client)
+
+void EquipSaxton(int client)
 {
     bEnableSuperDuperJump = false;
-    new SaxtonWeapon;
+    int SaxtonWeapon;
     TF2_RemoveAllWeapons(client);
     HaleCharge = 0;
     switch (Special)
@@ -2456,20 +2450,18 @@ EquipSaxton(client)
         }
         default:
         {
-            decl String:attribs[64];
+            char attribs[64];
             Format(attribs, sizeof(attribs), "68 ; 2.0 ; 2 ; 3.1 ; 259 ; 1.0 ; 252 ; 0.6 ; 214 ; %d", GetRandomInt(9999, 99999));
             SaxtonWeapon = SpawnWeapon(client, "tf_weapon_shovel", 5, 100, 4, attribs);
             SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", SaxtonWeapon);
         }
     }
 }
-public Action:MakeHale(Handle:hTimer)
+
+public Action MakeHale(Handle hTimer)
 {
     if (!IsValidClient(Hale))
-    {
         return Plugin_Continue;
-    }
-
     switch (Special)
     {
         case VSHSpecial_Hale:
@@ -2482,28 +2474,28 @@ public Action:MakeHale(Handle:hTimer)
             TF2_SetPlayerClass(Hale, TFClass_Sniper, _, false);
     }
     TF2_RemovePlayerDisguise(Hale);
-
-    ChangeTeam(Hale, HaleTeam);
-
+    ChangeTeam(Hale, view_as<int>(HaleTeam));
     if (VSHRoundState < VSHRState_Waiting)
         return Plugin_Continue;
     if (!IsPlayerAlive(Hale))
     {
-        if (VSHRoundState == VSHRState_Waiting) TF2_RespawnPlayer(Hale);
-        else return Plugin_Continue;
+        if (VSHRoundState == VSHRState_Waiting)
+            TF2_RespawnPlayer(Hale);
+        else
+            return Plugin_Continue;
     }
-    new iFlags = GetCommandFlags("r_screenoverlay");
+    int iFlags = GetCommandFlags("r_screenoverlay");
     SetCommandFlags("r_screenoverlay", iFlags & ~FCVAR_CHEAT);
     ClientCommand(Hale, "r_screenoverlay \"\"");
     SetCommandFlags("r_screenoverlay", iFlags);
     CreateTimer(0.2, MakeModelTimer, _);
     CreateTimer(20.0, MakeModelTimer, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
-    new ent = -1;
+    int ent = -1;
     while ((ent = FindEntityByClassname2(ent, "tf_wearable")) != -1)
     {
         if (GetEntPropEnt(ent, Prop_Send, "m_hOwnerEntity") == Hale)
         {
-            new index = GetEntProp(ent, Prop_Send, "m_iItemDefinitionIndex");
+            int index = GetEntProp(ent, Prop_Send, "m_iItemDefinitionIndex");
             switch (index)
             {
                 case 438, 463, 167, 477, 493, 233, 234, 241, 280, 281, 282, 283, 284, 286, 288, 362, 364, 365, 536, 542, 577, 599, 673, 729, 791, 839, 1015, 5607: {}
@@ -2516,7 +2508,7 @@ public Action:MakeHale(Handle:hTimer)
     {
         if (GetEntPropEnt(ent, Prop_Send, "m_hOwnerEntity") == Hale)
         {
-            new index = GetEntProp(ent, Prop_Send, "m_iItemDefinitionIndex");
+            int index = GetEntProp(ent, Prop_Send, "m_iItemDefinitionIndex");
             switch (index)
             {
                 case 438, 463, 167, 477, 493, 233, 234, 241, 280, 281, 282, 283, 284, 286, 288, 362, 364, 365, 536, 542, 577, 599, 673, 729, 791, 839, 1015, 5607: {}
@@ -2534,14 +2526,11 @@ public Action:MakeHale(Handle:hTimer)
         }
     }
     EquipSaxton(Hale);
-
     if (VSHRoundState >= VSHRState_Waiting && GetClientClasshelpinfoCookie(Hale))
-    {
         HintPanel(Hale);
-    }
-
     return Plugin_Continue;
 }
+
 public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefinitionIndex, &Handle:hItem)
 {
 //    if (!g_bEnabled) return Plugin_Continue; // This messes up the first round sometimes
