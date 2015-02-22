@@ -531,7 +531,7 @@ public Plugin myinfo = {
     url = "https://forums.alliedmods.net/showthread.php?p=2167912",
 };
 
-public APLRes AskPluginLoad2(Handle myself, bool late, char error[], int err_max)
+public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
     MarkNativeAsOptional("GetUserMessageType");
     MarkNativeAsOptional("PbSetInt");
