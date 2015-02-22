@@ -337,9 +337,8 @@ bool steamtools = false;
 TFTeam OtherTeam = TFTeam_Red, HaleTeam = TFTeam_Blue;
 VSHRState VSHRoundState = VSHRState_Disabled;
 VSHSpecial Special;
-int playing, healthcheckused, RedAlivePlayers, RoundCount, Incoming;
+int playing, healthcheckused, RedAlivePlayers, RoundCount, Incoming, Damage[TF_MAX_PLAYERS], AirDamage[TF_MAX_PLAYERS], ourHelp[TF_MAX_PLAYERS], uberTarget[TF_MAX_PLAYERS];
 static bool g_bReloadVSHOnRoundEnd = false;
-int Damage[TF_MAX_PLAYERS], AirDamage[TF_MAX_PLAYERS], ourHelp[TF_MAX_PLAYERS], uberTarget[TF_MAX_PLAYERS];
 #define VSHFLAG_HELPED          (1 << 0)
 #define VSHFLAG_UBERREADY       (1 << 1)
 #define VSHFLAG_NEEDSTODUCK (1 << 2)
@@ -347,46 +346,20 @@ int Damage[TF_MAX_PLAYERS], AirDamage[TF_MAX_PLAYERS], ourHelp[TF_MAX_PLAYERS], 
 #define VSHFLAG_CLASSHELPED (1 << 4)
 #define VSHFLAG_HASONGIVED  (1 << 5)
 int VSHFlags[TF_MAX_PLAYERS], Hale = -1, HaleHealthMax, HaleHealth, HaleHealthLast, HaleCharge = 0, HaleRage, NextHale, KSpreeCount = 1, HHHClimbCount;
-float g_flStabbed, g_flMarketed, HPTime, KSpreeTimer, WeighDownTimer, UberRageCount, GlowTimer;
-bool bEnableSuperDuperJump, bTenSecStart[2] = {false, false}, bSpawnTeleOnTriggerHurt = false, bNoTaunt = false;
-ConVar cvarVersion, cvarHaleSpeed, cvarPointDelay, cvarRageDMG, cvarRageDist, cvarAnnounce, cvarSpecials, cvarEnabled, cvarAliveToEnable, cvarPointType, cvarCrits, cvarRageSentry
+float g_flStabbed, g_flMarketed, HPTime, KSpreeTimer, WeighDownTimer, UberRageCount, GlowTimer, HaleSpeed = 340.0, RageDist = 800.0, Announce = 120.0, tf_scout_hype_pep_max;
+bool bEnableSuperDuperJump, bTenSecStart[2] = {false, false}, bSpawnTeleOnTriggerHurt = false, bNoTaunt = false, bool g_bEnabled = false, bool g_bAreEnoughPlayersPlaying = false;
+ConVar cvarVersion, cvarHaleSpeed, cvarPointDelay, cvarRageDMG, cvarRageDist, cvarAnnounce, cvarSpecials, cvarEnabled, cvarAliveToEnable, cvarPointType, cvarCrits, cvarRageSentry;
 ConVar cvarFirstRound, cvarDemoShieldCrits, cvarDisplayHaleHP, cvarEnableEurekaEffect, cvarForceHaleTeam;
-Handle PointCookie, MusicCookie, VoiceCookie, ClasshelpinfoCookie, doorchecktimer;
+Handle PointCookie, MusicCookie, VoiceCookie, ClasshelpinfoCookie, doorchecktimer, jumpHUD, rageHUD, healthHUD, infoHUD, MusicTimer;
 //new Handle:cvarCircuitStun;
 //new Handle:cvarForceSpecToHale;
-new Handle:jumpHUD;
-new Handle:rageHUD;
-new Handle:healthHUD;
-new Handle:infoHUD;
-new bool:g_bEnabled = false;
-new bool:g_bAreEnoughPlayersPlaying = false;
-new Float:HaleSpeed = 340.0;
-new PointDelay = 6;
-new RageDMG = 3500;
-new Float:RageDist = 800.0;
-new Float:Announce = 120.0;
-new bSpecials = true;
-new AliveToEnable = 5;
-new PointType = 0;
-new bool:haleCrits = false;
-new bool:bDemoShieldCrits = false;
-new bool:bAlwaysShowHealth = true;
-new bool:newRageSentry = true;
+int PointDelay = 6, RageDMG = 3500, bSpecials = true, AliveToEnable = 5, PointType = 0, TeamRoundCounter, botqueuepoints = 0, tf_arena_use_queue, mp_teams_unbalance_limit;
+int tf_arena_first_blood, mp_forcecamera, defaulttakedamagetype;
+bool haleCrits = false, bDemoShieldCrits = false, bAlwaysShowHealth = true, newRageSentry = true, checkdoors = false, PointReady;
 //new Float:circuitStun = 0.0;
-new Handle:MusicTimer;
-new TeamRoundCounter;
-new botqueuepoints = 0;
-new String:currentmap[99];
-new bool:checkdoors = false;
-new bool:PointReady;
-new tf_arena_use_queue;
-new mp_teams_unbalance_limit;
-new tf_arena_first_blood;
-new mp_forcecamera;
-new Float:tf_scout_hype_pep_max;
-new defaulttakedamagetype;
+char currentmap[99];
 
-static const String:haleversiontitles[][] =     //the last line of this is what determines the displayed plugin version
+static const char haleversiontitles[][] =     //the last line of this is what determines the displayed plugin version
 {
     "1.0",
     "1.1",
@@ -460,7 +433,7 @@ static const String:haleversiontitles[][] =     //the last line of this is what 
 	"1.52",
     PLUGIN_VERSION
 };
-static const String:haleversiondates[][] =
+static const char haleversiondates[][] =
 {
     "--",
     "--",
@@ -533,12 +506,8 @@ static const String:haleversiondates[][] =
     "29 Oct 2014", //  An update I never bothered to throw outdate
     "25 Dec 2014"  //  Merry Xmas
 };
-static const maxversion = (sizeof(haleversiontitles) - 1);
-new Handle:OnHaleJump;
-new Handle:OnHaleRage;
-new Handle:OnHaleWeighdown;
-new Handle:OnMusic;
-new Handle:OnHaleNext;
+static const int maxversion = (sizeof(haleversiontitles) - 1);
+Handle OnHaleJump, OnHaleRage, OnHaleWeighdown, OnMusic, OnHaleNext;
 
 //new Handle:hEquipWearable;
 //new Handle:hSetAmmoVelocity;
@@ -554,7 +523,7 @@ new Handle:OnGetDamage;
 new Handle:OnGetRoundState;*/
 
 //new bool:ACH_Enabled;
-public Plugin:myinfo = {
+public Plugin myinfo = {
     name = "Versus Saxton Hale",
     author = "Rainbolt Dash, FlaminSarge, Chdata, nergal, fiagram",
     description = "RUUUUNN!! COWAAAARRDSS!",
