@@ -767,17 +767,19 @@ public void OnPluginStart()
 
 public bool HaleTargetFilter(const char[] pattern, Handle clients)
 {
+    ArrayList clientsArray = view_as<ArrayList>(clients);
     bool non = StrContains(pattern, "!", false) != -1;
     for (int client = 1; client <= MaxClients; client++)
     {
-        if (IsClientInGame(client) && clients.FindValue(client) == -1)
+        if (IsClientInGame(client) && clientsArray.FindValue(client) == -1)
         {
             if (g_bEnabled && client == Hale && !non)
-                clients.Push(client);
+                clientsArray.Push(client);
             else if (non)
-                clients.Push(client);
+                clientsArray.Push(client);
         }
     }
+    clients = view_as<Handle>(clientsArray);
     return true;
 }
 
