@@ -1726,11 +1726,10 @@ public void CheckArena()
 
 public int numHaleKills = 0;    //See if the Hale was boosting his buddies or afk
 
-public Action:event_round_end(Handle:event, const String:name[], bool:dontBroadcast)
+public Action event_round_end(Event event, const char[] name, bool dontBroadcast)
 {
-    new String:s[265];
-    decl String:s2[265];
-    new bool:see = false;
+    char s[265], s2[265];
+    bool see = false;
     GetNextMap(s, 64);
     if (!strncmp(s, "Hale ", 5, false))
     {
@@ -1749,27 +1748,23 @@ public Action:event_round_end(Handle:event, const String:name[], bool:dontBroadc
     }
     if (see)
     {
-        new Handle:fileh = OpenFile("bNextMapToHale", "w");
-        WriteFileString(fileh, s2, false);
-        CloseHandle(fileh);
+        File fileh = OpenFile("bNextMapToHale", "w");
+        fileh.WriteString(s2, false);
+        delete fileh;
         SetNextMap(s2);
         CPrintToChatAll("{olive}[VSH]{default} %t", "vsh_nextmap", s2);
     }
     RoundCount++;
-
     if (g_bReloadVSHOnRoundEnd)
     {
         SetClientQueuePoints(Hale, 0);
         ServerCommand("sm plugins reload saxtonhale");
     }
-
     if (!g_bEnabled)
-    {
         return Plugin_Continue;
-    }
     VSHRoundState = VSHRState_End;
     TeamRoundCounter++;
-    if (GetEventInt(event, "team") == HaleTeam)
+    if (event.GetInt("team") == view_as<int>(HaleTeam))
     {
         switch (Special)
         {
@@ -1793,10 +1788,11 @@ public Action:event_round_end(Handle:event, const String:name[], bool:dontBroadc
             }
         }
     }
-    for (new i = 1 ; i <= MaxClients; i++)
+    for (int i = 1 ; i <= MaxClients; i++)
     {
         VSHFlags[i] &= ~VSHFLAG_HASONGIVED;
-        if (!IsClientInGame(i)) continue;
+        if (!IsClientInGame(i))
+            continue;
         StopHaleMusic(i);
     }
     ClearTimer(MusicTimer);
@@ -1806,7 +1802,7 @@ public Action:event_round_end(Handle:event, const String:name[], bool:dontBroadc
         GlowTimer = 0.0;
         if (IsPlayerAlive(Hale))
         {
-            decl String:translation[32];
+            char translation[32];
             switch (Special)
             {
                 case VSHSpecial_Bunny:      strcopy(translation, sizeof(translation), "vsh_bunny_is_alive");
@@ -1817,21 +1813,17 @@ public Action:event_round_end(Handle:event, const String:name[], bool:dontBroadc
             }
             CPrintToChatAll("{olive}[VSH]{default} %t", translation, Hale, HaleHealth, HaleHealthMax);
             SetHudTextParams(-1.0, 0.2, 10.0, 255, 255, 255, 255);
-            for (new i = 1; i <= MaxClients; i++)
+            for (int i = 1; i <= MaxClients; i++)
             {
                 if (IsClientInGame(i) && !(GetClientButtons(i) & IN_SCORE))
-                {
                     ShowHudText(i, -1, "%T", translation, i, Hale, HaleHealth, HaleHealthMax);
-                }
             }
         }
         else
-        {
-            ChangeTeam(Hale, HaleTeam);
-        }
-        new top[3];
+            ChangeTeam(Hale, view_as<int>(HaleTeam));
+        int top[3];
         Damage[0] = 0;
-        for (new i = 1; i <= MaxClients; i++)
+        for (int i = 1; i <= MaxClients; i++)
         {
             if (Damage[i] >= Damage[top[0]])
             {
@@ -1845,15 +1837,11 @@ public Action:event_round_end(Handle:event, const String:name[], bool:dontBroadc
                 top[1]=i;
             }
             else if (Damage[i] >= Damage[top[2]])
-            {
                 top[2]=i;
-            }
         }
         if (Damage[top[0]] > 9000)
-        {
             CreateTimer(1.0, Timer_NineThousand, _, TIMER_FLAG_NO_MAPCHANGE);
-        }
-        decl String:s1[80];
+        char s1[80];
         if (IsClientInGame(top[0]) && (GetEntityTeamNum(top[0]) >= 1))
             GetClientName(top[0], s, 80);
         else
@@ -1877,7 +1865,7 @@ public Action:event_round_end(Handle:event, const String:name[], bool:dontBroadc
         }
         SetHudTextParams(-1.0, 0.3, 10.0, 255, 255, 255, 255);
         PriorityCenterTextAll(_, ""); //Should clear center text
-        for (new i = 1; i <= MaxClients; i++)
+        for (int i = 1; i <= MaxClients; i++)
         {
             if (IsClientInGame(i) && !(GetClientButtons(i) & IN_SCORE))
             {
@@ -1897,37 +1885,43 @@ public Action:event_round_end(Handle:event, const String:name[], bool:dontBroadc
     CreateTimer(3.0, Timer_CalcScores, _, TIMER_FLAG_NO_MAPCHANGE);     //CalcScores();
     return Plugin_Continue;
 }
-public Action:Timer_NineThousand(Handle:timer)
+
+public Action Timer_NineThousand(Handle timer)
 {
     EmitSoundToAll("saxton_hale/9000.wav", _, _, SNDLEVEL_TRAFFIC, SND_NOFLAGS, 1.0, 100, _, _, NULL_VECTOR, false, 0.0);
     EmitSoundToAllExcept(SOUNDEXCEPT_VOICE, "saxton_hale/9000.wav", _, SNDCHAN_VOICE, SNDLEVEL_TRAFFIC, SND_NOFLAGS, 1.0, 100, _, _, NULL_VECTOR, false, 0.0);
     EmitSoundToAllExcept(SOUNDEXCEPT_VOICE, "saxton_hale/9000.wav", _, _, SNDLEVEL_TRAFFIC, SND_NOFLAGS, 1.0, 100, _, _, NULL_VECTOR, false, 0.0);
 }
-public Action:Timer_CalcScores(Handle:timer)
+
+public Action Timer_CalcScores(Handle timer)
 {
     CalcScores();
+    return Plugin_Continue;
 }
-CalcScores()
+
+void CalcScores()
 {
-    decl j, damage;
+    int j, damage;
     //new bool:spec = GetConVarBool(cvarForceSpecToHale);
     botqueuepoints += 5;
-    for (new i = 1; i <= MaxClients; i++)
+    for (int i = 1; i <= MaxClients; i++)
     {
         if (IsClientInGame(i))
         {
             damage = Damage[i];
-            new Handle:aevent = CreateEvent("player_escort_score", true);
-            SetEventInt(aevent, "player", i);
+            Event aevent = CreateEvent("player_escort_score", true);
+            aevent.SetInt("player", i);
             for (j = 0; damage - 600 > 0; damage -= 600, j++){}
-            SetEventInt(aevent, "points", j);
-            FireEvent(aevent);
+            aevent.SetInt("points", j);
+            aevent.Fire();
             if (i == Hale)
             {
-                if (IsFakeClient(Hale)) botqueuepoints = 0;
-                else SetClientQueuePoints(i, 0);
+                if (IsFakeClient(Hale))
+                    botqueuepoints = 0;
+                else
+                    SetClientQueuePoints(i, 0);
             }
-            else if (!IsFakeClient(i) && (GetEntityTeamNum(i) > _:TFTeam_Spectator))
+            else if (!IsFakeClient(i) && (GetEntityTeamNum(i) > view_as<int>(TFTeam_Spectator)))
             {
                 CPrintToChat(i, "{olive}[VSH]{default} %t", "vsh_add_points", 10);
                 SetClientQueuePoints(i, GetClientQueuePoints(i)+10);
@@ -1936,16 +1930,14 @@ CalcScores()
     }
 }
 
-public Action:StartResponceTimer(Handle:hTimer)
+public Action StartResponceTimer(Handle hTimer)
 {
-    decl String:s[PLATFORM_MAX_PATH];
-    decl Float:pos[3];
+    char s[PLATFORM_MAX_PATH];
+    float pos[3];
     switch (Special)
     {
         case VSHSpecial_Bunny:
-        {
             strcopy(s, PLATFORM_MAX_PATH, BunnyStart[GetRandomInt(0, sizeof(BunnyStart)-1)]);
-        }
         case VSHSpecial_Vagineer:
         {
             if (!GetRandomInt(0, 1))
@@ -1953,8 +1945,10 @@ public Action:StartResponceTimer(Handle:hTimer)
             else
                 strcopy(s, PLATFORM_MAX_PATH, VagineerRoundStart);
         }
-        case VSHSpecial_HHH: Format(s, PLATFORM_MAX_PATH, "ui/halloween_boss_summoned_fx.wav");
-        case VSHSpecial_CBS: strcopy(s, PLATFORM_MAX_PATH, CBS0);
+        case VSHSpecial_HHH:
+            Format(s, PLATFORM_MAX_PATH, "ui/halloween_boss_summoned_fx.wav");
+        case VSHSpecial_CBS:
+            strcopy(s, PLATFORM_MAX_PATH, CBS0);
         default:
         {
             if (!GetRandomInt(0, 1))
@@ -1972,11 +1966,13 @@ public Action:StartResponceTimer(Handle:hTimer)
     }
     return Plugin_Continue;
 }
-public Action:tTenSecStart(Handle:hTimer, any:ofs)
+
+public Action tTenSecStart(Handle hTimer, any ofs)
 {
     bTenSecStart[ofs] = false;
 }
-public Action:StartHaleTimer(Handle:hTimer)
+
+public Action StartHaleTimer(Handle hTimer)
 {
     CreateTimer(0.1, GottamTimer);
     if (!IsClientInGame(Hale))
@@ -1986,13 +1982,12 @@ public Action:StartHaleTimer(Handle:hTimer)
     }
     FixUnbalancedTeams();
     if (!IsPlayerAlive(Hale))
-    {
         TF2_RespawnPlayer(Hale);
-    }
     playing = 0; // nergal's FRoG fix
-    for (new client = 1; client <= MaxClients; client++)
+    for (int client = 1; client <= MaxClients; client++)
     {
-        if (!IsClientInGame(client) || !IsPlayerAlive(client) || client == Hale) continue;
+        if (!IsClientInGame(client) || !IsPlayerAlive(client) || client == Hale)
+            continue;
         playing++;
         CreateTimer(0.2, MakeNoHale, GetClientUserId(client));
     }
@@ -2002,9 +1997,7 @@ public Action:StartHaleTimer(Handle:hTimer)
     HaleHealthMax = RoundFloat(Pow(((760.8+playing)*(playing-1)), 1.0341)) + 2046;
     //HaleHealthMax = RoundFloat(Pow(((760.0+playing)*(playing-1)), 1.04));
     if (HaleHealthMax < 2046)
-    {
         HaleHealthMax = 2046;
-    }
     SetEntProp(Hale, Prop_Data, "m_iMaxHealth", HaleHealthMax);
     SetEntityHealth(Hale, HaleHealthMax);
     HaleHealth = HaleHealthMax;
@@ -2013,21 +2006,19 @@ public Action:StartHaleTimer(Handle:hTimer)
     CreateTimer(0.2, HaleTimer, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
     CreateTimer(0.2, StartRound);
     CreateTimer(0.2, ClientTimer, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
-    if (!PointType && playing > GetConVarInt(cvarAliveToEnable))
-    {
+    if (!PointType && playing > cvarAliveToEnable.IntValue
         SetControlPoint(false);
-    }
     if (VSHRoundState == VSHRState_Waiting)
-    {
         CreateTimer(2.0, Timer_MusicPlay, _, TIMER_FLAG_NO_MAPCHANGE);
-    }
     return Plugin_Continue;
 }
-public Action:Timer_MusicPlay(Handle:timer)
+
+public Action Timer_MusicPlay(Handle timer)
 {
-    if (VSHRoundState != VSHRState_Active) return Plugin_Stop;
-    new String:sound[PLATFORM_MAX_PATH] = "";
-    new Float:time = -1.0;
+    if (VSHRoundState != VSHRState_Active)
+        return Plugin_Stop;
+    char sound[PLATFORM_MAX_PATH] = "";
+    float time = -1.0;
     ClearTimer(MusicTimer);
     if (MapHasMusic())
     {
@@ -2055,10 +2046,10 @@ public Action:Timer_MusicPlay(Handle:timer)
             }
         }
     }
-    new Action:act = Plugin_Continue;
+    Action act = Plugin_Continue;
     Call_StartForward(OnMusic);
-    decl String:sound2[PLATFORM_MAX_PATH];
-    new Float:time2 = time;
+    char sound2[PLATFORM_MAX_PATH];
+    float time2 = time;
     strcopy(sound2, PLATFORM_MAX_PATH, sound);
     Call_PushStringEx(sound2, PLATFORM_MAX_PATH, 0, SM_PARAM_COPYBACK);
     Call_PushFloatRef(time2);
@@ -2083,19 +2074,20 @@ public Action:Timer_MusicPlay(Handle:timer)
     }
     if (time != -1.0)
     {
-        new Handle:pack;
+        Handle pack;
         MusicTimer = CreateDataTimer(time, Timer_MusicTheme, pack, TIMER_FLAG_NO_MAPCHANGE|TIMER_REPEAT);
         WritePackString(pack, sound);
         WritePackFloat(pack, time);
     }
     return Plugin_Continue;
 }
-public Action:Timer_MusicTheme(Handle:timer, any:pack)
+
+public Action Timer_MusicTheme(Handle timer, Handle pack)
 {
-    decl String:sound[PLATFORM_MAX_PATH];
+    char sound[PLATFORM_MAX_PATH];
     ResetPack(pack);
     ReadPackString(pack, sound, sizeof(sound));
-    new Float:time = ReadPackFloat(pack);
+    float time = ReadPackFloat(pack);
     if (g_bEnabled && VSHRoundState == VSHRState_Active)
     {
 /*      new String:sound[PLATFORM_MAX_PATH] = "";
@@ -2106,10 +2098,10 @@ public Action:Timer_MusicTheme(Handle:timer, any:pack)
             case VSHSpecial_HHH:
                 strcopy(sound, sizeof(sound), HHHTheme);
         }*/
-        new Action:act = Plugin_Continue;
+        Action act = Plugin_Continue;
         Call_StartForward(OnMusic);
-        decl String:sound2[PLATFORM_MAX_PATH];
-        new Float:time2 = time;
+        char sound2[PLATFORM_MAX_PATH];
+        float time2 = time;
         strcopy(sound2, PLATFORM_MAX_PATH, sound);
         Call_PushStringEx(sound2, PLATFORM_MAX_PATH, 0, SM_PARAM_COPYBACK);
         Call_PushFloatRef(time2);
@@ -2132,7 +2124,7 @@ public Action:Timer_MusicTheme(Handle:timer, any:pack)
                     ClearTimer(MusicTimer);
                     if (time != -1.0)
                     {
-                        new Handle:datapack;
+                        Handle datapack;
                         MusicTimer = CreateDataTimer(time, Timer_MusicTheme, datapack, TIMER_FLAG_NO_MAPCHANGE|TIMER_REPEAT);
                         WritePackString(datapack, sound);
                         WritePackFloat(datapack, time);
@@ -2153,49 +2145,53 @@ public Action:Timer_MusicTheme(Handle:timer, any:pack)
     }
     return Plugin_Continue;
 }
-EmitSoundToAllExcept(exceptiontype = SOUNDEXCEPT_MUSIC, const String:sample[],
-                 entity = SOUND_FROM_PLAYER,
-                 channel = SNDCHAN_AUTO,
-                 level = SNDLEVEL_NORMAL,
-                 flags = SND_NOFLAGS,
-                 Float:volume = SNDVOL_NORMAL,
-                 pitch = SNDPITCH_NORMAL,
-                 speakerentity = -1,
-                 const Float:origin[3] = NULL_VECTOR,
-                 const Float:dir[3] = NULL_VECTOR,
-                 bool:updatePos = true,
-                 Float:soundtime = 0.0)
+
+void EmitSoundToAllExcept(int exceptiontype = SOUNDEXCEPT_MUSIC, const char[] sample,
+                 int entity = SOUND_FROM_PLAYER,
+                 int channel = SNDCHAN_AUTO,
+                 int level = SNDLEVEL_NORMAL,
+                 int flags = SND_NOFLAGS,
+                 float volume = SNDVOL_NORMAL,
+                 int pitch = SNDPITCH_NORMAL,
+                 int speakerentity = -1,
+                 const float origin[3] = NULL_VECTOR,
+                 const float dir[3] = NULL_VECTOR,
+                 bool updatePos = true,
+                 float soundtime = 0.0)
 {
-    new clients[MaxClients];
-    new total = 0;
-    for (new i = 1; i <= MaxClients; i++)
+    int clients[MaxClients], total = 0;
+    for (int i = 1; i <= MaxClients; i++)
     {
         if (IsClientInGame(i) && CheckSoundException(i, exceptiontype))
-        {
             clients[total++] = i;
-        }
     }
     if (!total)
-    {
         return;
-    }
     EmitSound(clients, total, sample, entity, channel,
         level, flags, volume, pitch, speakerentity,
         origin, dir, updatePos, soundtime);
 }
-bool:CheckSoundException(client, excepttype)
+
+bool CheckSoundException(int client, int excepttype)
 {
-    if (!IsValidClient(client)) return false;
-    if (IsFakeClient(client)) return true;
-    if (!AreClientCookiesCached(client)) return true;
-    decl String:strCookie[32];
-    if (excepttype == SOUNDEXCEPT_VOICE) GetClientCookie(client, VoiceCookie, strCookie, sizeof(strCookie));
-    else GetClientCookie(client, MusicCookie, strCookie, sizeof(strCookie));
-    if (strCookie[0] == 0) return true;
-    else return bool:StringToInt(strCookie);
+    if (!IsValidClient(client))
+        return false;
+    if (IsFakeClient(client))
+        return true;
+    if (!AreClientCookiesCached(client))
+        return true;
+    char strCookie[32];
+    if (excepttype == SOUNDEXCEPT_VOICE)
+        GetClientCookie(client, VoiceCookie, strCookie, sizeof(strCookie));
+    else
+        GetClientCookie(client, MusicCookie, strCookie, sizeof(strCookie));
+    if (strCookie[0] == 0)
+        return true;
+    else
+        return view_as<bool>(StringToInt(strCookie));
 }
 
-SetClientSoundOptions(client, excepttype, bool:on)
+void SetClientSoundOptions(client, excepttype, bool:on)
 {
     if (!IsValidClient(client)) return;
     if (IsFakeClient(client)) return;
