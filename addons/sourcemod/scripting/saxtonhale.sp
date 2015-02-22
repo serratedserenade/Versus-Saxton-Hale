@@ -15,13 +15,9 @@
 #include <tf2items>
 #include <regex>
 #if SOURCEMOD_V_MINOR > 8
-  #define SMEIGHT
   #pragma newdecls required
 #endif
 #include <sdkhooks>
-#if SOURCEMOD_V_MINOR > 6 && !defined SMEIGHT
-  #pragma newdecls required
-#endif
 #include <morecolors>
 #include <sourcemod>
 #include <nextmap>
