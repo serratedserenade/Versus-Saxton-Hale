@@ -1588,7 +1588,7 @@ void SearchForItemPacks()
         {
             GetEntPropVector(ent, Prop_Send, "m_vecOrigin", pos);
             AcceptEntityInput(ent, "Kill");
-            new ent2 = CreateEntityByName("item_ammopack_small");
+            int ent2 = CreateEntityByName("item_ammopack_small");
             TeleportEntity(ent2, pos, NULL_VECTOR, NULL_VECTOR);
             DispatchSpawn(ent2);
             SetEntProp(ent2, Prop_Send, "m_iTeamNum", g_bEnabled?view_as<int>(OtherTeam):0, 4);
@@ -1603,7 +1603,7 @@ void SearchForItemPacks()
         {
             GetEntPropVector(ent, Prop_Send, "m_vecOrigin", pos);
             AcceptEntityInput(ent, "Kill");
-            new ent2 = CreateEntityByName("item_ammopack_small");
+            int ent2 = CreateEntityByName("item_ammopack_small");
             TeleportEntity(ent2, pos, NULL_VECTOR, NULL_VECTOR);
             DispatchSpawn(ent2);
             SetEntProp(ent2, Prop_Send, "m_iTeamNum", g_bEnabled?view_as<int>(OtherTeam):0, 4);
@@ -1640,60 +1640,50 @@ void SearchForItemPacks()
         SpawnRandomHealth();
 }
 
-SpawnRandomAmmo()
+void SpawnRandomAmmo()
 {
-    new iEnt = MaxClients + 1;
-    decl Float:vPos[3];
-    decl Float:vAng[3];
+    int iEnt = MaxClients + 1;
+    float vPos[3], vAng[3];
     while ((iEnt = FindEntityByClassname2(iEnt, "info_player_teamspawn")) != -1)
     {
         if (GetRandomInt(0, 4))
-        {
             continue;
-        }
-
         // Technically you'll never find a map without a spawn point.
         GetEntPropVector(iEnt, Prop_Send, "m_vecOrigin", vPos);
         GetEntPropVector(iEnt, Prop_Send, "m_angRotation", vAng);
-
-        new iEnt2 = !GetRandomInt(0, 3) ? CreateEntityByName("item_ammopack_medium") : CreateEntityByName("item_ammopack_small");
+        int iEnt2 = !GetRandomInt(0, 3) ? CreateEntityByName("item_ammopack_medium") : CreateEntityByName("item_ammopack_small");
         TeleportEntity(iEnt2, vPos, vAng, NULL_VECTOR);
         DispatchSpawn(iEnt2);
-        SetEntProp(iEnt2, Prop_Send, "m_iTeamNum", g_bEnabled?OtherTeam:0, 4);
+        SetEntProp(iEnt2, Prop_Send, "m_iTeamNum", g_bEnabled?view_as<int>(OtherTeam):0, 4);
     }
 }
 
-SpawnRandomHealth()
+void SpawnRandomHealth()
 {
-    new iEnt = MaxClients + 1;
-    decl Float:vPos[3];
-    decl Float:vAng[3];
+    int iEnt = MaxClients + 1;
+    float vPos[3], vAng[3];
     while ((iEnt = FindEntityByClassname2(iEnt, "info_player_teamspawn")) != -1)
     {
         if (GetRandomInt(0, 4))
-        {
             continue;
-        }
-
         // Technically you'll never find a map without a spawn point.
         GetEntPropVector(iEnt, Prop_Send, "m_vecOrigin", vPos);
         GetEntPropVector(iEnt, Prop_Send, "m_angRotation", vAng);
-
-        new iEnt2 = !GetRandomInt(0, 3) ? CreateEntityByName("item_healthkit_medium") : CreateEntityByName("item_healthkit_small");
+        int iEnt2 = !GetRandomInt(0, 3) ? CreateEntityByName("item_healthkit_medium") : CreateEntityByName("item_healthkit_small");
         TeleportEntity(iEnt2, vPos, vAng, NULL_VECTOR);
         DispatchSpawn(iEnt2);
-        SetEntProp(iEnt2, Prop_Send, "m_iTeamNum", g_bEnabled?OtherTeam:0, 4);
+        SetEntProp(iEnt2, Prop_Send, "m_iTeamNum", g_bEnabled?view_as<int>(OtherTeam):0, 4);
     }
 }
 
-public Action:Timer_EnableCap(Handle:timer)
+public Action Timer_EnableCap(Handle timer)
 {
     if (VSHRoundState == VSHRState_Disabled)
     {
         SetControlPoint(true);
         if (checkdoors)
         {
-            new ent = -1;
+            int ent = -1;
             while ((ent = FindEntityByClassname2(ent, "func_door")) != -1)
             {
                 AcceptEntityInput(ent, "Open");
@@ -1705,7 +1695,7 @@ public Action:Timer_EnableCap(Handle:timer)
     }
 }
 
-public Action:Timer_CheckDoors(Handle:hTimer)
+public Action Timer_CheckDoors(Handle hTimer)
 {
     if (!checkdoors)
     {
@@ -1714,7 +1704,7 @@ public Action:Timer_CheckDoors(Handle:hTimer)
     }
 
     if ((!g_bEnabled && VSHRoundState != VSHRState_Disabled) || (g_bEnabled && VSHRoundState != VSHRState_Active)) return Plugin_Continue;
-    new ent = -1;
+    int ent = -1;
     while ((ent = FindEntityByClassname2(ent, "func_door")) != -1)
     {
         AcceptEntityInput(ent, "Open");
@@ -1722,19 +1712,20 @@ public Action:Timer_CheckDoors(Handle:hTimer)
     }
     return Plugin_Continue;
 }
-public CheckArena()
+
+public void CheckArena()
 {
     if (PointType)
-    {
         SetArenaCapEnableTime(float(45 + PointDelay * (playing - 1)));
-    }
     else
     {
         SetArenaCapEnableTime(0.0);
         SetControlPoint(false);
     }
 }
-public numHaleKills = 0;    //See if the Hale was boosting his buddies or afk
+
+public int numHaleKills = 0;    //See if the Hale was boosting his buddies or afk
+
 public Action:event_round_end(Handle:event, const String:name[], bool:dontBroadcast)
 {
     new String:s[265];
