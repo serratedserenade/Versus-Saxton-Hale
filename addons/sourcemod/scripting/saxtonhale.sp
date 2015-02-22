@@ -346,22 +346,8 @@ int Damage[TF_MAX_PLAYERS], AirDamage[TF_MAX_PLAYERS], ourHelp[TF_MAX_PLAYERS], 
 #define VSHFLAG_BOTRAGE     (1 << 3)
 #define VSHFLAG_CLASSHELPED (1 << 4)
 #define VSHFLAG_HASONGIVED  (1 << 5)
-new VSHFlags[TF_MAX_PLAYERS];
-new Hale = -1;
-new HaleHealthMax;
-new HaleHealth;
-new HaleHealthLast;
-new HaleCharge = 0;
-new HaleRage;
-new NextHale;
-new Float:g_flStabbed;
-new Float:g_flMarketed;
-new Float:HPTime;
-new Float:KSpreeTimer;
-new Float:WeighDownTimer;
-new KSpreeCount = 1;
-new Float:UberRageCount;
-new Float:GlowTimer;
+int VSHFlags[TF_MAX_PLAYERS], Hale = -1, HaleHealthMax, HaleHealth, HaleHealthLast, HaleCharge = 0, HaleRage, NextHale, KSpreeCount = 1;
+float g_flStabbed, float g_flMarketed, float HPTime, float KSpreeTimer, float WeighDownTimer, float UberRageCount, float GlowTimer;
 new bool:bEnableSuperDuperJump;
 new bool:bTenSecStart[2] = {false, false};
 new bool:bSpawnTeleOnTriggerHurt = false;
