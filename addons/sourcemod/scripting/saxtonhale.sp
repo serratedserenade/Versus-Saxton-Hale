@@ -346,37 +346,14 @@ int Damage[TF_MAX_PLAYERS], AirDamage[TF_MAX_PLAYERS], ourHelp[TF_MAX_PLAYERS], 
 #define VSHFLAG_BOTRAGE     (1 << 3)
 #define VSHFLAG_CLASSHELPED (1 << 4)
 #define VSHFLAG_HASONGIVED  (1 << 5)
-int VSHFlags[TF_MAX_PLAYERS], Hale = -1, HaleHealthMax, HaleHealth, HaleHealthLast, HaleCharge = 0, HaleRage, NextHale, KSpreeCount = 1;
-float g_flStabbed, float g_flMarketed, float HPTime, float KSpreeTimer, float WeighDownTimer, float UberRageCount, float GlowTimer;
-new bool:bEnableSuperDuperJump;
-new bool:bTenSecStart[2] = {false, false};
-new bool:bSpawnTeleOnTriggerHurt = false;
-new HHHClimbCount;
-new bool:bNoTaunt = false;
-new Handle:cvarVersion;
-new Handle:cvarHaleSpeed;
-new Handle:cvarPointDelay;
-new Handle:cvarRageDMG;
-new Handle:cvarRageDist;
-new Handle:cvarAnnounce;
-new Handle:cvarSpecials;
-new Handle:cvarEnabled;
-new Handle:cvarAliveToEnable;
-new Handle:cvarPointType;
-new Handle:cvarCrits;
-new Handle:cvarRageSentry;
-new Handle:cvarFirstRound;
-new Handle:cvarDemoShieldCrits;
-new Handle:cvarDisplayHaleHP;
+int VSHFlags[TF_MAX_PLAYERS], Hale = -1, HaleHealthMax, HaleHealth, HaleHealthLast, HaleCharge = 0, HaleRage, NextHale, KSpreeCount = 1, HHHClimbCount;
+float g_flStabbed, g_flMarketed, HPTime, KSpreeTimer, WeighDownTimer, UberRageCount, GlowTimer;
+bool bEnableSuperDuperJump, bTenSecStart[2] = {false, false}, bSpawnTeleOnTriggerHurt = false, bNoTaunt = false;
+ConVar cvarVersion, cvarHaleSpeed, cvarPointDelay, cvarRageDMG, cvarRageDist, cvarAnnounce, cvarSpecials, cvarEnabled, cvarAliveToEnable, cvarPointType, cvarCrits, cvarRageSentry
+ConVar cvarFirstRound, cvarDemoShieldCrits, cvarDisplayHaleHP, cvarEnableEurekaEffect, cvarForceHaleTeam;
+Handle PointCookie, MusicCookie, VoiceCookie, ClasshelpinfoCookie, doorchecktimer;
 //new Handle:cvarCircuitStun;
 //new Handle:cvarForceSpecToHale;
-new Handle:cvarEnableEurekaEffect;
-new Handle:cvarForceHaleTeam;
-new Handle:PointCookie;
-new Handle:MusicCookie;
-new Handle:VoiceCookie;
-new Handle:ClasshelpinfoCookie;
-new Handle:doorchecktimer;
 new Handle:jumpHUD;
 new Handle:rageHUD;
 new Handle:healthHUD;
