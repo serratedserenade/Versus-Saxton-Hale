@@ -7647,12 +7647,12 @@ stock FindPlayerBack(client, indices[], len)
     return -1;
 }
 
-enum _:m_flNext
+enum m_flNext
 {
     m_flNextUnusedFeature = 0
 }
 
-enum _:m_flNext2
+enum m_flNext2
 {
     m_flNextEndPriority = 0
 }
