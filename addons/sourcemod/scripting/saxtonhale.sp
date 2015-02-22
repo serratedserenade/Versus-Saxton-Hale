@@ -1545,7 +1545,7 @@ public Action event_round_start(Event event, const char[] name, bool dontBroadca
         SetVariantInt(view_as<int>(OtherTeam));
         AcceptEntityInput(ent, "SetTeam");
         AcceptEntityInput(ent, "skin");
-        SetEntProp(ent, Prop_Send, "m_nSkin", view_as<int>(OtherTeam)-2);
+        SetEntProp(ent, Prop_Send, "m_nSkin", view_as<any>(view_as<int>(OtherTeam)-2));
     }
     ent = -1;
     while ((ent = FindEntityByClassname2(ent, "mapobj_cart_dispenser")) != -1)
