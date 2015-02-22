@@ -859,7 +859,7 @@ public void OnConfigsExecuted()
     }
 }
 
-public OnMapStart()
+public void OnMapStart()
 {
     HPTime = 0.0;
     KSpreeTimer = 0.0;
@@ -867,7 +867,7 @@ public OnMapStart()
     MusicTimer = INVALID_HANDLE;
     doorchecktimer = INVALID_HANDLE;
     Hale = -1;
-    for (new i = 1; i <= MaxClients; i++)
+    for (int i = 1; i <= MaxClients; i++)
     {
         VSHFlags[i] = 0;
     }
@@ -881,29 +881,27 @@ public OnMapStart()
     }
     RoundCount = 0;
 }
-public OnMapEnd()
+
+public void OnMapEnd()
 {
     if (g_bAreEnoughPlayersPlaying || g_bEnabled)
     {
-        SetConVarInt(FindConVar("tf_arena_use_queue"), tf_arena_use_queue);
-        SetConVarInt(FindConVar("mp_teams_unbalance_limit"), mp_teams_unbalance_limit);
-        SetConVarInt(FindConVar("tf_arena_first_blood"), tf_arena_first_blood);
-        SetConVarInt(FindConVar("mp_forcecamera"), mp_forcecamera);
-        SetConVarFloat(FindConVar("tf_scout_hype_pep_max"), tf_scout_hype_pep_max);
+        FindConVar("tf_arena_use_queue").IntValue = tf_arena_use_queue;
+        FindConVar("mp_teams_unbalance_limit").IntValue = mp_teams_unbalance_limit;
+        FindConVar("tf_arena_first_blood").IntValue = tf_arena_first_blood;
+        FindConVar("mp_forcecamera").IntValue = mp_forcecamera;
+        FindConVar("tf_scout_hype_pep_max").FloatValue = tf_scout_hype_pep_max;
 #if defined _steamtools_included
         if (steamtools)
-        {
             Steam_SetGameDescription("Team Fortress");
-        }
 #endif
     }
-
     ClearTimer(MusicTimer);
 }
-public OnPluginEnd()
+
+public void OnPluginEnd()
 {
     OnMapEnd();
-
     if (!g_bReloadVSHOnRoundEnd && VSHRoundState == VSHRState_Active)
     {
         ServerCommand("mp_restartround 5");
@@ -911,48 +909,36 @@ public OnPluginEnd()
     }
 }
 
-AddToDownload()
+void AddToDownload()
 {
     /*
         Files to precache that are originally part of TF2 or HL2 / etc and don't need to be downloaded
     */
-
     PrecacheSound("vo/announcer_am_capincite01.wav", true);
     PrecacheSound("vo/announcer_am_capincite03.wav", true);
     PrecacheSound("vo/announcer_am_capenabled02.wav", true);
-
     //PrecacheSound("weapons/barret_arm_zap.wav", true);
     PrecacheSound("player/doubledonk.wav", true);
-
     PrecacheParticleSystem("ghost_appearation");
     PrecacheParticleSystem("yikes_fx");
-
     /*
         Files to download + precache that are not originally part of TF2 or HL2 / etc
     */
-
     PrepareSound("saxton_hale/9000.wav");
-
     /*
         All boss related files
     */
-
     // Saxton Hale
-
     // Precache
     // None.. he's all custom
-
     // Download
-
     PrepareModel(HaleModel);
-
     PrepareMaterial("materials/models/player/saxton_hale/eye");
     PrepareMaterial("materials/models/player/saxton_hale/hale_head");
     PrepareMaterial("materials/models/player/saxton_hale/hale_body");
     PrepareMaterial("materials/models/player/saxton_hale/hale_misc");
     PrepareMaterial("materials/models/player/saxton_hale/sniper_red");
     PrepareMaterial("materials/models/player/saxton_hale/sniper_lens");
-
     //Saxton Hale Materials
     AddFileToDownloadsTable("materials/models/player/saxton_hale/sniper_head.vtf");
     AddFileToDownloadsTable("materials/models/player/saxton_hale/sniper_head_red.vmt");
@@ -962,11 +948,11 @@ AddToDownload()
     AddFileToDownloadsTable("materials/models/player/saxton_hale/eyeball_r.vmt");
     AddFileToDownloadsTable("materials/models/player/saxton_hale/hale_egg.vtf");
     AddFileToDownloadsTable("materials/models/player/saxton_hale/hale_egg.vmt");
-
     PrepareSound(HaleComicArmsFallSound);
     PrepareSound(HaleKSpree);
 
-    decl i, String:s[PLATFORM_MAX_PATH];
+    int i;
+    char s[PLATFORM_MAX_PATH];
     for (i = 1; i <= 4; i++)
     {
         Format(s, PLATFORM_MAX_PATH, "%s0%i.wav", HaleLastB, i);
@@ -976,7 +962,6 @@ AddToDownload()
         Format(s, PLATFORM_MAX_PATH, "%s0%i.wav", HHHAttack, i);
         PrecacheSound(s, true);*/
     }
-
     PrepareSound(HaleKillMedic);
     PrepareSound(HaleKillSniper1);
     PrepareSound(HaleKillSniper2);
@@ -985,7 +970,6 @@ AddToDownload()
     PrepareSound(HaleKillEngie1);
     PrepareSound(HaleKillEngie2);
     PrepareSound(HaleKillDemo132);
-
     PrepareSound(HaleKillHeavy132);
     PrepareSound(HaleKillScout132);
     PrepareSound(HaleKillSpy132);
@@ -997,81 +981,58 @@ AddToDownload()
     PrepareSound(HaleKillDemo132);
     PrepareSound(HaleKillDemo132);
     PrepareSound(HaleKillDemo132);
-
     for (i = 1; i <= 5; i++)
     {
         if (i <= 2)
         {
             Format(s, PLATFORM_MAX_PATH, "%s%i.wav", HaleJump, i);
             PrepareSound(s);
-
             /*Format(s, PLATFORM_MAX_PATH, "%s%i.wav", VagineerJump, i);
             PrepareSound(s);
-
             Format(s, PLATFORM_MAX_PATH, "%s%i.wav", VagineerRageSound2, i);
             PrepareSound(s);
-
             Format(s, PLATFORM_MAX_PATH, "%s%i.wav", VagineerFail, i);
             PrepareSound(s);*/
-
             Format(s, PLATFORM_MAX_PATH, "%s%i.wav", HaleWin, i);
             PrepareSound(s);
-
             Format(s, PLATFORM_MAX_PATH, "%s%i.wav", HaleJump132, i);
             PrepareSound(s);
-
             Format(s, PLATFORM_MAX_PATH, "%s%i.wav", HaleKillEngie132, i);
             PrepareSound(s);
-
             Format(s, PLATFORM_MAX_PATH, "%s%i.wav", HaleKillKSpree132, i);
             PrepareSound(s);
         }
-
         if (i <= 3)
         {
             Format(s, PLATFORM_MAX_PATH, "%s%i.wav", HaleFail, i);
             PrepareSound(s);
         }
-
         if (i <= 4)
         {
             Format(s, PLATFORM_MAX_PATH, "%s%i.wav", HaleRageSound, i);
             PrepareSound(s);
-
             Format(s, PLATFORM_MAX_PATH, "%s%i.wav", HaleStubbed132, i);
             PrepareSound(s);
         }
-
         Format(s, PLATFORM_MAX_PATH, "%s%i.wav", HaleRoundStart, i);
         PrepareSound(s);
-
         //Format(s, PLATFORM_MAX_PATH, "%s%i.wav", VagineerKSpreeNew, i);
         //PrepareSound(s);
-
         Format(s, PLATFORM_MAX_PATH, "%s%i.wav", HaleKSpreeNew, i);
         PrepareSound(s);
-
         Format(s, PLATFORM_MAX_PATH, "%s%i.wav", HaleLastMan, i);
         PrepareSound(s);
-
         Format(s, PLATFORM_MAX_PATH, "%s%i.wav", HaleStart132, i);
         PrepareSound(s);
     }
-
     if (!bSpecials)
-    {
         return;
-    }
-
     // Christian Brutal Sniper
-
     // Precache
-
     PrecacheSound(CBS0, true);
     PrecacheSound(CBS1, true);
     PrecacheSound(CBS3, true);
     PrecacheSound(CBSJump1, true);
-
     for (i = 1; i <= 25; i++)
     {
         if (i <= 9)
@@ -1082,23 +1043,14 @@ AddToDownload()
         Format(s, PLATFORM_MAX_PATH, "%s%02i.wav", CBS4, i);
         PrecacheSound(s, true);
     }
-
     PrecacheSound("vo/sniper_dominationspy04.wav", true);
-
     // Download
-
     PrepareModel(CBSModel);
-
     PrepareSound(CBSTheme);
-
-
     // Horseless Headless Horsemann
-
     // Precache
-
     PrecacheSound(HHHRage, true);
     PrecacheSound(HHHRage2, true);
-
     for (i = 1; i <= 4; i++)
     {
         Format(s, PLATFORM_MAX_PATH, "%s0%i.wav", HHHLaught, i);
@@ -1106,67 +1058,47 @@ AddToDownload()
         Format(s, PLATFORM_MAX_PATH, "%s0%i.wav", HHHAttack, i);
         PrecacheSound(s, true);
     }
-
     PrecacheSound("ui/halloween_boss_summoned_fx.wav", true);
     PrecacheSound("ui/halloween_boss_defeated_fx.wav", true);
-
     PrecacheSound("vo/halloween_boss/knight_pain01.wav", true);
     PrecacheSound("vo/halloween_boss/knight_pain02.wav", true);
     PrecacheSound("vo/halloween_boss/knight_pain03.wav", true);
     PrecacheSound("vo/halloween_boss/knight_death01.wav", true);
     PrecacheSound("vo/halloween_boss/knight_death02.wav", true);
-
     PrecacheSound("misc/halloween/spell_teleport.wav", true);
-
     // Download
-
     PrepareModel(HHHModel);
     PrepareSound(HHHTheme);
-
-
     // Vagineer
-
     // Precache
-
     PrecacheSound("vo/engineer_no01.wav", true);
     PrecacheSound("vo/engineer_jeers02.wav", true);
-
     // Download
-
     PrepareModel(VagineerModel);
-
     PrepareSound(VagineerLastA);
     PrepareSound(VagineerStart);
     PrepareSound(VagineerRageSound);
     PrepareSound(VagineerKSpree);
     PrepareSound(VagineerKSpree2);
     PrepareSound(VagineerHit);
-
     for (i = 1; i <= 5; i++)
     {
         if (i <= 2)
         {
             Format(s, PLATFORM_MAX_PATH, "%s%i.wav", VagineerJump, i);
             PrepareSound(s);
-
             Format(s, PLATFORM_MAX_PATH, "%s%i.wav", VagineerRageSound2, i);
             PrepareSound(s);
-
             Format(s, PLATFORM_MAX_PATH, "%s%i.wav", VagineerFail, i);
             PrepareSound(s);
         }
-
         Format(s, PLATFORM_MAX_PATH, "%s%i.wav", VagineerKSpreeNew, i);
         PrepareSound(s);
     }
-
     PrepareSound(VagineerRoundStart);
-
 #if defined EASTER_BUNNY_ON
     // Easter Bunny
-
     // Precache
-
     PrecacheSoundList(BunnyWin, sizeof(BunnyWin));
     PrecacheSoundList(BunnyJump, sizeof(BunnyJump));
     PrecacheSoundList(BunnyRage, sizeof(BunnyRage));
@@ -1177,72 +1109,62 @@ AddToDownload()
     PrecacheSoundList(BunnyPain, sizeof(BunnyPain));
     PrecacheSoundList(BunnyStart, sizeof(BunnyStart));
     PrecacheSoundList(BunnyRandomVoice, sizeof(BunnyRandomVoice));
-
     // Download
-
     PrepareModel(BunnyModel);
     PrepareModel(EggModel);
     // PrepareModel(ReloadEggModel);
-
     DownloadMaterialList(BunnyMaterials, sizeof(BunnyMaterials));
-
     PrepareMaterial("materials/models/props_easteregg/c_easteregg");
     AddFileToDownloadsTable("materials/models/props_easteregg/c_easteregg_gold.vmt");
 #endif
 }
 
-public HideCvarNotify(Handle:convar, const String:oldValue[], const String:newValue[])
+public void HideCvarNotify(ConVar convar, const char[] oldValue, const char[] newValue)
 {
-    new Handle:svtags = FindConVar("sv_tags");
-    new sflags = GetConVarFlags(svtags);
-    sflags &= ~FCVAR_NOTIFY;
-    SetConVarFlags(svtags, sflags);
-
-    new flags = GetConVarFlags(convar);
-    flags &= ~FCVAR_NOTIFY;
-    SetConVarFlags(convar, flags);
+    FindConVar("sv_tags").Flags &= ~FCVAR_NOTIFY;
+    convar.Flags &= ~FCVAR_NOTIFY;
 }
 
-public CvarChange(Handle:convar, const String:oldValue[], const String:newValue[])
+public void CvarChange(ConVar convar, const char[] oldValue, const char[] newValue)
 {
     if (convar == cvarHaleSpeed)
-        HaleSpeed = GetConVarFloat(convar);
+        HaleSpeed = convar.FloatValue;
     else if (convar == cvarPointDelay)
     {
-        PointDelay = GetConVarInt(convar);
+        PointDelay = convar.IntValue;
         if (PointDelay < 0) PointDelay *= -1;
     }
     else if (convar == cvarRageDMG)
-        RageDMG = GetConVarInt(convar);
+        RageDMG = convar.IntValue;
     else if (convar == cvarRageDist)
-        RageDist = GetConVarFloat(convar);
+        RageDist = convar.FloatValue;
     else if (convar == cvarAnnounce)
-        Announce = GetConVarFloat(convar);
+        Announce = convar.FloatValue;
     else if (convar == cvarSpecials)
-        bSpecials = GetConVarBool(convar);
+        bSpecials = convar.BoolValue;
     else if (convar == cvarPointType)
-        PointType = GetConVarInt(convar);
+        PointType = convar.IntValue;
     else if (convar == cvarAliveToEnable)
-        AliveToEnable = GetConVarInt(convar);
+        AliveToEnable = convar.IntValue;
     else if (convar == cvarCrits)
-        haleCrits = GetConVarBool(convar);
+        haleCrits = convar.BoolValue;
     else if (convar == cvarDemoShieldCrits)
-        bDemoShieldCrits = GetConVarBool(cvarDemoShieldCrits);
+        bDemoShieldCrits = cvarDemoShieldCrits.BoolValue;
     else if (convar == cvarDisplayHaleHP)
-        bAlwaysShowHealth = GetConVarBool(cvarDisplayHaleHP);
+        bAlwaysShowHealth = cvarDisplayHaleHP.BoolValue;
     else if (convar == cvarRageSentry)
-        newRageSentry = GetConVarBool(convar);
+        newRageSentry = convar.BoolValue;
     //else if (convar == cvarCircuitStun)
     //  circuitStun = GetConVarFloat(convar);
     else if (convar == cvarEnabled)
     {
-        if (GetConVarBool(convar) && IsSaxtonHaleMap())
+        if (convar.BoolValue && IsSaxtonHaleMap())
         {
             g_bAreEnoughPlayersPlaying = true;
 #if defined _steamtools_included
             if (steamtools)
             {
-                decl String:gameDesc[64];
+                char gameDesc[64];
                 Format(gameDesc, sizeof(gameDesc), "VS Saxton Hale (%s)", haleversiontitles[maxversion]);
                 Steam_SetGameDescription(gameDesc);
             }
