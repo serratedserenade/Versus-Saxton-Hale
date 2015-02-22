@@ -1370,12 +1370,12 @@ bool CheckNextSpecial()
     }
     while (Incoming == VSHSpecial_None || (Special && Special == Incoming))
     {
-        Incoming = GetRandomInt(0, 8);
         if (Special != VSHSpecial_Hale && !GetRandomInt(0, 5)) 
             Incoming = VSHSpecial_Hale;
         else
         {
-            switch (Incoming)
+            int randomBoss = GetRandomInt(0, 8);
+            switch (randomBoss)
             {
                 case 1: Incoming = VSHSpecial_Vagineer;
                 case 2: Incoming = VSHSpecial_HHH;
@@ -1430,35 +1430,35 @@ public Action event_round_start(Event event, const char[] name, bool dontBroadca
                 bBluHale = true;
             else if (TeamRoundCounter >= 3 && GetRandomInt(0, 1))
             {
-                bBluHale = (HaleTeam != 3);
+                bBluHale = (HaleTeam != TFTeam_Blue);
                 TeamRoundCounter = 0;
             }
             else
-                bBluHale = (HaleTeam == 3);
+                bBluHale = (HaleTeam == TFTeam_Blue);
         }
     }
     if (bBluHale)
     {
-        new score1 = GetTeamScore(OtherTeam);
-        new score2 = GetTeamScore(HaleTeam);
-        SetTeamScore(2, score1);
-        SetTeamScore(3, score2);
-        OtherTeam = 2;
-        HaleTeam = 3;
+        new score1 = GetTeamScore(view_as<int>(OtherTeam));
+        new score2 = GetTeamScore(view_as<int>(HaleTeam));
+        SetTeamScore(view_as<int>(TFTeam_Red), score1);
+        SetTeamScore(view_as<int>(TFTeam_Blue), score2);
+        OtherTeam = TFTeam_Red;
+        HaleTeam = TFTeam_Blue;
         bBluHale = false;
     }
     else
     {
-        new score1 = GetTeamScore(HaleTeam);
-        new score2 = GetTeamScore(OtherTeam);
-        SetTeamScore(2, score1);
-        SetTeamScore(3, score2);
-        HaleTeam = 2;
-        OtherTeam = 3;
+        new score1 = GetTeamScore(view_as<int>(OtherTeam));
+        new score2 = GetTeamScore(view_as<int>(HaleTeam));
+        SetTeamScore(view_as<int>(TFTeam_Red), score2);
+        SetTeamScore(view_as<int>(TFTeam_Blue), score1);
+        HaleTeam = TFTeam_Red;
+        OtherTeam = TFTeam_Blue;
         bBluHale = true;
     }
     playing = 0;
-    for (new ionplay = 1; ionplay <= MaxClients; ionplay++)
+    for (int ionplay = 1; ionplay <= MaxClients; ionplay++)
     {
         Damage[ionplay] = 0;
         AirDamage[ionplay] = 0;
@@ -1467,15 +1467,11 @@ public Action event_round_start(Event event, const char[] name, bool dontBroadca
         {
 #if defined _tf2attributes_included
             if (IsPlayerAlive(ionplay))
-            {
                 TF2Attrib_RemoveByName(ionplay, "damage force reduction");
-            }
 #endif
             StopHaleMusic(ionplay);
             if (IsClientParticipating(ionplay)) //GetEntityTeamNum(ionplay) > _:TFTeam_Spectator)
-            {
                 playing++;
-            }
             //if (GetEntityTeamNum(ionplay) > _:TFTeam_Spectator) playing++;
         }
     }
@@ -1487,40 +1483,30 @@ public Action event_round_start(Event event, const char[] name, bool dontBroadca
         SetControlPoint(true);
         return Plugin_Continue;
     }
-    else if (RoundCount >= 0 && GetConVarBool(cvarFirstRound)) // This line was breaking the first round sometimes
-    {
+    else if (RoundCount >= 0 && cvarFirstRound.BoolValue) // This line was breaking the first round sometimes
         g_bEnabled = true;
-    }
-    else if (RoundCount <= 0 && !GetConVarBool(cvarFirstRound))
+    else if (RoundCount <= 0 && !cvarFirstRound.BoolValue)
     {
         CPrintToChatAll("{olive}[VSH]{default} %t", "vsh_first_round");
-
         g_bEnabled = false;
         VSHRoundState = VSHRState_Disabled;
         SetArenaCapEnableTime(60.0);
-
         SearchForItemPacks();
-        SetConVarInt(FindConVar("mp_teams_unbalance_limit"), 1);
-
+        FindConVar("mp_teams_unbalance_limit").IntValue = 1;
         CreateTimer(71.0, Timer_EnableCap, _, TIMER_FLAG_NO_MAPCHANGE);
         return Plugin_Continue;
     }
-
-    SetConVarInt(FindConVar("mp_teams_unbalance_limit"), TF2_GetRoundWinCount() ? 0 : 1); // s_bLateLoad ? 0 :
-
+    FindConVar("mp_teams_unbalance_limit").IntValue =  TF2_GetRoundWinCount() ? 0 : 1; // s_bLateLoad ? 0 :
     if (FixUnbalancedTeams())
-    {
         return Plugin_Continue;
-    }
-
-    for (new i = 1; i <= MaxClients; i++)
+    for (int i = 1; i <= MaxClients; i++)
     {
         if (!IsClientInGame(i)) continue;
         if (!IsPlayerAlive(i)) continue;
         if (!(VSHFlags[i] & VSHFLAG_HASONGIVED)) TF2_RespawnPlayer(i);
     }
-    new bool:see[TF_MAX_PLAYERS];
-    new tHale = FindNextHale(see);
+    bool see[TF_MAX_PLAYERS];
+    int tHale = FindNextHale(see);
     if (tHale == -1)
     {
         CPrintToChatAll("{olive}[VSH]{default} %t", "vsh_needmoreplayers");
@@ -1535,9 +1521,7 @@ public Action event_round_start(Event event, const char[] name, bool dontBroadca
         NextHale = -1;
     }
     else
-    {
         Hale = tHale;
-    }
     bTenSecStart[0] = true;
     bTenSecStart[1] = true;
     CreateTimer(29.1, tTenSecStart, 0);
@@ -1551,7 +1535,7 @@ public Action event_round_start(Event event, const char[] name, bool dontBroadca
     g_flMarketed = 0.0;
     HHHClimbCount = 0;
     PointReady = false;
-    new ent = -1;
+    int ent = -1;
     while ((ent = FindEntityByClassname2(ent, "func_regenerate")) != -1)
         AcceptEntityInput(ent, "Disable");
     ent = -1;
@@ -1560,23 +1544,20 @@ public Action event_round_start(Event event, const char[] name, bool dontBroadca
     ent = -1;
     while ((ent = FindEntityByClassname2(ent, "obj_dispenser")) != -1)
     {
-        SetVariantInt(OtherTeam);
+        SetVariantInt(view_as<int>(OtherTeam));
         AcceptEntityInput(ent, "SetTeam");
         AcceptEntityInput(ent, "skin");
-        SetEntProp(ent, Prop_Send, "m_nSkin", OtherTeam-2);
+        SetEntProp(ent, Prop_Send, "m_nSkin", view_as<int>(OtherTeam)-2);
     }
     ent = -1;
     while ((ent = FindEntityByClassname2(ent, "mapobj_cart_dispenser")) != -1)
     {
-        SetVariantInt(OtherTeam);
+        SetVariantInt(view_as<int>(OtherTeam));
         AcceptEntityInput(ent, "SetTeam");
         AcceptEntityInput(ent, "skin");
     }
-
     SearchForItemPacks();
-
     CreateTimer(0.3, MakeHale);
-
     healthcheckused = 0;
     VSHRoundState = VSHRState_Waiting;
     return Plugin_Continue;
