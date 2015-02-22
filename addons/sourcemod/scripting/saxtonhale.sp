@@ -336,8 +336,8 @@ bool steamtools = false;
 #endif
 TFTeam OtherTeam = TFTeam_Red, HaleTeam = TFTeam_Blue;
 VSHRState VSHRoundState = VSHRState_Disabled;
-VSHSpecial Special;
-int playing, healthcheckused, RedAlivePlayers, RoundCount, Incoming, Damage[TF_MAX_PLAYERS], AirDamage[TF_MAX_PLAYERS], ourHelp[TF_MAX_PLAYERS], uberTarget[TF_MAX_PLAYERS];
+VSHSpecial Special, Incoming;
+int playing, healthcheckused, RedAlivePlayers, RoundCount, Damage[TF_MAX_PLAYERS], AirDamage[TF_MAX_PLAYERS], ourHelp[TF_MAX_PLAYERS], uberTarget[TF_MAX_PLAYERS];
 static bool g_bReloadVSHOnRoundEnd = false;
 #define VSHFLAG_HELPED          (1 << 0)
 #define VSHFLAG_UBERREADY       (1 << 1)
@@ -1326,6 +1326,7 @@ bool CheckToChangeMapDoors()
         }
     }
     delete fileh;
+    return false;
 }
 
 void CheckToTeleportToSpawn()
@@ -1351,11 +1352,10 @@ void CheckToTeleportToSpawn()
             return;
         }
     }
-
     delete fileh;
 }
 
-bool:CheckNextSpecial()
+bool CheckNextSpecial()
 {
     if (!bSpecials)
     {
@@ -1371,7 +1371,8 @@ bool:CheckNextSpecial()
     while (Incoming == VSHSpecial_None || (Special && Special == Incoming))
     {
         Incoming = GetRandomInt(0, 8);
-        if (Special != VSHSpecial_Hale && !GetRandomInt(0, 5)) Incoming = VSHSpecial_Hale;
+        if (Special != VSHSpecial_Hale && !GetRandomInt(0, 5)) 
+            Incoming = VSHSpecial_Hale;
         else
         {
             switch (Incoming)
@@ -1396,17 +1397,14 @@ bool:CheckNextSpecial()
     return true;        //OH GOD WHAT AM I DOING THIS ALWAYS RETURNS TRUE (still better than using QueuePanelH as a dummy)
 }
 
-public Action:event_round_start(Handle:event, const String:name[], bool:dontBroadcast)
+public Action event_round_start(Event event, const char[] name, bool dontBroadcast)
 {
     teamplay_round_start_TeleportToMultiMapSpawn(); // Cache spawns
-
-    if (!GetConVarBool(cvarEnabled))
+    if (!cvarEnabled.BoolValue)
     {
 #if defined _steamtools_included
         if (g_bAreEnoughPlayersPlaying && steamtools)
-        {
             Steam_SetGameDescription("Team Fortress");
-        }
 #endif
         g_bAreEnoughPlayersPlaying = false;
     }
@@ -1419,8 +1417,8 @@ public Action:event_round_start(Handle:event, const String:name[], bool:dontBroa
     KSpreeCount = 0;
     CheckArena();
     GetCurrentMap(currentmap, sizeof(currentmap));
-    new bool:bBluHale;
-    new convarsetting = GetConVarInt(cvarForceHaleTeam);
+    bool bBluHale;
+    int convarsetting = cvarForceHaleTeam.IntValue;
     switch (convarsetting)
     {
         case 3: bBluHale = true;
@@ -1428,13 +1426,15 @@ public Action:event_round_start(Handle:event, const String:name[], bool:dontBroa
         case 1: bBluHale = GetRandomInt(0, 1) == 1;
         default:
         {
-            if (strncmp(currentmap, "vsh_", 4, false) == 0) bBluHale = true;
+            if (strncmp(currentmap, "vsh_", 4, false) == 0)
+                bBluHale = true;
             else if (TeamRoundCounter >= 3 && GetRandomInt(0, 1))
             {
                 bBluHale = (HaleTeam != 3);
                 TeamRoundCounter = 0;
             }
-            else bBluHale = (HaleTeam == 3);
+            else
+                bBluHale = (HaleTeam == 3);
         }
     }
     if (bBluHale)
