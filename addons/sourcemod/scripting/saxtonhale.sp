@@ -1545,7 +1545,8 @@ public Action event_round_start(Event event, const char[] name, bool dontBroadca
         SetVariantInt(view_as<int>(OtherTeam));
         AcceptEntityInput(ent, "SetTeam");
         AcceptEntityInput(ent, "skin");
-        SetEntProp(ent, Prop_Send, "m_nSkin", view_as<any>(view_as<int>(OtherTeam)-2));
+        int skin = view_as<int>(OtherTeam) - 2;
+        SetEntProp(ent, Prop_Send, "m_nSkin", skin);
     }
     ent = -1;
     while ((ent = FindEntityByClassname2(ent, "mapobj_cart_dispenser")) != -1)
@@ -1561,23 +1562,21 @@ public Action event_round_start(Event event, const char[] name, bool dontBroadca
     return Plugin_Continue;
 }
 
-bool:FixUnbalancedTeams()
+bool FixUnbalancedTeams()
 {
-    if (GetTeamClientCount(HaleTeam) <= 0 || GetTeamClientCount(OtherTeam) <= 0)
+    if (GetTeamClientCount(view_as<int>(HaleTeam)) <= 0 || GetTeamClientCount(view_as<int>(OtherTeam)) <= 0)
     {
-        for (new i = 1; i <= MaxClients; i++)
+        for (int i = 1; i <= MaxClients; i++)
         {
             if (IsClientInGame(i))
-            {
-                ChangeTeam(i, i==Hale?HaleTeam:OtherTeam);
-            }
+                ChangeTeam(i, i==Hale?view_as<int>(HaleTeam):view_as<int>(OtherTeam));
         }
         return true;
     }
     return false;
 }
 
-SearchForItemPacks()
+void SearchForItemPacks()
 {
     new bool:foundAmmo = false, bool:foundHealth = false;
     new ent = -1;
