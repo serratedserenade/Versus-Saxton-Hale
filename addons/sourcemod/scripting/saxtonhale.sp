@@ -629,7 +629,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 {
     SpawnManyAmmoPacks(client, EggModel, 1);
 }*/
-public OnPluginStart()
+public void OnPluginStart()
 {
 //  InitGamedata();
 //  RegAdminCmd("hale_eggs", Command_Eggs, ADMFLAG_ROOT);   //WILL CRASH.
@@ -657,10 +657,10 @@ public OnPluginStart()
     
     // bFriendlyFire = GetConVarBool(FindConVar("mp_friendlyfire"));
     // HookConVarChange(FindConVar("mp_friendlyfire"), HideCvarNotify);
-    HookConVarChange(FindConVar("tf_bot_count"), HideCvarNotify);
-    HookConVarChange(FindConVar("tf_arena_use_queue"), HideCvarNotify);
-    HookConVarChange(FindConVar("tf_arena_first_blood"), HideCvarNotify);
-    HookConVarChange(FindConVar("mp_friendlyfire"), HideCvarNotify);
+    FindConVar("tf_bot_count").AddChangeHook(HideCvarNotify);
+    FindConVar("tf_arena_use_queue").AddChangeHook(HideCvarNotify);
+    FindConVar("tf_arena_first_blood").AddChangeHook(HideCvarNotify);
+    FindConVar("mp_friendlyfire").AddChangeHook(HideCvarNotify);
 
     HookEvent("teamplay_round_start", event_round_start);
     HookEvent("teamplay_round_win", event_round_end);
@@ -673,21 +673,20 @@ public OnPluginStart()
     HookEvent("object_deflected", event_deflect, EventHookMode_Pre);
 
     OnPluginStart_TeleportToMultiMapSpawn(); // Setup adt_array
-
     HookUserMessage(GetUserMessageId("PlayerJarated"), event_jarate);
-    HookConVarChange(cvarEnabled, CvarChange);
-    HookConVarChange(cvarHaleSpeed, CvarChange);
-    HookConVarChange(cvarRageDMG, CvarChange);
-    HookConVarChange(cvarRageDist, CvarChange);
-    HookConVarChange(cvarAnnounce, CvarChange);
-    HookConVarChange(cvarSpecials, CvarChange);
-    HookConVarChange(cvarPointType, CvarChange);
-    HookConVarChange(cvarPointDelay, CvarChange);
-    HookConVarChange(cvarAliveToEnable, CvarChange);
-    HookConVarChange(cvarCrits, CvarChange);
-    HookConVarChange(cvarDemoShieldCrits, CvarChange);
-    HookConVarChange(cvarDisplayHaleHP, CvarChange);
-    HookConVarChange(cvarRageSentry, CvarChange);
+    cvarEnabled.AddChangeHook(CvarChange);
+    cvarHaleSpeed.AddChangeHook(CvarChange);
+    cvarRageDMG.AddChangeHook(CvarChange);
+    cvarRageDist.AddChangeHook(CvarChange);
+    cvarAnnounce.AddChangeHook(CvarChange);
+    cvarSpecials.AddChangeHook(CvarChange);
+    cvarPointType.AddChangeHook(CvarChange);
+    cvarPointDelay.AddChangeHook(CvarChange);
+    cvarAliveToEnable.AddChangeHook(CvarChange);
+    cvarCrits.AddChangeHook(CvarChange);
+    cvarDemoShieldCrits.AddChangeHook(CvarChange);
+    cvarDisplayHaleHP.AddChangeHook(CvarChange);
+    cvarRageSentry.AddChangeHook(CvarChange);
     //HookConVarChange(cvarCircuitStun, CvarChange);
     g_bReloadVSHOnRoundEnd = false;
     RegAdminCmd("sm_hale_reload", Debug_ReloadVSH, ADMFLAG_ROOT, "Reloads the VSH plugin safely and silently.");
@@ -744,7 +743,7 @@ public OnPluginStart()
     LoadTranslations("saxtonhale_bunny.phrases");
 #endif
     LoadTranslations("common.phrases");
-    for (new client = 1; client <= MaxClients; client++)
+    for (int client = 1; client <= MaxClients; client++)
     {
         VSHFlags[client] = 0;
         Damage[client] = 0;
@@ -754,16 +753,12 @@ public OnPluginStart()
         {
             SDKHook(client, SDKHook_OnTakeDamage, OnTakeDamage);
             SDKHook(client, SDKHook_PreThinkPost, OnPreThinkPost);
-
 #if defined _tf2attributes_included
             if (IsPlayerAlive(client))
-            {
                 TF2Attrib_RemoveByName(client, "damage force reduction");
-            }
 #endif
         }
     }
-
     AddNormalSoundHook(HookSound);
 #if defined _steamtools_included
     steamtools = LibraryExists("SteamTools");
@@ -771,6 +766,7 @@ public OnPluginStart()
     AddMultiTargetFilter("@hale", HaleTargetFilter, "the current Boss", false);
     AddMultiTargetFilter("@!hale", HaleTargetFilter, "all non-Boss players", false);
 }
+
 public bool:HaleTargetFilter(const String:pattern[], Handle:clients)
 {
     new bool:non = StrContains(pattern, "!", false) != -1;
