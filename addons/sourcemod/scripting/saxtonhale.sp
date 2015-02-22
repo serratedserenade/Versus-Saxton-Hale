@@ -347,7 +347,7 @@ static bool g_bReloadVSHOnRoundEnd = false;
 #define VSHFLAG_HASONGIVED  (1 << 5)
 int VSHFlags[TF_MAX_PLAYERS], Hale = -1, HaleHealthMax, HaleHealth, HaleHealthLast, HaleCharge = 0, HaleRage, NextHale, KSpreeCount = 1, HHHClimbCount;
 float g_flStabbed, g_flMarketed, HPTime, KSpreeTimer, WeighDownTimer, UberRageCount, GlowTimer, HaleSpeed = 340.0, RageDist = 800.0, Announce = 120.0, tf_scout_hype_pep_max;
-bool bEnableSuperDuperJump, bTenSecStart[2] = {false, false}, bSpawnTeleOnTriggerHurt = false, bNoTaunt = false, bool g_bEnabled = false, bool g_bAreEnoughPlayersPlaying = false;
+bool bEnableSuperDuperJump, bTenSecStart[2] = {false, false}, bSpawnTeleOnTriggerHurt = false, bNoTaunt = false, g_bEnabled = false, g_bAreEnoughPlayersPlaying = false;
 ConVar cvarVersion, cvarHaleSpeed, cvarPointDelay, cvarRageDMG, cvarRageDist, cvarAnnounce, cvarSpecials, cvarEnabled, cvarAliveToEnable, cvarPointType, cvarCrits, cvarRageSentry;
 ConVar cvarFirstRound, cvarDemoShieldCrits, cvarDisplayHaleHP, cvarEnableEurekaEffect, cvarForceHaleTeam;
 Handle PointCookie, MusicCookie, VoiceCookie, ClasshelpinfoCookie, doorchecktimer, jumpHUD, rageHUD, healthHUD, infoHUD, MusicTimer;
