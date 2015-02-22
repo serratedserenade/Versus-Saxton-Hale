@@ -1173,9 +1173,9 @@ public void CvarChange(ConVar convar, const char[] oldValue, const char[] newVal
     }
 }
 
-public Action:Timer_Announce(Handle:hTimer)
+public Action Timer_Announce(Handle hTimer)
 {
-    static announcecount=-1;
+    static int announcecount = -1;
     announcecount++;
     if (Announce > 1.0 && g_bAreEnoughPlayersPlaying)
     {
@@ -1205,6 +1205,7 @@ public Action:Timer_Announce(Handle:hTimer)
     }
     return Plugin_Continue;
 }
+
 /*public Action:OnGetGameDescription(String:gameDesc[64])
 {
     if (g_bAreEnoughPlayersPlaying)
@@ -1214,10 +1215,11 @@ public Action:Timer_Announce(Handle:hTimer)
     }
     return Plugin_Continue;
 }*/
-bool:IsSaxtonHaleMap(bool:forceRecalc = false)
+
+bool IsSaxtonHaleMap(bool forceRecalc = false)
 {
-    static bool:found = false;
-    static bool:isVSHMap = false;
+    static bool found = false;
+    static bool isVSHMap = false;
     if (forceRecalc)
     {
         isVSHMap = false;
@@ -1225,7 +1227,7 @@ bool:IsSaxtonHaleMap(bool:forceRecalc = false)
     }
     if (!found)
     {
-        decl String:s[PLATFORM_MAX_PATH];
+        char s[PLATFORM_MAX_PATH];
         GetCurrentMap(currentmap, sizeof(currentmap));
         if (FileExists("bNextMapToHale"))
         {
@@ -1241,7 +1243,7 @@ bool:IsSaxtonHaleMap(bool:forceRecalc = false)
             found = true;
             return false;
         }
-        new Handle:fileh = OpenFile(s, "r");
+        File fileh = OpenFile(s, "r");
         if (fileh == INVALID_HANDLE)
         {
             LogError("[VSH] Error reading maps from %s, disabling plugin.", s);
@@ -1249,8 +1251,8 @@ bool:IsSaxtonHaleMap(bool:forceRecalc = false)
             found = true;
             return false;
         }
-        new pingas = 0;
-        while (!IsEndOfFile(fileh) && ReadFileLine(fileh, s, sizeof(s)) && (pingas < 100))
+        int pingas = 0;
+        while (!fileh.EndOfFile() && fileh.ReadLine(s, sizeof(s)) && (pingas < 100))
         {
             pingas++;
             if (pingas == 100)
@@ -1259,20 +1261,21 @@ bool:IsSaxtonHaleMap(bool:forceRecalc = false)
             if (strncmp(s, "//", 2, false) == 0) continue;
             if ((StrContains(currentmap, s, false) != -1) || (StrContains(s, "all", false) == 0))
             {
-                CloseHandle(fileh);
+                delete fileh;
                 isVSHMap = true;
                 found = true;
                 return true;
             }
         }
-        CloseHandle(fileh);
+        delete fileh;
     }
     return isVSHMap;
 }
-bool:MapHasMusic(bool:forceRecalc = false)
+
+bool MapHasMusic(bool forceRecalc = false)
 {
-    static bool:hasMusic;
-    static bool:found = false;
+    static bool hasMusic;
+    static bool found = false;
     if (forceRecalc)
     {
         found = false;
@@ -1280,8 +1283,8 @@ bool:MapHasMusic(bool:forceRecalc = false)
     }
     if (!found)
     {
-        new i = -1;
-        decl String:name[64];
+        int i = -1;
+        char name[64];
         while ((i = FindEntityByClassname2(i, "info_target")) != -1)
         {
             GetEntPropString(i, Prop_Data, "m_iName", name, sizeof(name));
@@ -1291,9 +1294,10 @@ bool:MapHasMusic(bool:forceRecalc = false)
     }
     return hasMusic;
 }
-bool:CheckToChangeMapDoors()
+
+bool CheckToChangeMapDoors()
 {
-    decl String:s[PLATFORM_MAX_PATH];
+    char s[PLATFORM_MAX_PATH];
     GetCurrentMap(currentmap, sizeof(currentmap));
     checkdoors = false;
     BuildPath(Path_SM, s, PLATFORM_MAX_PATH, "configs/saxton_hale/saxton_hale_doors.cfg");
@@ -1301,66 +1305,56 @@ bool:CheckToChangeMapDoors()
     {
         if (strncmp(currentmap, "vsh_lolcano_pb1", 15, false) == 0)
             checkdoors = true;
-        return;
+        return false;
     }
-    new Handle:fileh = OpenFile(s, "r");
+    File fileh = OpenFile(s, "r");
     if (fileh == INVALID_HANDLE)
     {
         if (strncmp(currentmap, "vsh_lolcano_pb1", 15, false) == 0)
             checkdoors = true;
-        return;
+        return false;
     }
-    while (!IsEndOfFile(fileh) && ReadFileLine(fileh, s, sizeof(s)))
+    while (!fileh.EndOfFile() && fileh.ReadLine(s, sizeof(s)))
     {
         Format(s, strlen(s)-1, s);
         if (strncmp(s, "//", 2, false) == 0) continue;
         if (StrContains(currentmap, s, false) != -1 || StrContains(s, "all", false) == 0)
         {
-            CloseHandle(fileh);
+            delete fileh;
             checkdoors = true;
-            return;
+            return true;
         }
     }
-    CloseHandle(fileh);
+    delete fileh;
 }
-CheckToTeleportToSpawn()
+
+void CheckToTeleportToSpawn()
 {
-    decl String:s[PLATFORM_MAX_PATH];
+    char s[PLATFORM_MAX_PATH];
     GetCurrentMap(currentmap, sizeof(currentmap));
     bSpawnTeleOnTriggerHurt = false;
-
     BuildPath(Path_SM, s, PLATFORM_MAX_PATH, "configs/saxton_hale/saxton_spawn_teleport.cfg");
-
     if (!FileExists(s))
-    {
         return;
-    }
-
-    new Handle:fileh = OpenFile(s, "r");
-
+    File fileh = OpenFile(s, "r");
     if (fileh == INVALID_HANDLE)
-    {
         return;
-    }
-
-    while (!IsEndOfFile(fileh) && ReadFileLine(fileh, s, sizeof(s)))
+    while (!fileh.EndOfFile() && fileh.ReadLine(s, sizeof(s)))
     {
         Format(s, strlen(s) - 1, s);
         if (strncmp(s, "//", 2, false) == 0)
-        {
             continue;
-        }
-
         if (StrContains(currentmap, s, false) != -1 || StrContains(s, "all", false) == 0)
         {
             bSpawnTeleOnTriggerHurt = true;
-            CloseHandle(fileh);
+            delete fileh;
             return;
         }
     }
 
-    CloseHandle(fileh);
+    delete fileh;
 }
+
 bool:CheckNextSpecial()
 {
     if (!bSpecials)
