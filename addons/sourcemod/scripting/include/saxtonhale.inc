@@ -11,7 +11,7 @@ enum VSHRState
     VSHRState_Waiting,
     VSHRState_Active,
     VSHRState_End
-}
+};
 
 // VSH_GetSpecialRoundIndex()
 enum VSHSpecial
@@ -22,7 +22,50 @@ enum VSHSpecial
     VSHSpecial_HHH,
     VSHSpecial_CBS,
     VSHSpecial_Bunny
-}
+};
+
+methodmap VSH
+{
+	property bool IsVSHMap
+	{
+		public native get();
+	}
+	
+	property bool IsEnabled
+	{
+		public native get();
+	}
+	
+	property int BossUserId
+	{
+		public native get();
+	}
+	
+	property TFTeam BossTeam
+	{
+		public native get();
+	}
+	
+	property VSHSpecial SpecialIndex
+	{
+		public native get();
+	}
+	
+	property int BossHealth
+	{
+		public native get();
+	}
+	
+	property int BossHealthMax
+	{
+		public native get();
+	}
+	
+	property VSHRState RoundState
+	{
+		public native get();
+	}
+};
 
 /**
  * Will VSH be played on the current map?
@@ -31,12 +74,14 @@ enum VSHSpecial
  *
  * @return 1 if it's a VSH map, 0 otherwise.
  */
+#pragma deprecated Use the VSH method map.
 native bool VSH_IsSaxtonHaleModeMap();
 
 /**
  *
  * @return True if VSH is enabled, false otherwise.
  */
+#pragma deprecated Use the VSH method map.
 native bool VSH_IsSaxtonHaleModeEnabled();
 
 /**
@@ -44,6 +89,7 @@ native bool VSH_IsSaxtonHaleModeEnabled();
  *
  * @return		    	Userid of current Hale/boss (-1 if invalid/doesn't exist).
  */
+#pragma deprecated Use the VSH method map.
 native int VSH_GetSaxtonHaleUserId();
 
 /**
@@ -51,6 +97,7 @@ native int VSH_GetSaxtonHaleUserId();
  *
  * @return		    	Hale's team number (as in the TFTeam enum)
  */
+#pragma deprecated Use the VSH method map.
 native TFTeam VSH_GetSaxtonHaleTeam();
 
 /**
@@ -61,6 +108,7 @@ native TFTeam VSH_GetSaxtonHaleTeam();
  *						2 - HHH
  *						4 - CBS
  */
+#pragma deprecated Use the VSH method map.
 native VSHSpecial VSH_GetSpecialRoundIndex();
 
 /**
@@ -68,6 +116,7 @@ native VSHSpecial VSH_GetSpecialRoundIndex();
  *
  * @return		    	An integer representing Hale's health.
  */
+#pragma deprecated Use the VSH method map.
 native int VSH_GetSaxtonHaleHealth();
 
 /**
@@ -75,6 +124,7 @@ native int VSH_GetSaxtonHaleHealth();
  *
  * @return		    	An integer representing Hale's max/initial health.
  */
+#pragma deprecated Use the VSH method map.
 native int VSH_GetSaxtonHaleHealthMax();
 
 /**
@@ -93,6 +143,7 @@ native int VSH_GetClientDamage(int client);
  *				1 - VSH during round
  *				2 - VSH after round end
  */
+#pragma deprecated Use the VSH method map.
 native VSHRState VSH_GetRoundState();
 
 /**
@@ -163,5 +214,13 @@ public __pl_SaxtonHale_SetNTVOptional()
 	MarkNativeAsOptional("VSH_GetSaxtonHaleHealthMax");
 	MarkNativeAsOptional("VSH_GetClientDamage");
 	MarkNativeAsOptional("VSH_GetRoundState");
-}
+	MarkNativeAsOptional("VSH.IsVSHMap.get");
+	MarkNativeAsOptional("VSH.IsEnabled.get");
+	MarkNativeAsOptional("VSH.BossUserId.get");
+	MarkNativeAsOptional("VSH.BossTeam.get");
+	MarkNativeAsOptional("VSH.SpecialIndex.get");
+	MarkNativeAsOptional("VSH.BossHealth.get");
+	MarkNativeAsOptional("VSH.BossHealthMax.get");
+	MarkNativeAsOptional("VSH.RoundState.get");
+};
 #endif
