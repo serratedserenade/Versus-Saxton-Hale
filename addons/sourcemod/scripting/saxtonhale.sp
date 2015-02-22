@@ -531,7 +531,7 @@ public Plugin myinfo = {
     url = "https://forums.alliedmods.net/showthread.php?p=2167912",
 };
 
-public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max)
+public APLRes AskPluginLoad2(Handle myself, bool late, char error[], int err_max)
 {
     MarkNativeAsOptional("GetUserMessageType");
     MarkNativeAsOptional("PbSetInt");
@@ -564,7 +564,16 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max)
     
     CreateNative("VSH_GetRoundState", Native_GetRoundState);
     OnGetRoundState = CreateGlobalForward("VSH_OnGetRoundState", ET_Hook, Param_CellByRef);*/
-
+	//Methodmap natives.
+    CreateNative("VSH.IsVSHMap.get", Native_IsVSHMap);
+    CreateNative("VSH.IsEnabled.get", Native_IsEnabled);
+    CreateNative("VSH.BossUserId.get", Native_GetHale);
+    CreateNative("VSH.BossTeam.get", Native_GetTeam);
+    CreateNative("VSH.SpecialIndex.get", Native_GetSpecial);
+    CreateNative("VSH.BossHealth.get", Native_GetHealth);
+    CreateNative("VSH.BossHealthMax.get", Native_GetHealthMax);
+    CreateNative("VSH.RoundState.get", Native_GetRoundState);
+	//End methodmap natives.
     CreateNative("VSH_IsSaxtonHaleModeMap", Native_IsVSHMap);
     CreateNative("VSH_IsSaxtonHaleModeEnabled", Native_IsEnabled);
     CreateNative("VSH_GetSaxtonHaleUserId", Native_GetHale);
