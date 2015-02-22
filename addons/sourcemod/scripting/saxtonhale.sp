@@ -238,16 +238,16 @@ static const String:BunnyMaterials[][] = {
     "materials/models/player/easter_demo/easter_rabbit.vmt",
     "materials/models/player/easter_demo/easter_rabbit.vtf",
     "materials/models/player/easter_demo/easter_rabbit_normal.vtf",
-    "materials/models/player/easter_demo/eyeball_r.vmt",
-    "materials/models/player/easter_demo/demoman_head_blue_invun.vmt",
-    "materials/models/player/easter_demo/demoman_head_red_invun.vmt",
-    "materials/models/player/easter_demo/easter_rabbit_blue.vmt",
-    "materials/models/player/easter_demo/easter_rabbit_blue.vtf",
-    "materials/models/player/easter_demo/easter_rabbit_invun.vmt",
-    "materials/models/player/easter_demo/easter_rabbit_invun.vtf",
-    "materials/models/player/easter_demo/easter_rabbit_invun_blue.vmt",
-    "materials/models/player/easter_demo/easter_rabbit_invun_blue.vtf",
-    "materials/models/player/easter_demo/eyeball_invun.vmt"
+    "materials/models/player/easter_demo/eyeball_r.vmt"
+    // "materials/models/player/easter_demo/demoman_head_blue_invun.vmt", // This is for the new version of easter demo which VSH isn't using
+    // "materials/models/player/easter_demo/demoman_head_red_invun.vmt",
+    // "materials/models/player/easter_demo/easter_rabbit_blue.vmt",
+    // "materials/models/player/easter_demo/easter_rabbit_blue.vtf",
+    // "materials/models/player/easter_demo/easter_rabbit_invun.vmt",
+    // "materials/models/player/easter_demo/easter_rabbit_invun.vtf",
+    // "materials/models/player/easter_demo/easter_rabbit_invun_blue.vmt",
+    // "materials/models/player/easter_demo/easter_rabbit_invun_blue.vtf",
+    // "materials/models/player/easter_demo/eyeball_invun.vmt"
 };
 
 // SFX
