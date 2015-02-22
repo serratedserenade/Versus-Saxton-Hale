@@ -2,11 +2,11 @@
     ===Versus Saxton Hale Mode===
     Created by Rainbolt Dash (formerly Dr.Eggman): programmer, model-maker, mapper.
     Notoriously famous for creating plugins with terrible code and then abandoning them
-    
+
     FlaminSarge - He makes cool things. He improves on terrible things until they're good.
     Chdata - A Hale enthusiast and a coder. An Integrated Data Sentient Entity.
     nergal - Added some very nice features to the plugin and fixed important bugs.
-    
+
     New plugin thread on AlliedMods: https://forums.alliedmods.net/showthread.php?p=2167912
 */
 #define PLUGIN_VERSION "1.53"
@@ -430,7 +430,7 @@ static const char haleversiontitles[][] =     //the last line of this is what de
     "1.49",
     "1.50",
     "1.51",
-	"1.52",
+    "1.52",
     PLUGIN_VERSION
 };
 static const char haleversiondates[][] =
@@ -540,31 +540,31 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
     MarkNativeAsOptional("PbAddString");
 /*  CreateNative("VSH_IsSaxtonHaleModeMap", Native_IsVSHMap);
     OnIsVSHMap = CreateGlobalForward("VSH_OnIsSaxtonHaleModeMap", ET_Hook, Param_CellByRef);
-    
+
     CreateNative("VSH_IsSaxtonHaleModeEnabled", Native_IsEnabled);
     OnIsEnabled = CreateGlobalForward("VSH_OnIsSaxtonHaleModeEnabled", ET_Hook, Param_CellByRef);
-    
+
     CreateNative("VSH_GetSaxtonHaleUserId", Native_GetHale);
     OnGetHale = CreateGlobalForward("VSH_OnGetSaxtonHaleUserId", ET_Hook, Param_CellByRef);
-    
+
     CreateNative("VSH_GetSaxtonHaleTeam", Native_GetTeam);
     OnGetTeam = CreateGlobalForward("VSH_OnGetSaxtonHaleTeam", ET_Hook, Param_CellByRef);
-    
+
     CreateNative("VSH_GetSpecialRoundIndex", Native_GetSpecial);
     OnGetSpecial = CreateGlobalForward("VSH_OnGetSpecialRoundIndex", ET_Hook, Param_CellByRef);
-    
+
     CreateNative("VSH_GetSaxtonHaleHealth", Native_GetHealth);
     OnGetHealth = CreateGlobalForward("VSH_OnGetSaxtonHaleHealth", ET_Hook, Param_CellByRef);
-    
+
     CreateNative("VSH_GetSaxtonHaleHealthMax", Native_GetHealthMax);
     OnGetHealthMax = CreateGlobalForward("VSH_OnGetSaxtonHaleHealthMax", ET_Hook, Param_CellByRef);
-    
+
     CreateNative("VSH_GetClientDamage", Native_GetDamage);
     OnGetDamage = CreateGlobalForward("VSH_OnGetClientDamage", ET_Hook, Param_Cell,Param_CellByRef);
-    
+
     CreateNative("VSH_GetRoundState", Native_GetRoundState);
     OnGetRoundState = CreateGlobalForward("VSH_OnGetRoundState", ET_Hook, Param_CellByRef);*/
-	//Methodmap natives.
+    //Methodmap natives.
     CreateNative("VSH.IsVSHMap.get", Native_IsVSHMap);
     CreateNative("VSH.IsEnabled.get", Native_IsEnabled);
     CreateNative("VSH.BossUserId.get", Native_GetHale);
@@ -573,7 +573,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
     CreateNative("VSH.BossHealth.get", Native_GetHealth);
     CreateNative("VSH.BossHealthMax.get", Native_GetHealthMax);
     CreateNative("VSH.RoundState.get", Native_GetRoundState);
-	//End methodmap natives.
+    //End methodmap natives.
     CreateNative("VSH_IsSaxtonHaleModeMap", Native_IsVSHMap);
     CreateNative("VSH_IsSaxtonHaleModeEnabled", Native_IsEnabled);
     CreateNative("VSH_GetSaxtonHaleUserId", Native_GetHale);
@@ -654,7 +654,7 @@ public void OnPluginStart()
     //cvarForceSpecToHale = CreateConVar("hale_spec_force_boss", "0", "1- if a spectator is up next, will force them to Hale + spectators will gain queue points, else spectators are ignored by plugin", FCVAR_PLUGIN, true, 0.0, true, 1.0);
     cvarEnableEurekaEffect = CreateConVar("hale_enable_eureka", "0", "1- allow Eureka Effect, else disallow", FCVAR_PLUGIN, true, 0.0, true, 1.0);
     cvarForceHaleTeam = CreateConVar("hale_force_team", "0", "0- Use plugin logic, 1- random team, 2- red, 3- blue", FCVAR_PLUGIN, true, 0.0, true, 3.0);
-    
+
     // bFriendlyFire = GetConVarBool(FindConVar("mp_friendlyfire"));
     // HookConVarChange(FindConVar("mp_friendlyfire"), HideCvarNotify);
     FindConVar("tf_bot_count").AddChangeHook(HideCvarNotify);
@@ -671,7 +671,6 @@ public void OnPluginStart()
     HookEvent("player_hurt", event_hurt, EventHookMode_Pre);
     HookEvent("object_destroyed", event_destroy, EventHookMode_Pre);
     HookEvent("object_deflected", event_deflect, EventHookMode_Pre);
-
     OnPluginStart_TeleportToMultiMapSpawn(); // Setup adt_array
     HookUserMessage(GetUserMessageId("PlayerJarated"), event_jarate);
     cvarEnabled.AddChangeHook(CvarChange);
@@ -737,7 +736,6 @@ public void OnPluginStart()
     rageHUD = CreateHudSynchronizer();
     healthHUD = CreateHudSynchronizer();
     infoHUD = CreateHudSynchronizer();
-
     LoadTranslations("saxtonhale.phrases");
 #if defined EASTER_BUNNY_ON
     LoadTranslations("saxtonhale_bunny.phrases");
@@ -767,30 +765,23 @@ public void OnPluginStart()
     AddMultiTargetFilter("@!hale", HaleTargetFilter, "all non-Boss players", false);
 }
 
-public bool:HaleTargetFilter(const String:pattern[], Handle:clients)
+public bool HaleTargetFilter(const char[] pattern, Handle clients)
 {
-    new bool:non = StrContains(pattern, "!", false) != -1;
-    for (new client = 1; client <= MaxClients; client++)
+    bool non = StrContains(pattern, "!", false) != -1;
+    for (int client = 1; client <= MaxClients; client++)
     {
-        if (IsClientInGame(client) && FindValueInArray(clients, client) == -1)
+        if (IsClientInGame(client) && clients.FindValue(client) == -1)
         {
-            if (g_bEnabled && client == Hale)
-            {
-                if (!non)
-                {
-                    PushArrayCell(clients, client);
-                }
-            }
+            if (g_bEnabled && client == Hale && !non)
+                clients.Push(client);
             else if (non)
-            {
-                PushArrayCell(clients, client);
-            }
+                clients.Push(client);
         }
     }
-
     return true;
 }
-public OnLibraryAdded(const String:name[])
+
+public void OnLibraryAdded(const char[] name)
 {
 #if defined _steamtools_included
     if (strcmp(name, "SteamTools", false) == 0)
@@ -799,7 +790,8 @@ public OnLibraryAdded(const String:name[])
 //  if (strcmp(name, "hale_achievements", false) == 0)
 //      ACH_Enabled = true;
 }
-public OnLibraryRemoved(const String:name[])
+
+public void OnLibraryRemoved(const char[] name)
 {
 #if defined _steamtools_included
     if (strcmp(name, "SteamTools", false) == 0)
@@ -809,44 +801,45 @@ public OnLibraryRemoved(const String:name[])
 //      ACH_Enabled = false;
 }
 
-public OnConfigsExecuted()
+public void OnConfigsExecuted()
 {
-    decl String:oldversion[64];
-    GetConVarString(cvarVersion, oldversion, sizeof(oldversion));
-    if (strcmp(oldversion, haleversiontitles[maxversion], false) != 0) LogError("[VS Saxton Hale] Warning: your config may be outdated. Back up your tf/cfg/sourcemod/SaxtonHale.cfg file and delete it, and this plugin will generate a new one that you can then modify to your original values.");
-    SetConVarString(FindConVar("hale_version"), haleversiontitles[maxversion]);
-    HaleSpeed = GetConVarFloat(cvarHaleSpeed);
-    RageDMG = GetConVarInt(cvarRageDMG);
-    RageDist = GetConVarFloat(cvarRageDist);
-    Announce = GetConVarFloat(cvarAnnounce);
-    bSpecials = GetConVarBool(cvarSpecials);
-    PointType = GetConVarInt(cvarPointType);
-    PointDelay = GetConVarInt(cvarPointDelay);
+    char oldversion[64];
+    cvarVersion.GetString(oldversion, sizeof(oldversion));
+    if (strcmp(oldversion, haleversiontitles[maxversion], false) != 0)
+        LogError("[VS Saxton Hale] Warning: your config may be outdated. Back up your tf/cfg/sourcemod/SaxtonHale.cfg file and delete it, and this plugin will generate a new one that you can then modify to your original values.");
+    cvarVersion.SetString(haleversiontitles[maxversion]);
+    HaleSpeed = cvarHaleSpeed.FloatValue;
+    RageDMG = cvarRageDMG.IntValue;
+    RageDist = cvarRageDist.FloatValue;
+    Announce = cvarAnnounce.FloatValue;
+    bSpecials = cvarSpecials.BoolValue;
+    PointType = cvarPointType.IntValue;
+    PointDelay = cvarPointDelay.IntValue;
     if (PointDelay < 0) PointDelay *= -1;
-    AliveToEnable = GetConVarInt(cvarAliveToEnable);
-    haleCrits = GetConVarBool(cvarCrits);
-    bDemoShieldCrits = GetConVarBool(cvarDemoShieldCrits);
-    bAlwaysShowHealth = GetConVarBool(cvarDisplayHaleHP);
-    newRageSentry = GetConVarBool(cvarRageSentry);
+    AliveToEnable = cvarAliveToEnable.IntValue;
+    haleCrits = cvarCrits.BoolValue;
+    bDemoShieldCrits = cvarDemoShieldCrits.BoolValue;
+    bAlwaysShowHealth = cvarDisplayHaleHP.BoolValue;
+    newRageSentry = cvarRageSentry.BoolValue;
     //circuitStun = GetConVarFloat(cvarCircuitStun);
-    if (IsSaxtonHaleMap() && GetConVarBool(cvarEnabled))
+    if (IsSaxtonHaleMap() && cvarEnabled.BoolValue)
     {
-        tf_arena_use_queue = GetConVarInt(FindConVar("tf_arena_use_queue"));
-        mp_teams_unbalance_limit = GetConVarInt(FindConVar("mp_teams_unbalance_limit"));
-        tf_arena_first_blood = GetConVarInt(FindConVar("tf_arena_first_blood"));
-        mp_forcecamera = GetConVarInt(FindConVar("mp_forcecamera"));
-        tf_scout_hype_pep_max = GetConVarFloat(FindConVar("tf_scout_hype_pep_max"));
-        SetConVarInt(FindConVar("tf_arena_use_queue"), 0);
-        SetConVarInt(FindConVar("mp_teams_unbalance_limit"), TF2_GetRoundWinCount() ? 0 : 1); // s_bLateLoad ? 0 : 
+        tf_arena_use_queue = FindConVar("tf_arena_use_queue").IntValue;
+        mp_teams_unbalance_limit = FindConVar("mp_teams_unbalance_limit").IntValue;
+        tf_arena_first_blood = FindConVar("tf_arena_first_blood").IntValue;
+        mp_forcecamera = FindConVar("mp_forcecamera").IntValue;
+        tf_scout_hype_pep_max = FindConVar("tf_scout_hype_pep_max").FloatValue;
+        FindConVar("tf_arena_use_queue").IntValue = 0;
+        FindConVar("mp_teams_unbalance_limit").IntValue = TF2_GetRoundWinCount() ? 0 : 1; // s_bLateLoad ? 0 :
         //SetConVarInt(FindConVar("mp_teams_unbalance_limit"), GetConVarBool(cvarFirstRound)?0:1);
-        SetConVarInt(FindConVar("tf_arena_first_blood"), 0);
-        SetConVarInt(FindConVar("mp_forcecamera"), 0);
-        SetConVarFloat(FindConVar("tf_scout_hype_pep_max"), 100.0);
-        SetConVarInt(FindConVar("tf_damage_disablespread"), 1);
+        FindConVar("tf_arena_first_blood").IntValue = 0;
+        FindConVar("mp_forcecamera").IntValue = 0;
+        FindConVar("tf_scout_hype_pep_max").FloatValue = 100.0;
+        FindConVar("tf_damage_disablespread").IntValue = 1;
 #if defined _steamtools_included
         if (steamtools)
         {
-            decl String:gameDesc[64];
+            char gameDesc[64];
             Format(gameDesc, sizeof(gameDesc), "VS Saxton Hale (%s)", haleversiontitles[maxversion]);
             Steam_SetGameDescription(gameDesc);
         }
@@ -855,9 +848,7 @@ public OnConfigsExecuted()
         g_bEnabled = true;
         g_bAreEnoughPlayersPlaying = true;
         if (Announce > 1.0)
-        {
             CreateTimer(Announce, Timer_Announce, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
-        }
     }
     else
     {
@@ -865,6 +856,7 @@ public OnConfigsExecuted()
         g_bEnabled = false;
     }
 }
+
 public OnMapStart()
 {
     HPTime = 0.0;
@@ -936,7 +928,7 @@ AddToDownload()
     /*
         Files to download + precache that are not originally part of TF2 or HL2 / etc
     */
-    
+
     PrepareSound("saxton_hale/9000.wav");
 
     /*
@@ -1596,7 +1588,7 @@ public Action:event_round_start(Handle:event, const String:name[], bool:dontBroa
         return Plugin_Continue;
     }
 
-    SetConVarInt(FindConVar("mp_teams_unbalance_limit"), TF2_GetRoundWinCount() ? 0 : 1); // s_bLateLoad ? 0 : 
+    SetConVarInt(FindConVar("mp_teams_unbalance_limit"), TF2_GetRoundWinCount() ? 0 : 1); // s_bLateLoad ? 0 :
 
     if (FixUnbalancedTeams())
     {
@@ -1707,7 +1699,7 @@ SearchForItemPacks()
             SetEntProp(ent2, Prop_Send, "m_iTeamNum", g_bEnabled?OtherTeam:0, 4);
             foundAmmo = true;
         }
-        
+
     }
     ent = -1;
     while ((ent = FindEntityByClassname2(ent, "item_ammopack_medium")) != -1)
@@ -1723,7 +1715,7 @@ SearchForItemPacks()
             DispatchSpawn(ent2);
             SetEntProp(ent2, Prop_Send, "m_iTeamNum", g_bEnabled?OtherTeam:0, 4);
         }
-        
+
         foundAmmo = true;
     }
     ent = -1;
@@ -1912,7 +1904,7 @@ public Action:event_round_end(Handle:event, const String:name[], bool:dontBroadc
             {
                 strcopy(s, PLATFORM_MAX_PATH, BunnyWin[GetRandomInt(0, sizeof(BunnyWin)-1)]);
                 EmitSoundToAll(s, _, SNDCHAN_VOICE, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, Hale, _, NULL_VECTOR, false, 0.0);
-                EmitSoundToAllExcept(SOUNDEXCEPT_VOICE, s, _, _, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, Hale, _, NULL_VECTOR, false, 0.0);  
+                EmitSoundToAllExcept(SOUNDEXCEPT_VOICE, s, _, _, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, Hale, _, NULL_VECTOR, false, 0.0);
             }
         }
     }
@@ -2421,7 +2413,7 @@ SkipHalePanelNotify(client) // , bool:newchoice = true
     DrawPanelItem(panel, s);
     SendPanelToClient(panel, client, SkipHalePanelH, 30);
     CloseHandle(panel);
-    
+
     return;
 }
 
@@ -3078,7 +3070,7 @@ public Action:MakeNoHale(Handle:hTimer, any:clientid)
         if (GetEntPropFloat(weapon, Prop_Send, "m_flChargeLevel") < 0.41)
             SetEntPropFloat(weapon, Prop_Send, "m_flChargeLevel", 0.41);
         #endif
-        
+
         #if !defined OVERRIDE_MEDIGUNS_ON
         new mediquality = (weapon > MaxClients && IsValidEdict(weapon) ? GetEntProp(weapon, Prop_Send, "m_iEntityQuality") : -1);
         if (mediquality != 10)
@@ -3604,14 +3596,14 @@ public Action:event_player_spawn(Handle:event, const String:name[], bool:dontBro
         if (!(VSHFlags[client] & VSHFLAG_HASONGIVED))
         {
             VSHFlags[client] |= VSHFLAG_HASONGIVED;
-			new array[] = { 57, 133, 231, 405, 444, 608, 642 };
+            new array[] = { 57, 133, 231, 405, 444, 608, 642 };
             RemovePlayerBack(client, array, sizeof(array));
             RemoveDemoShield(client);
             TF2_RemoveAllWeapons(client);
             TF2_RegeneratePlayer(client);
             CreateTimer(0.1, Timer_RegenPlayer, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
         }
-    } 
+    }
     if (!(VSHFlags[client] & VSHFLAG_HELPED))
     {
         HelpPanel(client);
@@ -3781,7 +3773,7 @@ public Action:ClientTimer(Handle:hTimer)
                 SetHudTextParams(-1.0, bHudAdjust?0.78:0.83, 0.35, 255, 255, 255, 255);
                 if (!(GetClientButtons(client) & IN_SCORE)) ShowSyncHudText(client, healthHUD, "%t", "vsh_health", HaleHealth, HaleHealthMax);
             }
-            
+
 //          else if (AirBlastReload[client]>0)
 //          {
 //              SetHudTextParams(-1.0, 0.83, 0.15, 255, 255, 255, 255, 0, 0.2, 0.0, 0.1);
@@ -4057,7 +4049,7 @@ public Action:HaleTimer(Handle:hTimer)
                     target = GetRandomInt(1, MaxClients);
                 }
                 while ((RedAlivePlayers > 0) && (!IsClientInGame(target) || (target == Hale) || !IsPlayerAlive(target) || GetEntityTeamNum(target) != OtherTeam)); // IsValidClient(target, false)
-                
+
                 if (IsValidClient(target)) // Maybe it can fail it we teleport to nobody?
                 {
                     // Chdata's HHH teleport rework
@@ -4088,7 +4080,7 @@ public Action:HaleTimer(Handle:hTimer)
                     }
 
                     AttachParticle(Hale, "ghost_appearation", 3.0, _, true);    // So the teleport smoke appears at both destinations
-                    
+
                     // Chdata's HHH teleport rework
                     decl Float:vPos[3];
                     GetEntPropVector(target, Prop_Send, "m_vecOrigin", vPos);
@@ -4273,10 +4265,10 @@ public Action:cdVoiceMenu(iClient, const String:sCommand[], iArgc)
     if (iArgc < 2) return Plugin_Handled;
 
     decl String:sCmd1[8], String:sCmd2[8];
-    
+
     GetCmdArg(1, sCmd1, sizeof(sCmd1));
     GetCmdArg(2, sCmd2, sizeof(sCmd2));
-    
+
     // Capture call for medic commands (represented by "voicemenu 0 0")
 
     if (sCmd1[0] == '0' && sCmd2[0] == '0' && IsPlayerAlive(iClient) && iClient == Hale)
@@ -4287,7 +4279,7 @@ public Action:cdVoiceMenu(iClient, const String:sCommand[], iArgc)
             return Plugin_Handled;
         }
     }
-    
+
     return (iClient == Hale && Special != VSHSpecial_CBS && Special != VSHSpecial_Bunny) ? Plugin_Handled : Plugin_Continue;
 }
 
@@ -4974,7 +4966,7 @@ public Action:CheckAlivePlayers(Handle:hTimer)
             EmitSoundToAll(s, _, SNDCHAN_ITEM, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, Hale, pos, NULL_VECTOR, false, 0.0);
         }
     }
-    
+
     if (!PointType && (RedAlivePlayers <= (AliveToEnable = GetConVarInt(cvarAliveToEnable))) && !PointReady)
     {
         PrintHintTextToAll("%t", "vsh_point_enable", RedAlivePlayers);
@@ -5144,7 +5136,7 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                 }
 #else
                 // Does not protect against sentries or FaN, but does against miniguns and rockets
-                if ((iFlags & (FL_ONGROUND|FL_DUCKING)) == (FL_ONGROUND|FL_DUCKING))    
+                if ((iFlags & (FL_ONGROUND|FL_DUCKING)) == (FL_ONGROUND|FL_DUCKING))
                 {
                     damagetype |= DMG_PREVENT_PHYSICS_FORCE;
                     bChanged = true;
@@ -6169,7 +6161,7 @@ public Action:NewPanel(client, versionindex)
         }
         else
         {
-            Format(s, 90, "Older v%s", haleversiontitles[versionindex-1]); 
+            Format(s, 90, "Older v%s", haleversiontitles[versionindex-1]);
         }
         DrawPanelItem(panel, s);
     }
@@ -6196,7 +6188,7 @@ public Action:NewPanel(client, versionindex)
         Format(s, 90, "%t", "vsh_nonewer");
         DrawPanelItem(panel, s, ITEMDRAW_DISABLED);
     }
-    
+
     Format(s, 512, "%t", "vsh_menu_exit");
     DrawPanelItem(panel, s);
 
@@ -6209,10 +6201,10 @@ FindVersionData(Handle:panel, versionindex)
     switch (versionindex) // DrawPanelText(panel, "1) .");
     {
         // Unnerfed the Easter Bunny's rage.
-		case 70: //1.53
-		{
-			DrawPanelText(panel, "1) Ported VSH over to 1.7 syntax.(WildCard65)");
-		}
+        case 70: //1.53
+        {
+            DrawPanelText(panel, "1) Ported VSH over to 1.7 syntax.(WildCard65)");
+        }
         case 69: //1.52
         {
             DrawPanelText(panel, "1) Added the new festive/other weapons!");
@@ -6931,7 +6923,7 @@ public Action:HelpPanel2Cmd(client, args)
     {
         HelpPanel2(client);
     }
-    
+
     return Plugin_Handled;
 }
 public Action:HelpPanel2(client)
@@ -7844,21 +7836,21 @@ stock SetArenaCapEnableTime(Float:time)
     }
 }
 
-stock bool:IsNearSpencer(client) 
-{ 
-    new bool:dispenserheal, medics = 0; 
-    new healers = GetEntProp(client, Prop_Send, "m_nNumHealers"); 
-    if (healers > 0) 
-    { 
-        for (new i = 1; i <= MaxClients; i++) 
-        { 
-            if (IsClientInGame(i) && IsPlayerAlive(i) && GetHealingTarget(i) == client) 
-                medics++; 
-        } 
-    } 
-    dispenserheal = (healers > medics) ? true : false; 
-    return dispenserheal; 
-} 
+stock bool:IsNearSpencer(client)
+{
+    new bool:dispenserheal, medics = 0;
+    new healers = GetEntProp(client, Prop_Send, "m_nNumHealers");
+    if (healers > 0)
+    {
+        for (new i = 1; i <= MaxClients; i++)
+        {
+            if (IsClientInGame(i) && IsPlayerAlive(i) && GetHealingTarget(i) == client)
+                medics++;
+        }
+    }
+    dispenserheal = (healers > medics) ? true : false;
+    return dispenserheal;
+}
 
 stock FindSentry(client)
 {
@@ -8151,7 +8143,7 @@ stock PrepareModel(const String:szModelPath[], bool:bMdlOnly = false)
     decl String:szPath[PLATFORM_MAX_PATH];
     strcopy(szBase, sizeof(szBase), szModelPath);
     SplitString(szBase, ".mdl", szBase, sizeof(szBase));
-    
+
     if (!bMdlOnly)
     {
         Format(szPath, sizeof(szPath), "%s.phy", szBase);
@@ -8159,34 +8151,34 @@ stock PrepareModel(const String:szModelPath[], bool:bMdlOnly = false)
         {
             AddFileToDownloadsTable(szPath);
         }
-        
+
         Format(szPath, sizeof(szPath), "%s.sw.vtx", szBase);
         if (FileExists(szPath))
         {
             AddFileToDownloadsTable(szPath);
         }
-        
+
         Format(szPath, sizeof(szPath), "%s.vvd", szBase);
         if (FileExists(szPath))
         {
             AddFileToDownloadsTable(szPath);
         }
-        
+
         Format(szPath, sizeof(szPath), "%s.dx80.vtx", szBase);
         if (FileExists(szPath))
         {
             AddFileToDownloadsTable(szPath);
         }
-        
+
         Format(szPath, sizeof(szPath), "%s.dx90.vtx", szBase);
         if (FileExists(szPath))
         {
             AddFileToDownloadsTable(szPath);
         }
     }
-    
+
     AddFileToDownloadsTable(szModelPath);
-    
+
     return PrecacheModel(szModelPath, true);
 }
 
@@ -8225,17 +8217,17 @@ stock bool:IsClientParticipating(iClient)
     {
         return false;
     }
-    
-    if (bool:GetEntProp(iClient, Prop_Send, "m_bIsCoaching")) 
+
+    if (bool:GetEntProp(iClient, Prop_Send, "m_bIsCoaching"))
     {
         return false;
     }
-    
+
     if (TF2_GetPlayerClass(iClient) == TFClass_Unknown)
     {
         return false;
     }
-    
+
     return true;
 }
 
@@ -8365,7 +8357,7 @@ stock GetClosestPlayerTo(iEnt, iTeam = 0)
             {
                 continue;
             }
-            
+
             GetEntPropVector(iClient, Prop_Send, "m_vecOrigin", vPos);
             flTemp = GetVectorDistance(vLoc, vPos);
             if (!iBest || flTemp < flDist)
@@ -8407,7 +8399,7 @@ stock bool:TeleMeToYou(iMe, iYou, bool:bAngles = false)
         SetEntityFlags(iMe, GetEntityFlags(iMe) | FL_DUCKING);
         bDucked = true;
     }
-    
+
     TeleportEntity(iMe, vPos, bAngles ? vAng : NULL_VECTOR, NULL_VECTOR);
 
     return bDucked;
@@ -8474,7 +8466,7 @@ stock AttachParticle(iEnt, const String:szParticleType[], Float:flTimeToDie = -1
             AcceptEntityInput(iParti, "Start");
         }
 
-        if (flTimeToDie > 0.0) 
+        if (flTimeToDie > 0.0)
         {
             killEntityIn(iParti, flTimeToDie); // Interestingly, OnUser1 can be used multiple times, as the code above won't conflict with this.
         }
