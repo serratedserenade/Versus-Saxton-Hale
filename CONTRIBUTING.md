@@ -1,6 +1,5 @@
 #Guidelines for contributors:  
-1) When making a PR, make sure it's based on the develop branch.  
-2) Make sure your PR from branch is not develop or master. It'll make things 100% easier to manage later on.  
-    ``` git checkout -b <branch name here> ``` is a useful command for this while on develop branch.
+1) Don't push to master. Merge to develop, then some time it'll be merged to master.
+2) When making a PR, make sure it's based on the develop branch, but is renamed as a different branch. (Don't name it master/develop!)
 
 ###More will be added later on.
