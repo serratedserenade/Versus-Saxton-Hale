@@ -252,7 +252,7 @@ static const char BunnyWin[][] = {
     "vo/demoman_cheers07.wav",
     "vo/demoman_cheers08.wav",
     "vo/taunts/demoman_taunts12.wav"
-}
+};
 
 static const char BunnyJump[][] = {
     "vo/demoman_gibberish07.wav",
