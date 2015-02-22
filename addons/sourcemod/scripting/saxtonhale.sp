@@ -2159,7 +2159,7 @@ void EmitSoundToAllExcept(int exceptiontype = SOUNDEXCEPT_MUSIC, const char[] sa
                  bool updatePos = true,
                  float soundtime = 0.0)
 {
-    int clients = new int[MaxClients];
+    int[] clients = new int[MaxClients];
     int total = 0;
     for (int i = 1; i <= MaxClients; i++)
     {
