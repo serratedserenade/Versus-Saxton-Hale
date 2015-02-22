@@ -18,14 +18,17 @@
 #undef REQUIRE_PLUGIN
 #tryinclude <tf2attributes>
 #define REQUIRE_PLUGIN
-#if SOURCEMOD_V_MINOR > 8
+#if SOURCEMOD_V_MINOR > 7
   #pragma newdecls required
+  #define SMEIGHT
 #endif
 #include <tf2_stocks>
 #include <regex>
 #include <sdkhooks>
 #include <clientprefs>
-#pragma newdecls required
+#if !defined SMEIGHT
+  #pragma newdecls required
+#endif
 #include <morecolors>
 #include <sourcemod>
 #include <nextmap>
