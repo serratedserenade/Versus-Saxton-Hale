@@ -2792,7 +2792,7 @@ Handle PrepareItemHandle(Handle hItem, char[] name = "", int index = -1, const c
 
 public Action MakeNoHale(Handle hTimer, any clientid)
 {
-    new client = GetClientOfUserId(clientid);
+    int client = GetClientOfUserId(clientid);
     if (!client || !IsClientInGame(client) || !IsPlayerAlive(client) || VSHRoundState == VSHRState_End || client == Hale)
         return Plugin_Continue;
 //  SetVariantString("");
