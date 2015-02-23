@@ -2721,7 +2721,7 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
     return Plugin_Continue;
 }
 
-Handle PrepareItemHandle(Handle hItem, char[] name = "", int index = -1, const char[] att[] = "", bool dontpreserve = false)
+Handle PrepareItemHandle(Handle hItem, char[] name = "", int index = -1, const char[] att = "", bool dontpreserve = false)
 {
     static Handle hWeapon;
     int addattribs = 0;
