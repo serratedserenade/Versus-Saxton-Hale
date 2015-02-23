@@ -2739,7 +2739,7 @@ Handle PrepareItemHandle(Handle hItem, char[] name = "", int index = -1, const c
         addattribs = TF2Items_GetNumAttributes(hItem);
         if (addattribs > 0)
         {
-            for (new i = 0; i < 2 * addattribs; i += 2)
+            for (int i = 0; i < 2 * addattribs; i += 2)
             {
                 bool dontAdd = false;
                 int attribIndex = TF2Items_GetAttributeId(hItem, i);
@@ -2790,34 +2790,26 @@ Handle PrepareItemHandle(Handle hItem, char[] name = "", int index = -1, const c
     return hWeapon;
 }
 
-public Action:MakeNoHale(Handle:hTimer, any:clientid)
+public Action MakeNoHale(Handle hTimer, any clientid)
 {
     new client = GetClientOfUserId(clientid);
     if (!client || !IsClientInGame(client) || !IsPlayerAlive(client) || VSHRoundState == VSHRState_End || client == Hale)
         return Plugin_Continue;
 //  SetVariantString("");
 //  AcceptEntityInput(client, "SetCustomModel");
-
-    ChangeTeam(client, OtherTeam);
+    ChangeTeam(client, view_as<int>(OtherTeam));
     //TF2_RegeneratePlayer(client);   // Added fix by Chdata to correct team colors Edit: I guess it's not necessary
 
 //  SetEntityRenderColor(client, 255, 255, 255, 255);
     if (!VSHRoundState && GetClientClasshelpinfoCookie(client) && !(VSHFlags[client] & VSHFLAG_CLASSHELPED))
         HelpPanel2(client);
-
 #if defined _tf2attributes_included
     if (IsValidEntity(FindPlayerBack(client, { 444 }, 1)))    //  Fixes mantreads to have jump height again
-    {
         TF2Attrib_SetByDefIndex(client, 58, 1.8);          //  "self dmg push force increased"
-    }
     else
-    {
         TF2Attrib_RemoveByDefIndex(client, 58);
-    }
 #endif
-
-    new weapon = GetPlayerWeaponSlot(client, TFWeaponSlot_Primary);
-    new index = -1;
+    int weapon = GetPlayerWeaponSlot(client, TFWeaponSlot_Primary), index = -1;
     if (weapon > MaxClients && IsValidEdict(weapon))
     {
         index = GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex");
@@ -2902,9 +2894,7 @@ public Action:MakeNoHale(Handle:hTimer, any:clientid)
         SpawnWeapon(client, "tf_weapon_smg", 16, 1, 0, "");
     }
     if (IsValidEntity(FindPlayerBack(client, { 642 }, 1)))
-    {
         SpawnWeapon(client, "tf_weapon_smg", 16, 1, 6, "149 ; 1.5 ; 15 ; 0.0 ; 1 ; 0.85");
-    }
     weapon = GetPlayerWeaponSlot(client, TFWeaponSlot_Melee);
     if (weapon > MaxClients && IsValidEdict(weapon))
     {
@@ -2917,12 +2907,10 @@ public Action:MakeNoHale(Handle:hTimer, any:clientid)
                 SpawnWeapon(client, "tf_weapon_fists", 195, 1, 6, "");
             }
             case 357:
-            {
                 CreateTimer(1.0, Timer_NoHonorBound, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
-            }
             case 589:
             {
-                if (!GetConVarBool(cvarEnableEurekaEffect))
+                if (!cvarEnableEurekaEffect.BoolValue)
                 {
                     TF2_RemoveWeaponSlot(client, TFWeaponSlot_Melee);
                     SpawnWeapon(client, "tf_weapon_wrench", 7, 1, 0, "");
@@ -2945,7 +2933,7 @@ public Action:MakeNoHale(Handle:hTimer, any:clientid)
         #endif
 
         #if !defined OVERRIDE_MEDIGUNS_ON
-        new mediquality = (weapon > MaxClients && IsValidEdict(weapon) ? GetEntProp(weapon, Prop_Send, "m_iEntityQuality") : -1);
+        int mediquality = (weapon > MaxClients && IsValidEdict(weapon) ? GetEntProp(weapon, Prop_Send, "m_iEntityQuality") : -1);
         if (mediquality != 10)
         {
             TF2_RemoveWeaponSlot(client, TFWeaponSlot_Secondary);
@@ -2961,6 +2949,7 @@ public Action:MakeNoHale(Handle:hTimer, any:clientid)
     }
     return Plugin_Continue;
 }
+
 public Action:Timer_NoHonorBound(Handle:timer, any:userid)
 {
     new client = GetClientOfUserId(userid);
