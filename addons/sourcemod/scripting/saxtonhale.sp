@@ -2532,10 +2532,10 @@ public Action MakeHale(Handle hTimer)
     return Plugin_Continue;
 }
 
-public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefinitionIndex, &Handle:hItem)
+public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDefinitionIndex, Handle &hItem)
 {
 //    if (!g_bEnabled) return Plugin_Continue; // This messes up the first round sometimes
-    if (RoundCount <= 0 && !GetConVarBool(cvarFirstRound)) return Plugin_Continue;
+    if (RoundCount <= 0 && !cvarFirstRound.BoolValue) return Plugin_Continue;
 
 //  if (client == Hale) return Plugin_Continue;
 //  if (hItem != INVALID_HANDLE) return Plugin_Continue;
@@ -2543,7 +2543,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
     {
         case 39, 351, 1081: // Megadetonator
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "25 ; 0.5 ; 207 ; 1.33 ; 144 ; 1.0 ; 58 ; 3.2", true);
+            Handle hItemOverride = PrepareItemHandle(hItem, _, _, "25 ; 0.5 ; 207 ; 1.33 ; 144 ; 1.0 ; 58 ; 3.2", true);
 
             if (hItemOverride != INVALID_HANDLE)
             {
@@ -2554,7 +2554,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         }
         case 40, 1146: // Backburner
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "165 ; 1");
+            Handle hItemOverride = PrepareItemHandle(hItem, _, _, "165 ; 1");
             if (hItemOverride != INVALID_HANDLE)
             {
                 hItem = hItemOverride;
@@ -2563,7 +2563,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         }
         case 648: // Wrap assassin
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "279 ; 2.0");
+            Handle hItemOverride = PrepareItemHandle(hItem, _, _, "279 ; 2.0");
             if (hItemOverride != INVALID_HANDLE)
             {
                 hItem = hItemOverride;
@@ -2572,7 +2572,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         }
         case 224: // Letranger
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "166 ; 15 ; 1 ; 0.8", true);
+            Handle hItemOverride = PrepareItemHandle(hItem, _, _, "166 ; 15 ; 1 ; 0.8", true);
 
             if (hItemOverride != INVALID_HANDLE)
             {
@@ -2583,7 +2583,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         }
         case 225, 574: // YER
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "155 ; 1 ; 160 ; 1", true);
+            Handle hItemOverride = PrepareItemHandle(hItem, _, _, "155 ; 1 ; 160 ; 1", true);
 
             if (hItemOverride != INVALID_HANDLE)
             {
@@ -2594,7 +2594,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         }
         case 232, 401: // Bushwacka + Shahanshah
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "236 ; 1");
+            Handle hItemOverride = PrepareItemHandle(hItem, _, _, "236 ; 1");
 
             if (hItemOverride != INVALID_HANDLE)
             {
@@ -2605,7 +2605,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         }
         case 356: // Kunai
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "125 ; -60");
+            Handle hItemOverride = PrepareItemHandle(hItem, _, _, "125 ; -60");
 
             if (hItemOverride != INVALID_HANDLE)
             {
@@ -2616,7 +2616,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         }
         case 405, 608: // Demo boots have falling stomp damage
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "259 ; 1 ; 252 ; 0.25");
+            Handle hItemOverride = PrepareItemHandle(hItem, _, _, "259 ; 1 ; 252 ; 0.25");
 
             if (hItemOverride != INVALID_HANDLE)
             {
@@ -2627,7 +2627,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         }
         case 220: // Shortstop (Removed shortstop reload penalty I guess? Makes it act like scattergun...)
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "328 ; 1", true);
+            Handle hItemOverride = PrepareItemHandle(hItem, _, _, "328 ; 1", true);
             if (hItemOverride != INVALID_HANDLE)
             {
                 hItem = hItemOverride;
@@ -2636,7 +2636,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         }
         case 226: // The Battalion's Backup
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "252 ; 0.25"); //125 ; -10
+            Handle hItemOverride = PrepareItemHandle(hItem, _, _, "252 ; 0.25"); //125 ; -10
 
             if (hItemOverride != INVALID_HANDLE)
             {
@@ -2647,7 +2647,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         }
         case 305, 1079: // Medic Xbow
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "17 ; 0.15 ; 2 ; 1.45"); // ; 266 ; 1.0");
+            Handle hItemOverride = PrepareItemHandle(hItem, _, _, "17 ; 0.15 ; 2 ; 1.45"); // ; 266 ; 1.0");
             if (hItemOverride != INVALID_HANDLE)
             {
                 hItem = hItemOverride;
@@ -2656,7 +2656,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         }
         case 56, 1005, 1092: // Huntsman
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "2 ; 1.5 ; 76 ; 2.0");
+            Handle hItemOverride = PrepareItemHandle(hItem, _, _, "2 ; 1.5 ; 76 ; 2.0");
             if (hItemOverride != INVALID_HANDLE)
             {
                 hItem = hItemOverride;
@@ -2665,7 +2665,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         }
         case 38, 457: // Axtinguisher
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "", true);
+            Handle hItemOverride = PrepareItemHandle(hItem, _, _, "", true);
             if (hItemOverride != INVALID_HANDLE)
             {
                 hItem = hItemOverride;
@@ -2674,7 +2674,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         }
         case 43, 239, 1100, 1084: // GRU
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "107 ; 1.5 ; 1 ; 0.5 ; 128 ; 1 ; 191 ; -7", true);
+            Handle hItemOverride = PrepareItemHandle(hItem, _, _, "107 ; 1.5 ; 1 ; 0.5 ; 128 ; 1 ; 191 ; -7", true);
             if (hItemOverride != INVALID_HANDLE)
             {
                 hItem = hItemOverride;
@@ -2683,7 +2683,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         }
         case 415: // Reserve Shooter
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "179 ; 1 ; 265 ; 99999.0 ; 178 ; 0.6 ; 2 ; 1.1 ; 3 ; 0.5 ; 551 ; 1", true);
+            Handle hItemOverride = PrepareItemHandle(hItem, _, _, "179 ; 1 ; 265 ; 99999.0 ; 178 ; 0.6 ; 2 ; 1.1 ; 3 ; 0.5 ; 551 ; 1", true);
 
             if (hItemOverride != INVALID_HANDLE)
             {
@@ -2696,7 +2696,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
     }
     if (TF2_GetPlayerClass(client) == TFClass_Soldier && (strncmp(classname, "tf_weapon_rocketlauncher", 24, false) == 0 || strncmp(classname, "tf_weapon_shotgun", 17, false) == 0))
     {
-        new Handle:hItemOverride;
+        Handle hItemOverride;
         if (iItemDefinitionIndex == 127) hItemOverride = PrepareItemHandle(hItem, _, _, "265 ; 99999.0 ; 179 ; 1.0");
         else hItemOverride = PrepareItemHandle(hItem, _, _, "265 ; 99999.0");
         if (hItemOverride != INVALID_HANDLE)
@@ -2709,7 +2709,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
     //Medic mediguns
     if (TF2_GetPlayerClass(client) == TFClass_Medic && (strncmp(classname, "tf_weapon_medigun", 17, false) == 0))
     {
-        new Handle:hItemOverride;
+        Handle hItemOverride;
         hItemOverride = PrepareItemHandle(hItem, _, _, "18 ; 0.0 ; 10 ; 1.25 ; 178 ; 0.75 ; 144 ; 2.0", true);
         if (hItemOverride != INVALID_HANDLE)
         {
@@ -2720,15 +2720,16 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
     #endif
     return Plugin_Continue;
 }
-Handle:PrepareItemHandle(Handle:hItem, String:name[] = "", index = -1, const String:att[] = "", bool:dontpreserve = false)
+
+Handle PrepareItemHandle(Handle hItem, char[] name = "", int index = -1, const char[] att[] = "", bool dontpreserve = false)
 {
-    static Handle:hWeapon;
-    new addattribs = 0;
+    static Handle hWeapon;
+    int addattribs = 0;
 
-    new String:weaponAttribsArray[32][32];
-    new attribCount = ExplodeString(att, " ; ", weaponAttribsArray, 32, 32);
+    char weaponAttribsArray[32][32];
+    int attribCount = ExplodeString(att, " ; ", weaponAttribsArray, 32, 32);
 
-    new flags = OVERRIDE_ATTRIBUTES;
+    int flags = OVERRIDE_ATTRIBUTES;
     if (!dontpreserve) flags |= PRESERVE_ATTRIBUTES;
     if (hWeapon == INVALID_HANDLE) hWeapon = TF2Items_CreateItem(flags);
     else TF2Items_SetFlags(hWeapon, flags);
@@ -2740,9 +2741,9 @@ Handle:PrepareItemHandle(Handle:hItem, String:name[] = "", index = -1, const Str
         {
             for (new i = 0; i < 2 * addattribs; i += 2)
             {
-                new bool:dontAdd = false;
-                new attribIndex = TF2Items_GetAttributeId(hItem, i);
-                for (new j = 0; j < attribCount+i; j += 2)
+                bool dontAdd = false;
+                int attribIndex = TF2Items_GetAttributeId(hItem, i);
+                for (int j = 0; j < attribCount+i; j += 2)
                 {
                     if (StringToInt(weaponAttribsArray[j]) == attribIndex)
                     {
@@ -2758,7 +2759,7 @@ Handle:PrepareItemHandle(Handle:hItem, String:name[] = "", index = -1, const Str
             }
             attribCount += 2 * addattribs;
         }
-        CloseHandle(hItem); //probably returns false but whatever
+        delete hItem; //probably returns false but whatever
     }
 
     if (name[0] != '\0')
@@ -2774,8 +2775,8 @@ Handle:PrepareItemHandle(Handle:hItem, String:name[] = "", index = -1, const Str
     if (attribCount > 1)
     {
         TF2Items_SetNumAttributes(hWeapon, (attribCount/2));
-        new i2 = 0;
-        for (new i = 0; i < attribCount && i < 32; i += 2)
+        int i2 = 0;
+        for (int i = 0; i < attribCount && i < 32; i += 2)
         {
             TF2Items_SetAttribute(hWeapon, i2, StringToInt(weaponAttribsArray[i]), StringToFloat(weaponAttribsArray[i+1]));
             i2++;
@@ -2788,6 +2789,7 @@ Handle:PrepareItemHandle(Handle:hItem, String:name[] = "", index = -1, const Str
     TF2Items_SetFlags(hWeapon, flags);
     return hWeapon;
 }
+
 public Action:MakeNoHale(Handle:hTimer, any:clientid)
 {
     new client = GetClientOfUserId(clientid);
