@@ -598,7 +598,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 {
 #if defined EASTER_BUNNY_ON
     new Handle:hGameConf = LoadGameConfigFile("saxtonhale");
-    if (hGameConf == INVALID_HANDLE)
+    if (hGameConf == null)
     {
         SetFailState("[VSH] Unable to load gamedata file 'saxtonhale.txt'");
         return;
@@ -607,7 +607,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
     PrepSDKCall_SetFromConf(hGameConf, SDKConf_Virtual, "CTFPlayer::EquipWearable");
     PrepSDKCall_AddParameter(SDKType_CBaseEntity, SDKPass_Pointer);
     hEquipWearable = EndPrepSDKCall();
-    if (hEquipWearable == INVALID_HANDLE)
+    if (hEquipWearable == null)
     {
         SetFailState("[VSH] Failed to initialize call to CTFPlayer::EquipWearable");
         return;
@@ -616,7 +616,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
     PrepSDKCall_SetFromConf(hGameConf, SDKConf_Signature, "CTFAmmoPack::SetInitialVelocity");
     PrepSDKCall_AddParameter(SDKType_Vector, SDKPass_Pointer);
     hSetAmmoVelocity = EndPrepSDKCall();
-    if (hSetAmmoVelocity == INVALID_HANDLE)
+    if (hSetAmmoVelocity == null)
     {
         SetFailState("[VSH] Failed to initialize call to CTFAmmoPack::SetInitialVelocity");
         CloseHandle(hGameConf);
@@ -864,8 +864,8 @@ public void OnMapStart()
     HPTime = 0.0;
     KSpreeTimer = 0.0;
     TeamRoundCounter = 0;
-    MusicTimer = INVALID_HANDLE;
-    doorchecktimer = INVALID_HANDLE;
+    MusicTimer = null;
+    doorchecktimer = null;
     Hale = -1;
     for (int i = 1; i <= MaxClients; i++)
     {
@@ -1244,7 +1244,7 @@ bool IsSaxtonHaleMap(bool forceRecalc = false)
             return false;
         }
         File fileh = OpenFile(s, "r");
-        if (fileh == INVALID_HANDLE)
+        if (fileh == null)
         {
             LogError("[VSH] Error reading maps from %s, disabling plugin.", s);
             isVSHMap = false;
@@ -1308,7 +1308,7 @@ bool CheckToChangeMapDoors()
         return false;
     }
     File fileh = OpenFile(s, "r");
-    if (fileh == INVALID_HANDLE)
+    if (fileh == null)
     {
         if (strncmp(currentmap, "vsh_lolcano_pb1", 15, false) == 0)
             checkdoors = true;
@@ -1338,7 +1338,7 @@ void CheckToTeleportToSpawn()
     if (!FileExists(s))
         return;
     File fileh = OpenFile(s, "r");
-    if (fileh == INVALID_HANDLE)
+    if (fileh == null)
         return;
     while (!fileh.EndOfFile() && fileh.ReadLine(s, sizeof(s)))
     {
@@ -1689,7 +1689,7 @@ public Action Timer_EnableCap(Handle timer)
                 AcceptEntityInput(ent, "Open");
                 AcceptEntityInput(ent, "Unlock");
             }
-            if (doorchecktimer == INVALID_HANDLE)
+            if (doorchecktimer == null)
                 doorchecktimer = CreateTimer(5.0, Timer_CheckDoors, _, TIMER_FLAG_NO_MAPCHANGE|TIMER_REPEAT);
         }
     }
@@ -1699,7 +1699,7 @@ public Action Timer_CheckDoors(Handle hTimer)
 {
     if (!checkdoors)
     {
-        doorchecktimer = INVALID_HANDLE;
+        doorchecktimer = null;
         return Plugin_Stop;
     }
 
@@ -2101,7 +2101,7 @@ public Action Timer_MusicTheme(Handle timer, Handle pack)
             {
                 strcopy(sound, sizeof(sound), "");
                 time = -1.0;
-                MusicTimer = INVALID_HANDLE;
+                MusicTimer = null;
                 return Plugin_Stop;
             }
             case Plugin_Changed:
@@ -2129,7 +2129,7 @@ public Action Timer_MusicTheme(Handle timer, Handle pack)
     }
     else
     {
-        MusicTimer = INVALID_HANDLE;
+        MusicTimer = null;
         return Plugin_Stop;
     }
     return Plugin_Continue;
@@ -2339,7 +2339,7 @@ public Action MessageTimer(Handle hTimer, any allclients)
             AcceptEntityInput(ent, "Open");
             AcceptEntityInput(ent, "Unlock");
         }
-        if (doorchecktimer == INVALID_HANDLE)
+        if (doorchecktimer == null)
             doorchecktimer = CreateTimer(5.0, Timer_CheckDoors, _, TIMER_FLAG_NO_MAPCHANGE|TIMER_REPEAT);
     }
     char translation[32];
@@ -2527,14 +2527,14 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
     if (RoundCount <= 0 && !cvarFirstRound.BoolValue) return Plugin_Continue;
 
 //  if (client == Hale) return Plugin_Continue;
-//  if (hItem != INVALID_HANDLE) return Plugin_Continue;
+//  if (hItem != null) return Plugin_Continue;
     switch (iItemDefinitionIndex)
     {
         case 39, 351, 1081: // Megadetonator
         {
             Handle hItemOverride = PrepareItemHandle(hItem, _, _, "25 ; 0.5 ; 207 ; 1.33 ; 144 ; 1.0 ; 58 ; 3.2", true);
 
-            if (hItemOverride != INVALID_HANDLE)
+            if (hItemOverride != null)
             {
                 hItem = hItemOverride;
 
@@ -2544,7 +2544,7 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
         case 40, 1146: // Backburner
         {
             Handle hItemOverride = PrepareItemHandle(hItem, _, _, "165 ; 1");
-            if (hItemOverride != INVALID_HANDLE)
+            if (hItemOverride != null)
             {
                 hItem = hItemOverride;
                 return Plugin_Changed;
@@ -2553,7 +2553,7 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
         case 648: // Wrap assassin
         {
             Handle hItemOverride = PrepareItemHandle(hItem, _, _, "279 ; 2.0");
-            if (hItemOverride != INVALID_HANDLE)
+            if (hItemOverride != null)
             {
                 hItem = hItemOverride;
                 return Plugin_Changed;
@@ -2563,7 +2563,7 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
         {
             Handle hItemOverride = PrepareItemHandle(hItem, _, _, "166 ; 15 ; 1 ; 0.8", true);
 
-            if (hItemOverride != INVALID_HANDLE)
+            if (hItemOverride != null)
             {
                 hItem = hItemOverride;
 
@@ -2574,7 +2574,7 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
         {
             Handle hItemOverride = PrepareItemHandle(hItem, _, _, "155 ; 1 ; 160 ; 1", true);
 
-            if (hItemOverride != INVALID_HANDLE)
+            if (hItemOverride != null)
             {
                 hItem = hItemOverride;
 
@@ -2585,7 +2585,7 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
         {
             Handle hItemOverride = PrepareItemHandle(hItem, _, _, "236 ; 1");
 
-            if (hItemOverride != INVALID_HANDLE)
+            if (hItemOverride != null)
             {
                 hItem = hItemOverride;
 
@@ -2596,7 +2596,7 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
         {
             Handle hItemOverride = PrepareItemHandle(hItem, _, _, "125 ; -60");
 
-            if (hItemOverride != INVALID_HANDLE)
+            if (hItemOverride != null)
             {
                 hItem = hItemOverride;
 
@@ -2607,7 +2607,7 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
         {
             Handle hItemOverride = PrepareItemHandle(hItem, _, _, "259 ; 1 ; 252 ; 0.25");
 
-            if (hItemOverride != INVALID_HANDLE)
+            if (hItemOverride != null)
             {
                 hItem = hItemOverride;
 
@@ -2617,7 +2617,7 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
         case 220: // Shortstop (Removed shortstop reload penalty I guess? Makes it act like scattergun...)
         {
             Handle hItemOverride = PrepareItemHandle(hItem, _, _, "328 ; 1", true);
-            if (hItemOverride != INVALID_HANDLE)
+            if (hItemOverride != null)
             {
                 hItem = hItemOverride;
                 return Plugin_Changed;
@@ -2627,7 +2627,7 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
         {
             Handle hItemOverride = PrepareItemHandle(hItem, _, _, "252 ; 0.25"); //125 ; -10
 
-            if (hItemOverride != INVALID_HANDLE)
+            if (hItemOverride != null)
             {
                 hItem = hItemOverride;
 
@@ -2637,7 +2637,7 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
         case 305, 1079: // Medic Xbow
         {
             Handle hItemOverride = PrepareItemHandle(hItem, _, _, "17 ; 0.15 ; 2 ; 1.45"); // ; 266 ; 1.0");
-            if (hItemOverride != INVALID_HANDLE)
+            if (hItemOverride != null)
             {
                 hItem = hItemOverride;
                 return Plugin_Changed;
@@ -2646,7 +2646,7 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
         case 56, 1005, 1092: // Huntsman
         {
             Handle hItemOverride = PrepareItemHandle(hItem, _, _, "2 ; 1.5 ; 76 ; 2.0");
-            if (hItemOverride != INVALID_HANDLE)
+            if (hItemOverride != null)
             {
                 hItem = hItemOverride;
                 return Plugin_Changed;
@@ -2655,7 +2655,7 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
         case 38, 457: // Axtinguisher
         {
             Handle hItemOverride = PrepareItemHandle(hItem, _, _, "", true);
-            if (hItemOverride != INVALID_HANDLE)
+            if (hItemOverride != null)
             {
                 hItem = hItemOverride;
                 return Plugin_Changed;
@@ -2664,7 +2664,7 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
         case 43, 239, 1100, 1084: // GRU
         {
             Handle hItemOverride = PrepareItemHandle(hItem, _, _, "107 ; 1.5 ; 1 ; 0.5 ; 128 ; 1 ; 191 ; -7", true);
-            if (hItemOverride != INVALID_HANDLE)
+            if (hItemOverride != null)
             {
                 hItem = hItemOverride;
                 return Plugin_Changed;
@@ -2673,11 +2673,9 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
         case 415: // Reserve Shooter
         {
             Handle hItemOverride = PrepareItemHandle(hItem, _, _, "179 ; 1 ; 265 ; 99999.0 ; 178 ; 0.6 ; 2 ; 1.1 ; 3 ; 0.5 ; 551 ; 1", true);
-
-            if (hItemOverride != INVALID_HANDLE)
+            if (hItemOverride != null)
             {
                 hItem = hItemOverride;
-
                 return Plugin_Changed;
             }
         }
@@ -2688,7 +2686,7 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
         Handle hItemOverride;
         if (iItemDefinitionIndex == 127) hItemOverride = PrepareItemHandle(hItem, _, _, "265 ; 99999.0 ; 179 ; 1.0");
         else hItemOverride = PrepareItemHandle(hItem, _, _, "265 ; 99999.0");
-        if (hItemOverride != INVALID_HANDLE)
+        if (hItemOverride != null)
         {
             hItem = hItemOverride;
             return Plugin_Changed;
@@ -2700,7 +2698,7 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
     {
         Handle hItemOverride;
         hItemOverride = PrepareItemHandle(hItem, _, _, "18 ; 0.0 ; 10 ; 1.25 ; 178 ; 0.75 ; 144 ; 2.0", true);
-        if (hItemOverride != INVALID_HANDLE)
+        if (hItemOverride != null)
         {
             hItem = hItemOverride;
             return Plugin_Changed;
@@ -2714,16 +2712,16 @@ Handle PrepareItemHandle(Handle hItem, char[] name = "", int index = -1, const c
 {
     static Handle hWeapon;
     int addattribs = 0;
-
     char weaponAttribsArray[32][32];
-    int attribCount = ExplodeString(att, " ; ", weaponAttribsArray, 32, 32);
-
-    int flags = OVERRIDE_ATTRIBUTES;
-    if (!dontpreserve) flags |= PRESERVE_ATTRIBUTES;
-    if (hWeapon == INVALID_HANDLE) hWeapon = TF2Items_CreateItem(flags);
-    else TF2Items_SetFlags(hWeapon, flags);
-//  new Handle:hWeapon = TF2Items_CreateItem(flags);    //INVALID_HANDLE;
-    if (hItem != INVALID_HANDLE)
+    int attribCount = ExplodeString(att, " ; ", weaponAttribsArray, 32, 32), flags = OVERRIDE_ATTRIBUTES;
+    if (!dontpreserve)
+        flags |= PRESERVE_ATTRIBUTES;
+    if (hWeapon == null)
+        hWeapon = TF2Items_CreateItem(flags);
+    else
+        TF2Items_SetFlags(hWeapon, flags);
+//  new Handle:hWeapon = TF2Items_CreateItem(flags);    //null;
+    if (hItem != null)
     {
         addattribs = TF2Items_GetNumAttributes(hItem);
         if (addattribs > 0)
@@ -2750,7 +2748,6 @@ Handle PrepareItemHandle(Handle hItem, char[] name = "", int index = -1, const c
         }
         delete hItem; //probably returns false but whatever
     }
-
     if (name[0] != '\0')
     {
         flags |= OVERRIDE_CLASSNAME;
@@ -4226,7 +4223,7 @@ public Action UseRage(Handle hTimer, any dist)
     if (!GetEntProp(Hale, Prop_Send, "m_bIsReadyToHighFive") && !IsValidEntity(GetEntPropEnt(Hale, Prop_Send, "m_hHighFivePartner")))
     {
         TF2_RemoveCondition(Hale, TFCond_Taunting);
-        MakeModelTimer(INVALID_HANDLE); // should reset Hale's animation
+        MakeModelTimer(null); // should reset Hale's animation
     }
     GetEntPropVector(Hale, Prop_Send, "m_vecOrigin", pos);
     for (i = 1; i <= MaxClients; i++)
@@ -4307,7 +4304,7 @@ public Action UseUberRage(Handle hTimer, any param)
         if (!GetEntProp(Hale, Prop_Send, "m_bIsReadyToHighFive") && !IsValidEntity(GetEntPropEnt(Hale, Prop_Send, "m_hHighFivePartner")))
         {
             TF2_RemoveCondition(Hale, TFCond_Taunting);
-            MakeModelTimer(INVALID_HANDLE); // should reset Hale's animation
+            MakeModelTimer(null); // should reset Hale's animation
         }
 //      TF2_StunPlayer(Hale, 0.0, _, TF_STUNFLAG_NOSOUNDOREFFECT);
     }
@@ -4338,7 +4335,7 @@ public Action UseBowRage(Handle hTimer)
     if (!GetEntProp(Hale, Prop_Send, "m_bIsReadyToHighFive") && !IsValidEntity(GetEntPropEnt(Hale, Prop_Send, "m_hHighFivePartner")))
     {
         TF2_RemoveCondition(Hale, TFCond_Taunting);
-        MakeModelTimer(INVALID_HANDLE); // should reset Hale's animation
+        MakeModelTimer(null); // should reset Hale's animation
     }
 //  TF2_StunPlayer(Hale, 0.0, _, TF_STUNFLAG_NOSOUNDOREFFECT);
 //  UberRageCount = 9.0;
@@ -4593,7 +4590,7 @@ public Action event_player_death(Event event, const char[] name, bool dontBroadc
 
 stock void SpawnManyAmmoPacks(int client, char[] model, int skin=0, int num=14, float offsz = 30.0)
 {
-//  if (hSetAmmoVelocity == INVALID_HANDLE) return;
+//  if (hSetAmmoVelocity == null) return;
     float pos[3], vel[3], ang[3] = {90.0, 0.0, 0.0};
     GetClientAbsOrigin(client, pos);
     pos[2] += offsz;
@@ -5527,13 +5524,13 @@ void SickleClimbWalls(int client, int weapon)     //Credit to Mecha the Slag
     GetClientEyeAngles(client, vecClientEyeAng);       // Get the angle the player is looking
     //Check for colliding entities
     TR_TraceRayFilter(vecClientEyePos, vecClientEyeAng, MASK_PLAYERSOLID, RayType_Infinite, TraceRayDontHitSelf, client);
-    if (!TR_DidHit(INVALID_HANDLE))
+    if (!TR_DidHit(null))
         return;
-    int TRIndex = TR_GetEntityIndex(INVALID_HANDLE);
+    int TRIndex = TR_GetEntityIndex(null);
     GetEdictClassname(TRIndex, classname, sizeof(classname));
     if (!StrEqual(classname, "worldspawn"))
         return;
-    TR_GetPlaneNormal(INVALID_HANDLE, fNormal);
+    TR_GetPlaneNormal(null, fNormal);
     GetVectorAngles(fNormal, fNormal);
     if (fNormal[0] >= 30.0 && fNormal[0] <= 330.0)
         return;
@@ -7426,7 +7423,7 @@ stock bool:IfDoNextTime2(iClient, iIndex, Float:flThenAdd)
 
 */
 static s_iLastPriority[TF_MAX_PLAYERS] = {MIN_INT,...};
-//static Handle:s_hPCTTimer[TF_MAX_PLAYERS] = {INVALID_HANDLE,...};
+//static Handle:s_hPCTTimer[TF_MAX_PLAYERS] = {null,...};
 
 /*
     An example of how to use this:
@@ -7715,7 +7712,7 @@ stock SetNextAttack(weapon, Float:duration = 0.0)
 stock SpawnWeapon(client, String:name[], index, level, qual, String:att[])
 {
     new Handle:hWeapon = TF2Items_CreateItem(OVERRIDE_ALL|FORCE_GENERATION);
-    if (hWeapon == INVALID_HANDLE)
+    if (hWeapon == null)
         return -1;
     TF2Items_SetClassname(hWeapon, name);
     TF2Items_SetItemIndex(hWeapon, index);
@@ -8013,10 +8010,10 @@ stock int TF2_GetRoundWinCount()
 
 stock ClearTimer(&Handle:hTimer)
 {
-    if (hTimer != INVALID_HANDLE)
+    if (hTimer != null)
     {
         KillTimer(hTimer);
-        hTimer = INVALID_HANDLE;
+        hTimer = null;
     }
 }
 
@@ -8027,7 +8024,7 @@ stock ClearTimer(&Handle:hTimer)
        [0] = RED spawnpoint entref
        [1] = BLU spawnpoint entref
 */
-static Handle:s_hSpawnArray = INVALID_HANDLE;
+static Handle:s_hSpawnArray = null;
 
 stock OnPluginStart_TeleportToMultiMapSpawn()
 {
