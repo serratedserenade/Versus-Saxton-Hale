@@ -4817,7 +4817,7 @@ public Action event_hurt(Event event, const char[] name, bool dontBroadcast)
 {
     if (!g_bEnabled)
         return Plugin_Continue;
-    int client = GetClientOfUserId(event.GetInt("userid")), attacker = GetClientOfUserId(event.GetInt("attacker")), damage = event.GetInt("damageamount"), custom = event.GetInt("custom"), weapon = Gevent.GetInt("weaponid");
+    int client = GetClientOfUserId(event.GetInt("userid")), attacker = GetClientOfUserId(event.GetInt("attacker")), damage = event.GetInt("damageamount"), custom = event.GetInt("custom"), weapon = event.GetInt("weaponid");
     if (client != Hale) // || !IsValidEdict(client) || !IsValidEdict(attacker) || (client <= 0) || (attacker <= 0) || (attacker > MaxClients))
         return Plugin_Continue;
     if (!IsValidClient(attacker) || !IsValidClient(client) || client == attacker) // || custom == TF_CUSTOM_BACKSTAB)
@@ -4982,7 +4982,7 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
                     case 593:       //Third Degree
                     {
                         int healers[TF_MAX_PLAYERS], healercount = 0;
-                        for (new i = 1; i <= MaxClients; i++)
+                        for (int i = 1; i <= MaxClients; i++)
                         {
                             if (IsClientInGame(i) && IsPlayerAlive(i) && (GetHealingTarget(i) == attacker))
                             {
@@ -5165,7 +5165,7 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
                             HaleRage = RageDMG;
                     }
                 }*/
-                if (dmgcustom == TF_CUSTOM_BACKSTAB) //Should always be here with SM 1.7
+                if (damagecustom == TF_CUSTOM_BACKSTAB) //Should always be here with SM 1.7
                 {
                     /*
                      Rebalanced backstab formula.
@@ -5294,34 +5294,27 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
                     // Teleport the boss back to one of the spawns.
                     // And during the first 30 seconds, he can only teleport to his own spawn.
                     //TeleportToSpawn(Hale, (bTenSecStart[1]) ? HaleTeam : 0);
-                    TeleportToMultiMapSpawn(Hale, (bTenSecStart[1]) ? HaleTeam : 0);
+                    TeleportToMultiMapSpawn(Hale, bTenSecStart[1] ? HaleTeam : TFTeam_Unassigned);
                 }
                 else if (damage >= 250.0)
                 {
                     if (Special == VSHSpecial_HHH)
                     {
                         //TeleportToSpawn(Hale, (bTenSecStart[1]) ? HaleTeam : 0);
-                        TeleportToMultiMapSpawn(Hale, (bTenSecStart[1]) ? HaleTeam : 0);
+                        TeleportToMultiMapSpawn(Hale, bTenSecStart[1] ? HaleTeam : TFTeam_Unassigned);
                     }
                     else if (HaleCharge >= 0)
-                    {
                         bEnableSuperDuperJump = true;
-                    }
                 }
-
-                new Float:flMaxDmg = float(HaleHealthMax) * 0.05;
+                float flMaxDmg = float(HaleHealthMax) * 0.05;
                 if (flMaxDmg > 500.0)
-                {
                     flMaxDmg = 500.0;
-                }
-
                 if (damage > flMaxDmg)
-                {
                     damage = flMaxDmg;
-                }
                 HaleHealth -= RoundFloat(damage);
                 HaleRage += RoundFloat(damage);
-                if (HaleHealth <= 0) damage *= 5;
+                if (HaleHealth <= 0)
+                    damage *= 5;
                 if (HaleRage > RageDMG)
                     HaleRage = RageDMG;
                 return Plugin_Changed;
@@ -5330,12 +5323,10 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
     }
     else if (attacker == 0 && client != Hale && IsValidClient(client) && (damagetype & DMG_FALL) && (TF2_GetPlayerClass(client) == TFClass_Soldier || TF2_GetPlayerClass(client) == TFClass_DemoMan)) // IsValidClient(client, false)
     {
-        new item = GetPlayerWeaponSlot(client, (TF2_GetPlayerClass(client) == TFClass_DemoMan ? TFWeaponSlot_Primary:TFWeaponSlot_Secondary));
-
+        int item = GetPlayerWeaponSlot(client, (TF2_GetPlayerClass(client) == TFClass_DemoMan ? TFWeaponSlot_Primary:TFWeaponSlot_Secondary));
         if (item <= 0 || !IsValidEntity(item))
         {
             damage /= 10.0;
-
             return Plugin_Changed;
         }
     }
@@ -5389,12 +5380,12 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
     }
 }*/
 
-
-SpawnSmallHealthPackAt(client, ownerteam = 0)
+void SpawnSmallHealthPackAt(int client, TFTeam ownerteam = TFTeam_Unassigned)
 {
-    if (!IsValidClient(client) || !IsPlayerAlive(client)) return; // IsValidClient(client, false)
-    new healthpack = CreateEntityByName("item_healthkit_small");
-    decl Float:pos[3];
+    if (!IsValidClient(client) || !IsPlayerAlive(client))
+        return; // IsValidClient(client, false)
+    int healthpack = CreateEntityByName("item_healthkit_small");
+    float pos[3];
     GetClientAbsOrigin(client, pos);
     pos[2] += 20.0;
     if (IsValidEntity(healthpack))
@@ -5403,12 +5394,13 @@ SpawnSmallHealthPackAt(client, ownerteam = 0)
         DispatchSpawn(healthpack);
         SetEntProp(healthpack, Prop_Send, "m_iTeamNum", ownerteam, 4);
         SetEntityMoveType(healthpack, MOVETYPE_VPHYSICS);
-        new Float:vel[3];
+        float vel[3];
         vel[0] = float(GetRandomInt(-10, 10)), vel[1] = float(GetRandomInt(-10, 10)), vel[2] = 50.0;
         TeleportEntity(healthpack, pos, NULL_VECTOR, vel);
 //      CreateTimer(17.0, Timer_RemoveCandycaneHealthPack, EntIndexToEntRef(healthpack), TIMER_FLAG_NO_MAPCHANGE);
     }
 }
+
 /*public Action:Timer_RemoveCandycaneHealthPack(Handle:timer, any:ref)
 {
     new entity = EntRefToEntIndex(ref);
@@ -5417,19 +5409,23 @@ SpawnSmallHealthPackAt(client, ownerteam = 0)
         AcceptEntityInput(entity, "Kill");
     }
 }*/
-public Action:Timer_StopTickle(Handle:timer, any:userid)
+
+public Action Timer_StopTickle(Handle timer, any userid)
 {
-    new client = GetClientOfUserId(userid);
-    if (!client || !IsClientInGame(client) || !IsPlayerAlive(client)) return;
-    if (!GetEntProp(client, Prop_Send, "m_bIsReadyToHighFive") && !IsValidEntity(GetEntPropEnt(client, Prop_Send, "m_hHighFivePartner"))) TF2_RemoveCondition(client, TFCond_Taunting);
+    int client = GetClientOfUserId(userid);
+    if (!client || !IsClientInGame(client) || !IsPlayerAlive(client))
+        return Plugin_Continue;
+    if (!GetEntProp(client, Prop_Send, "m_bIsReadyToHighFive") && !IsValidEntity(GetEntPropEnt(client, Prop_Send, "m_hHighFivePartner")))
+        TF2_RemoveCondition(client, TFCond_Taunting);
+    return Plugin_Continue;
 }
-public Action:Timer_CheckBuffRage(Handle:timer, any:userid)
+
+public Action Timer_CheckBuffRage(Handle timer, any userid)
 {
-    new client = GetClientOfUserId(userid);
+    int client = GetClientOfUserId(userid);
     if (client && IsClientInGame(client) && IsPlayerAlive(client))
-    {
         SetEntPropFloat(client, Prop_Send, "m_flRageMeter", 100.0);
-    }
+    return Plugin_Continue;
 }
 
 /*public Action:Timer_DisguiseBackstab(Handle:timer, any:userid)
@@ -5478,15 +5474,15 @@ stock RandomlyDisguise(client)  //original code was mecha's, but the original co
         }
     }
 }*/
-public Action:TF2_CalcIsAttackCritical(client, weapon, String:weaponname[], &bool:result)
-{
-    if (!IsValidClient(client) || !g_bEnabled) return Plugin_Continue; // IsValidClient(client, false)
 
+public Action TF2_CalcIsAttackCritical(int client, int weapon, char[] weaponname, bool &result)
+{
+    if (!IsValidClient(client) || !g_bEnabled)
+        return Plugin_Continue; // IsValidClient(client, false)
     // HHH can climb walls
     if (IsValidEntity(weapon) && Special == VSHSpecial_HHH && client == Hale && HHHClimbCount <= 9 && VSHRoundState > VSHRState_Waiting)
     {
-        new index = GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex");
-
+        int index = GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex");
         if (index == 266 && StrEqual(weaponname, "tf_weapon_sword", false))
         {
             SickleClimbWalls(client, weapon);
@@ -5494,11 +5490,12 @@ public Action:TF2_CalcIsAttackCritical(client, weapon, String:weaponname[], &boo
             HHHClimbCount++;
         }
     }
-
     if (client == Hale)
     {
-        if (VSHRoundState != VSHRState_Active) return Plugin_Continue;
-        if (TF2_IsPlayerCritBuffed(client)) return Plugin_Continue;
+        if (VSHRoundState != VSHRState_Active)
+            return Plugin_Continue;
+        if (TF2_IsPlayerCritBuffed(client))
+            return Plugin_Continue;
         if (!haleCrits)
         {
             result = false;
@@ -5507,79 +5504,69 @@ public Action:TF2_CalcIsAttackCritical(client, weapon, String:weaponname[], &boo
     }
     else if (IsValidEntity(weapon))
     {
-        new index = GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex");
+        int index = GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex");
         if (index == 232 && StrEqual(weaponname, "tf_weapon_club", false))
-        {
             SickleClimbWalls(client, weapon);
-        }
     }
     return Plugin_Continue;
 }
-public Timer_NoAttacking(any:ref)
+
+public Timer_NoAttacking(any ref)
 {
-    new weapon = EntRefToEntIndex(ref);
+    int weapon = EntRefToEntIndex(ref);
     SetNextAttack(weapon, 1.56);
 }
-SickleClimbWalls(client, weapon)     //Credit to Mecha the Slag
-{
-    if (!IsValidClient(client) || (GetClientHealth(client)<=15) )return;
 
-    decl String:classname[64];
-    decl Float:vecClientEyePos[3];
-    decl Float:vecClientEyeAng[3];
+SickleClimbWalls(int client, int weapon)     //Credit to Mecha the Slag
+{
+    if (!IsValidClient(client) || (GetClientHealth(client)<=15))
+        return;
+    char classname[64];
+    float vecClientEyePos[3], vecClientEyeAng[3], fNormal[3], pos[3], distance, fVelocity[3];
     GetClientEyePosition(client, vecClientEyePos);   // Get the position of the player's eyes
     GetClientEyeAngles(client, vecClientEyeAng);       // Get the angle the player is looking
-
     //Check for colliding entities
     TR_TraceRayFilter(vecClientEyePos, vecClientEyeAng, MASK_PLAYERSOLID, RayType_Infinite, TraceRayDontHitSelf, client);
-
-    if (!TR_DidHit(INVALID_HANDLE)) return;
-
-    new TRIndex = TR_GetEntityIndex(INVALID_HANDLE);
+    if (!TR_DidHit(INVALID_HANDLE))
+        return;
+    int TRIndex = TR_GetEntityIndex(INVALID_HANDLE);
     GetEdictClassname(TRIndex, classname, sizeof(classname));
-    if (!StrEqual(classname, "worldspawn")) return;
-
-    decl Float:fNormal[3];
+    if (!StrEqual(classname, "worldspawn"))
+        return;
     TR_GetPlaneNormal(INVALID_HANDLE, fNormal);
     GetVectorAngles(fNormal, fNormal);
-
-    if (fNormal[0] >= 30.0 && fNormal[0] <= 330.0) return;
-    if (fNormal[0] <= -30.0) return;
-
-    decl Float:pos[3];
+    if (fNormal[0] >= 30.0 && fNormal[0] <= 330.0)
+        return;
+    if (fNormal[0] <= -30.0)
+        return;
     TR_GetEndPosition(pos);
-    new Float:distance = GetVectorDistance(vecClientEyePos, pos);
-
-    if (distance >= 100.0) return;
-
-    new Float:fVelocity[3];
+    distance = GetVectorDistance(vecClientEyePos, pos);
+    if (distance >= 100.0)
+        return;
     GetEntPropVector(client, Prop_Data, "m_vecVelocity", fVelocity);
-
     fVelocity[2] = 600.0;
-
     TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, fVelocity);
-
     SDKHooks_TakeDamage(client, client, client, 15.0, DMG_CLUB, GetPlayerWeaponSlot(client, TFWeaponSlot_Melee));
-
-    if (client != Hale) ClientCommand(client, "playgamesound \"%s\"", "player\\taunt_clip_spin.wav");
-
+    if (client != Hale)
+        ClientCommand(client, "playgamesound \"%s\"", "player\\taunt_clip_spin.wav");
     RequestFrame(Timer_NoAttacking, EntIndexToEntRef(weapon));
 }
-public bool:TraceRayDontHitSelf(entity, mask, any:data)
+
+public bool TraceRayDontHitSelf(intt entity, int mask, any data)
 {
     return (entity != data);
 }
-FindNextHale(bool:array[])
+
+int FindNextHale(bool[] array)
 {
-    new tBoss = -1;
-    new tBossPoints = -1073741824;
+    int tBoss = -1, tBossPoints = -1073741824;
     //new bool:spec = GetConVarBool(cvarForceSpecToHale);
-    for (new i = 1; i <= MaxClients; i++)
+    for (int i = 1; i <= MaxClients; i++)
     {
         //if (IsClientInGame(i) && (GetEntityTeamNum(i) > _:TFTeam_Spectator || (spec && GetEntityTeamNum(i) != _:TFTeam_Unassigned)))   // GetEntityTeamNum(i) != _:TFTeam_Unassigned)
         if (IsClientInGame(i) && IsClientParticipating(i))
         {
-            new points = GetClientQueuePoints(i);
+            int points = GetClientQueuePoints(i);
             if (points >= tBossPoints && !array[i])
             {
                 tBoss = i;
@@ -5589,15 +5576,18 @@ FindNextHale(bool:array[])
     }
     return tBoss;
 }
-FindNextHaleEx()
+
+int FindNextHaleEx()
 {
-    new bool:added[TF_MAX_PLAYERS];
-    if (Hale >= 0) added[Hale] = true;
+    bool added[TF_MAX_PLAYERS];
+    if (Hale >= 0)
+        added[Hale] = true;
     return FindNextHale(added);
 }
+
 void ForceTeamWin(TFTeam team)
 {
-    new ent = FindEntityByClassname2(-1, "team_control_point_master");
+    int ent = FindEntityByClassname2(-1, "team_control_point_master");
     if (ent == -1)
     {
         ent = CreateEntityByName("team_control_point_master");
@@ -5608,19 +5598,21 @@ void ForceTeamWin(TFTeam team)
     AcceptEntityInput(ent, "SetWinner");
 }
 
-public HintPanelH(Handle:menu, MenuAction:action, param1, param2)
+public int HintPanelH(Menu menu, MenuAction action, int param1, int param2)
 {
-    if (!IsValidClient(param1)) return;
-    if (action == MenuAction_Select || (action == MenuAction_Cancel && param2 == MenuCancel_Exit)) VSHFlags[param1] |= VSHFLAG_CLASSHELPED;
-    return;
+    if (!IsValidClient(param1))
+        return 0;
+    if (action == MenuAction_Select || (action == MenuAction_Cancel && param2 == MenuCancel_Exit))
+        VSHFlags[param1] |= VSHFLAG_CLASSHELPED;
+    return 0;
 }
 
-public Action:HintPanel(client)
+public Action HintPanel(int client)
 {
     if (IsVoteInProgress())
         return Plugin_Continue;
-    new Handle:panel = CreatePanel();
-    decl String:s[512];
+    Panel panel = new Panel();
+    char s[512];
     SetGlobalTransTarget(client);
     switch (Special)
     {
@@ -5635,45 +5627,53 @@ public Action:HintPanel(client)
         case VSHSpecial_Bunny:
             Format(s, 512, "%t", "vsh_help_bunny");
     }
-    DrawPanelText(panel, s);
+    panel.DrawText(s);
     Format(s, 512, "%t", "vsh_menu_exit");
-    DrawPanelItem(panel, s);
-    SendPanelToClient(panel, client, HintPanelH, 9001);
-    CloseHandle(panel);
+    panel.DrawItem(s);
+    panel.Send(client, HintPanelH, 9001);
+    delete panel;
     return Plugin_Continue;
 }
-public QueuePanelH(Handle:menu, MenuAction:action, param1, param2)
+
+public int QueuePanelH(Menu menu, MenuAction action, int param1, int param2)
 {
     if (action == MenuAction_Select && param2 == 10)
         TurnToZeroPanel(param1);
-    return false;
+    return 0;
 }
-public Action:QueuePanelCmd(client, Args)
+
+public Action QueuePanelCmd(int client, int Args)
 {
-    if (!IsValidClient(client)) return Plugin_Handled;
+    if (!IsValidClient(client))
+        return Plugin_Handled;
     QueuePanel(client);
     return Plugin_Handled;
 }
-public Action:QueuePanel(client)
+
+public Action QueuePanel(int client)
 {
     if (!g_bAreEnoughPlayersPlaying)
         return Plugin_Handled;
-    new Handle:panel = CreatePanel();
-    decl String:s[512];
+    Panel panel = new Panel();
+    char s[512];
     Format(s, 512, "%T", "vsh_thequeue", client);
-    SetPanelTitle(panel, s);
-    new bool:added[TF_MAX_PLAYERS];
-    new tHale = Hale;
-    if (Hale >= 0) added[Hale] = true;
-    if (!g_bEnabled) DrawPanelItem(panel, "None");
+    panel.SetTitle(s);
+    bool added[TF_MAX_PLAYERS];
+    int tHale = Hale;
+    if (Hale >= 0)
+        added[Hale] = true;
+    if (!g_bEnabled)
+        panel.DrawItem("None");
     else if (IsValidClient(tHale))
     {
         Format(s, sizeof(s), "%N - %i", tHale, GetClientQueuePoints(tHale));
-        DrawPanelItem(panel, s);
+        panel.DrawItem(s);
     }
-    else DrawPanelItem(panel, "None");
-    new i, pingas, bool:botadded;
-    DrawPanelText(panel, "---");
+    else
+        panel.DrawItem("None");
+    int i, pingas;
+    bool botadded;
+    panel.DrawText("---");
     do
     {
         tHale = FindNextHale(added);
@@ -5682,7 +5682,7 @@ public Action:QueuePanel(client)
             if (client == tHale)
             {
                 Format(s, 64, "%N - %i", tHale, GetClientQueuePoints(tHale));
-                DrawPanelText(panel, s);
+                panel.DrawText(s);
                 i--;
             }
             else
@@ -5697,8 +5697,9 @@ public Action:QueuePanel(client)
                     Format(s, 64, "BOT - %i", botqueuepoints);
                     botadded = true;
                 }
-                else Format(s, 64, "%N - %i", tHale, GetClientQueuePoints(tHale));
-                DrawPanelItem(panel, s);
+                else
+                    Format(s, 64, "%N - %i", tHale, GetClientQueuePoints(tHale));
+                panel.DrawText(s);
             }
             added[tHale]=true;
             i++;
@@ -5707,28 +5708,30 @@ public Action:QueuePanel(client)
     }
     while (i < 8 && pingas < 100);
     for (; i < 8; i++)
-        DrawPanelItem(panel, "");
+        panel.DrawItem("");
     Format(s, 64, "%T %i (%T)", "vsh_your_points", client, GetClientQueuePoints(client), "vsh_to0", client);
-    DrawPanelItem(panel, s);
-    SendPanelToClient(panel, client, QueuePanelH, 9001);
-    CloseHandle(panel);
+    panel.DrawItem(s);
+    panel.Send(client, QueuePanelH, 9001);
+    delete panel;
     return Plugin_Handled;
 }
-public TurnToZeroPanelH(Handle:menu, MenuAction:action, param1, param2)
+
+public int TurnToZeroPanelH(Menu menu, MenuAction action, int param1, int param2)
 {
     if (action == MenuAction_Select && param2 == 1)
     {
         SetClientQueuePoints(param1, 0);
         CPrintToChat(param1, "{olive}[VSH]{default} %t", "vsh_to0_done");
-        new cl = FindNextHaleEx();
-        if (IsValidClient(cl)) SkipHalePanelNotify(cl);
+        int cl = FindNextHaleEx();
+        if (IsValidClient(cl))
+            SkipHalePanelNotify(cl);
     }
+    return 0;
 }
-public Action:ResetQueuePointsCmd(client, args)
+
+public Action ResetQueuePointsCmd(int client, int args)
 {
-    if (!g_bAreEnoughPlayersPlaying)
-        return Plugin_Handled;
-    if (!IsValidClient(client))
+    if (!g_bAreEnoughPlayersPlaying || !IsValidClient(client))
         return Plugin_Handled;
     if (GetCmdReplySource() == SM_REPLY_TO_CHAT)
         TurnToZeroPanel(client);
@@ -5736,11 +5739,12 @@ public Action:ResetQueuePointsCmd(client, args)
         TurnToZeroPanelH(INVALID_HANDLE, MenuAction_Select, client, 1);
     return Plugin_Handled;
 }
-public Action:TurnToZeroPanel(client)
+
+public Action TurnToZeroPanel(int client)
 {
     if (!g_bAreEnoughPlayersPlaying)
         return Plugin_Continue;
-    new Handle:panel = CreatePanel();
+    Panel panel = new Panel();
     decl String:s[512];
     SetGlobalTransTarget(client);
     Format(s, 512, "%t", "vsh_to0_title");
