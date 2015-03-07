@@ -5745,53 +5745,60 @@ public Action TurnToZeroPanel(int client)
     char s[512];
     SetGlobalTransTarget(client);
     Format(s, 512, "%t", "vsh_to0_title");
-    SetPanelTitle(panel, s);
+    panel.SetTitle(s);
     Format(s, 512, "%t", "Yes");
-    DrawPanelItem(panel, s);
+    panel.DrawItem(s);
     Format(s, 512, "%t", "No");
-    DrawPanelItem(panel, s);
-    SendPanelToClient(panel, client, TurnToZeroPanelH, 9001);
-    CloseHandle(panel);
+    panel.DrawItem(s);
+    panel.Send(client, TurnToZeroPanelH, 9001);
+    delete panel;
     return Plugin_Continue;
 }
-bool:GetClientClasshelpinfoCookie(client)
+
+bool GetClientClasshelpinfoCookie(int client)
 {
-    if (!IsValidClient(client)) return false;
-    if (IsFakeClient(client)) return false;
-    if (!AreClientCookiesCached(client)) return true;
-    decl String:strCookie[MAX_DIGITS];
+    if (!IsValidClient(client) || IsFakeClient(client))
+        return false;
+    if (!AreClientCookiesCached(client))
+        return true;
+    char strCookie[MAX_DIGITS];
     GetClientCookie(client, ClasshelpinfoCookie, strCookie, sizeof(strCookie));
-    if (strCookie[0] == 0) return true;
-    else return bool:StringToInt(strCookie);
+    if (strCookie[0] == 0)
+        return true;
+    else
+        return view_as<bool>(StringToInt(strCookie));
 }
-GetClientQueuePoints(client)
+
+int GetClientQueuePoints(int client)
 {
-    if (!IsValidClient(client)) return 0;
+    if (!IsValidClient(client))
+        return 0;
     if (IsFakeClient(client))
-    {
         return botqueuepoints;
-    }
-    if (!AreClientCookiesCached(client)) return 0;
-    decl String:strPoints[MAX_DIGITS];
+    if (!AreClientCookiesCached(client))
+        return 0;
+    char strPoints[MAX_DIGITS];
     GetClientCookie(client, PointCookie, strPoints, sizeof(strPoints));
     return StringToInt(strPoints);
 }
-SetClientQueuePoints(client, points)
+
+void SetClientQueuePoints(int client, int points)
 {
-    if (!IsValidClient(client)) return;
-    if (IsFakeClient(client)) return;
-    if (!AreClientCookiesCached(client)) return;
-    decl String:strPoints[MAX_DIGITS];
+    if (!IsValidClient(client) || IsFakeClient(client) || !AreClientCookiesCached(client))
+        return;
+    char strPoints[MAX_DIGITS];
     IntToString(points, strPoints, sizeof(strPoints));
     SetClientCookie(client, PointCookie, strPoints);
 }
-SetAuthIdQueuePoints(String:authid[], points)
+
+void SetAuthIdQueuePoints(char[] authid, int points)
 {
-    decl String:strPoints[MAX_DIGITS];
+    char strPoints[MAX_DIGITS];
     IntToString(points, strPoints, sizeof(strPoints));
     SetAuthIdCookie(authid, PointCookie, strPoints);
 }
-public HalePanelH(Handle:menu, MenuAction:action, param1, param2)
+
+public int HalePanelH(Menu menu, MenuAction action, int param1, int param2)
 {
     if (action == MenuAction_Select)
     {
@@ -5827,9 +5834,9 @@ public HalePanelH(Handle:menu, MenuAction:action, param1, param2)
                 else
                     return;
             }*/
-            default: return;
         }
     }
+    return 0;
 }
 
 public Action:HalePanel(client, args)
