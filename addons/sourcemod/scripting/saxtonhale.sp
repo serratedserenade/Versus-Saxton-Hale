@@ -6641,58 +6641,52 @@ void FindVersionData(Panel panel, int versionindex)
     }
 }//75% port mark
 
-public HelpPanelH(Handle:menu, MenuAction:action, param1, param2)
+public int HelpPanelH(Menu menu, MenuAction action, int param1, int param2)
 {
-    if (action == MenuAction_Select)
-    {
-        return;
-    }
+    return 0; //This is easier.
 }
-public Action:HelpPanelCmd(client, args)
+
+public Action HelpPanelCmd(int client, int args)
 {
-    if (!client) return Plugin_Handled;
+    if (!client)
+        return Plugin_Handled;
     HelpPanel(client);
     return Plugin_Handled;
 }
-public Action:HelpPanel(client)
+
+public Action HelpPanel(int client)
 {
     if (!g_bAreEnoughPlayersPlaying || IsVoteInProgress())
         return Plugin_Continue;
-    new Handle:panel = CreatePanel();
-    decl String:s[512];
+    Panel panel = new Panel();
+    char s[512];
     SetGlobalTransTarget(client);
     Format(s, 512, "%t", "vsh_help_mode");
-    DrawPanelItem(panel, s);
+    panel.DrawItem(s);
     Format(s, 512, "%t", "vsh_menu_exit");
-    DrawPanelItem(panel, s);
-    SendPanelToClient(panel, client, HelpPanelH, 9001);
-    CloseHandle(panel);
+    panel.DrawItem(s);
+    panel.Send(client, HelpPanelH, 9001);
+    delete panel;
     return Plugin_Continue;
 }
-public Action:HelpPanel2Cmd(client, args)
+
+public Action HelpPanel2Cmd(int client, int args)
 {
     if (!client)
-    {
         return Plugin_Handled;
-    }
-
     if (client == Hale)
-    {
         HintPanel(Hale);
-    }
     else
-    {
         HelpPanel2(client);
-    }
-
     return Plugin_Handled;
 }
-public Action:HelpPanel2(client)
+
+public Action HelpPanel2(int client)
 {
     if (!g_bAreEnoughPlayersPlaying || IsVoteInProgress())
         return Plugin_Continue;
-    decl String:s[512];
-    new TFClassType:class = TF2_GetPlayerClass(client);
+    char s[512];
+    TFClassType class = TF2_GetPlayerClass(client);
     SetGlobalTransTarget(client);
     switch (class)
     {
@@ -6717,21 +6711,23 @@ public Action:HelpPanel2(client)
         default:
             Format(s, 512, "");
     }
-    new Handle:panel = CreatePanel();
+    Panel panel = new Panel();
     if (class != TFClass_Sniper)
         Format(s, 512, "%t\n%s", "vsh_help_melee", s);
-    SetPanelTitle(panel, s);
-    DrawPanelItem(panel, "Exit");
-    SendPanelToClient(panel, client, HintPanelH, 12);
-    CloseHandle(panel);
+    panel.SetTitle(s);
+    panel.DrawItem("Exit");
+    panel.Send(client, HintPanelH, 12);
+    delete panel;
     return Plugin_Continue;
 }
+
 public Action:ClasshelpinfoCmd(client, args)
 {
     if (!client) return Plugin_Handled;
     ClasshelpinfoSetting(client);
     return Plugin_Handled;
 }
+
 public Action:ClasshelpinfoSetting(client)
 {
     if (!g_bAreEnoughPlayersPlaying)
@@ -7897,48 +7893,30 @@ stock DownloadMaterialList(const String:szFileList[][], iSize)
     }
 }
 
-stock PrepareModel(const String:szModelPath[], bool:bMdlOnly = false)
+stock int PrepareModel(const char[] szModelPath, bool bMdlOnly = false)
 {
-    decl String:szBase[PLATFORM_MAX_PATH];
-    decl String:szPath[PLATFORM_MAX_PATH];
+    char szBase[PLATFORM_MAX_PATH], szPath[PLATFORM_MAX_PATH];
     strcopy(szBase, sizeof(szBase), szModelPath);
     SplitString(szBase, ".mdl", szBase, sizeof(szBase));
-
     if (!bMdlOnly)
     {
         Format(szPath, sizeof(szPath), "%s.phy", szBase);
         if (FileExists(szPath))
-        {
             AddFileToDownloadsTable(szPath);
-        }
-
         Format(szPath, sizeof(szPath), "%s.sw.vtx", szBase);
         if (FileExists(szPath))
-        {
             AddFileToDownloadsTable(szPath);
-        }
-
         Format(szPath, sizeof(szPath), "%s.vvd", szBase);
         if (FileExists(szPath))
-        {
             AddFileToDownloadsTable(szPath);
-        }
-
         Format(szPath, sizeof(szPath), "%s.dx80.vtx", szBase);
         if (FileExists(szPath))
-        {
             AddFileToDownloadsTable(szPath);
-        }
-
         Format(szPath, sizeof(szPath), "%s.dx90.vtx", szBase);
         if (FileExists(szPath))
-        {
             AddFileToDownloadsTable(szPath);
-        }
     }
-
     AddFileToDownloadsTable(szModelPath);
-
     return PrecacheModel(szModelPath, true);
 }
 
@@ -7963,7 +7941,7 @@ stock TFTeam GetEntityTeamNum(int iEnt)
 /*
     Common check that says whether or not a client index is occupied.
 */
-stock bool:IsValidClient(iClient)
+stock bool IsValidClient(iClient)
 {
     return (0 < iClient && iClient <= MaxClients && IsClientInGame(iClient));
 }
@@ -7971,23 +7949,14 @@ stock bool:IsValidClient(iClient)
 /*
     Common checks that says "this player can safely be selected from a queue of players"
 */
-stock bool:IsClientParticipating(iClient)
+stock bool IsClientParticipating(iClient)
 {
     if (IsSpectator(iClient) || IsReplayClient(iClient))
-    {
         return false;
-    }
-
-    if (bool:GetEntProp(iClient, Prop_Send, "m_bIsCoaching"))
-    {
+    if (bool GetEntProp(iClient, Prop_Send, "m_bIsCoaching"))
         return false;
-    }
-
     if (TF2_GetPlayerClass(iClient) == TFClass_Unknown)
-    {
         return false;
-    }
-
     return true;
 }
 
@@ -8009,7 +7978,7 @@ stock int TF2_GetRoundWinCount()
     return GetTeamScore(view_as<int>(TFTeam_Red)) + GetTeamScore(view_as<int>(TFTeam_Blue));
 }
 
-stock ClearTimer(&Handle:hTimer)
+stock void ClearTimer(Handle &hTimer)
 {
     if (hTimer != null)
     {
@@ -8025,21 +7994,17 @@ stock ClearTimer(&Handle:hTimer)
        [0] = RED spawnpoint entref
        [1] = BLU spawnpoint entref
 */
-static Handle:s_hSpawnArray = null;
+static ArrayList s_hSpawnArray = null;
 
-stock OnPluginStart_TeleportToMultiMapSpawn()
+stock void OnPluginStart_TeleportToMultiMapSpawn()
 {
-    s_hSpawnArray = CreateArray(2);
+    s_hSpawnArray = new ArrayList(2);
 }
 
-stock teamplay_round_start_TeleportToMultiMapSpawn()
+stock void teamplay_round_start_TeleportToMultiMapSpawn()
 {
-    ClearArray(s_hSpawnArray);
-
-    new iInt = 0;
-    new iSkip[TF_MAX_PLAYERS] = {0,...};
-
-    new iEnt = MaxClients + 1;
+    s_hSpawnArray.Clear();
+    int iInt = 0, iSkip[TF_MAX_PLAYERS] = {0,...}, iEnt = MaxClients + 1;
     while ((iEnt = FindEntityByClassname2(iEnt, "info_player_teamspawn")) != -1)
     {
         // if (FindValueInArrayAnyEx(s_hSpawnArray, iEnt) != -1) // If already in the array, don't add it again
@@ -8047,14 +8012,12 @@ stock teamplay_round_start_TeleportToMultiMapSpawn()
         //     //CPrintToChdata("not added spawn %i", iEnt);
         //     continue;
         // }
-
-        new iTeam = GetEntityTeamNum(iEnt);
-        new iClient = GetClosestPlayerTo(iEnt, iTeam);
-
+        TFTeam iTeam = GetEntityTeamNum(iEnt);
+        int iClient = GetClosestPlayerTo(iEnt, iTeam);
         if (iClient)
         {
-            new bool:bSkip = false;
-            for (new i = 0; i < TF_MAX_PLAYERS; i++)
+            bool bSkip = false;
+            for (int i = 0; i < TF_MAX_PLAYERS; i++)
             {
                 if (iSkip[i] == iClient)
                 {
@@ -8063,12 +8026,10 @@ stock teamplay_round_start_TeleportToMultiMapSpawn()
                 }
             }
             if (bSkip)
-            {
                 continue;
-            }
             iSkip[iInt++] = iClient;
-            new iIndex = PushArrayCell(s_hSpawnArray, EntIndexToEntRef(iEnt));
-            SetArrayCell(s_hSpawnArray, iIndex, iTeam, 1);       // Opposite team becomes an invalid ent
+            int iIndex = s_hSpawnArray.Push(EntIndexToEntRef(iEnt));
+            s_hSpawnArray.Set(iIndex, iTeam, 1);       // Opposite team becomes an invalid ent
             //CPrintToChdata("spawn %i near %N added to team %i", iEnt, iClient, iTeam);
         }
     }
@@ -8079,21 +8040,17 @@ stock teamplay_round_start_TeleportToMultiMapSpawn()
 
     Useful for multi-stage maps like vsh_megaman
 */
-stock TeleportToMultiMapSpawn(iClient, iTeam = 0)
+stock int TeleportToMultiMapSpawn(int iClient, TFTeam iTeam = TFTeam_Unassigned)
 {
-    decl iSpawn, iTeleTeam, iIndex;
+    int iSpawn, iIndex;
+    TFTeam iTeleTeam
     if (iTeam <= 1)
-    {
         iSpawn = EntRefToEntIndex(GetRandBlockCellEx(s_hSpawnArray));
-    }
     else
     {
         do
-        {
-            iTeleTeam = GetRandBlockCell(s_hSpawnArray, iIndex, 1);
-        }
+            iTeleTeam = view_as<TFTeam>(GetRandBlockCell(s_hSpawnArray, iIndex, 1));
         while (iTeleTeam != iTeam);
-
         iSpawn = EntRefToEntIndex(GetArrayCell(s_hSpawnArray, iIndex, 0));
     }
     TeleMeToYou(iClient, iSpawn);
@@ -8103,21 +8060,17 @@ stock TeleportToMultiMapSpawn(iClient, iTeam = 0)
 /*
     Returns 0 if no client was found.
 */
-stock GetClosestPlayerTo(iEnt, iTeam = 0)
+stock int GetClosestPlayerTo(int iEnt, TFTeam iTeam = TFTeam_Unassigned)
 {
-    new iBest;
-    decl Float:flDist, Float:flTemp;
-    decl Float:vLoc[3], Float:vPos[3];
+    int iBest;
+    float flDist, flTemp, vLoc[3], vPos[3];
     GetEntPropVector(iEnt, Prop_Send, "m_vecOrigin", vLoc);
-    for(new iClient = 1; iClient <= MaxClients; iClient++)
+    for(int iClient = 1; iClient <= MaxClients; iClient++)
     {
         if (IsClientInGame(iClient) && IsPlayerAlive(iClient))
         {
-            if (iTeam && GetEntityTeamNum(iClient) != iTeam)
-            {
+            if (iTeam > TFTeam_Unassigned && GetEntityTeamNum(iClient) != iTeam)
                 continue;
-            }
-
             GetEntPropVector(iClient, Prop_Send, "m_vecOrigin", vPos);
             flTemp = GetVectorDistance(vLoc, vPos);
             if (!iBest || flTemp < flDist)
@@ -8136,21 +8089,16 @@ stock GetClosestPlayerTo(iEnt, iTeam = 0)
 
     Returns true if a player teleported to a ducking player
 */
-stock bool:TeleMeToYou(iMe, iYou, bool:bAngles = false)
+stock bool TeleMeToYou(int iMe, int iYou, bool bAngles = false)
 {
-    decl Float:vPos[3], Float:vAng[3];
+    float vPos[3], vAng[3] = NULL_VECTOR;
     GetEntPropVector(iYou, Prop_Send, "m_vecOrigin", vPos);
-
     if (bAngles)
-    {
         GetEntPropVector(iYou, Prop_Send, "m_angRotation", vAng);
-    }
-
-    new bool:bDucked = false;
-
+    bool bDucked = false;
     if (IsValidClient(iMe) && IsValidClient(iYou) && GetEntProp(iYou, Prop_Send, "m_bDucked"))
     {
-        decl Float:vCollisionVec[3];
+        float vCollisionVec[3];
         vCollisionVec[0] = 24.0;
         vCollisionVec[1] = 24.0;
         vCollisionVec[2] = 62.0;
@@ -8159,78 +8107,64 @@ stock bool:TeleMeToYou(iMe, iYou, bool:bAngles = false)
         SetEntityFlags(iMe, GetEntityFlags(iMe) | FL_DUCKING);
         bDucked = true;
     }
-
-    TeleportEntity(iMe, vPos, bAngles ? vAng : NULL_VECTOR, NULL_VECTOR);
-
+    TeleportEntity(iMe, vPos, vAng, NULL_VECTOR);
     return bDucked;
 }
 
-stock GetRandBlockCell(Handle:hArray, &iSaveIndex, iBlock = 0, bool:bAsChar = false, iDefault = 0)
+stock int GetRandBlockCell(ArrayList hArray, int &iSaveIndex, int iBlock = 0, bool bAsChar = false, int iDefault = 0)
 {
-    new iSize = GetArraySize(hArray);
+    int iSize = hArray.Length;
     if (iSize > 0)
     {
         iSaveIndex = GetRandomInt(0, iSize - 1);
-        return GetArrayCell(hArray, iSaveIndex, iBlock, bAsChar);
+        return hArray.Get(iSaveIndex, iBlock, bAsChar);
     }
     iSaveIndex = -1;
     return iDefault;
 }
 
 // Get a random value while ignoring the save index.
-stock GetRandBlockCellEx(Handle:hArray, iBlock = 0, bool:bAsChar = false, iDefault = 0)
+stock int GetRandBlockCellEx(ArrayList hArray, int iBlock = 0, bool bAsChar = false, int iDefault = 0)
 {
-    decl iIndex;
+    int iIndex;
     return GetRandBlockCell(hArray, iIndex, iBlock, bAsChar, iDefault);
 }
 
 /*
     Chdata's reworked attachparticle
 */
-stock AttachParticle(iEnt, const String:szParticleType[], Float:flTimeToDie = -1.0, Float:vOffsets[3] = {0.0,0.0,0.0}, bool:bAttach = false, Float:flTimeToStart = -1.0)
+stock int AttachParticle(int iEnt, const char[] szParticleType, float flTimeToDie = -1.0, float vOffsets[3] = {0.0,0.0,0.0}, bool bAttach = false, float flTimeToStart = -1.0)
 {
-    new iParti = CreateEntityByName("info_particle_system");
+    int iParti = CreateEntityByName("info_particle_system");
     if (IsValidEntity(iParti))
     {
-        decl Float:vPos[3];
+        float vPos[3];
         GetEntPropVector(iEnt, Prop_Send, "m_vecOrigin", vPos);
         AddVectors(vPos, vOffsets, vPos);
         TeleportEntity(iParti, vPos, NULL_VECTOR, NULL_VECTOR);
-
         DispatchKeyValue(iParti, "effect_name", szParticleType);
         DispatchSpawn(iParti);
-
         if (bAttach)
         {
             SetParent(iEnt, iParti);
             SetEntPropEnt(iParti, Prop_Send, "m_hOwnerEntity", iEnt);
         }
-
         ActivateEntity(iParti);
-
         if (flTimeToStart > 0.0)
         {
-            decl String:szAddOutput[32];
+            char szAddOutput[32];
             Format(szAddOutput, sizeof(szAddOutput), "OnUser1 !self,Start,,%0.2f,1", flTimeToStart);
             SetVariantString(szAddOutput);
             AcceptEntityInput(iParti, "AddOutput");
             AcceptEntityInput(iParti, "FireUser1");
-
             if (flTimeToDie > 0.0)
-            {
                 flTimeToDie += flTimeToStart;
-            }
         }
         else
-        {
             AcceptEntityInput(iParti, "Start");
-        }
 
         if (flTimeToDie > 0.0)
-        {
             killEntityIn(iParti, flTimeToDie); // Interestingly, OnUser1 can be used multiple times, as the code above won't conflict with this.
-        }
-
         return iParti;
     }
     return -1;
