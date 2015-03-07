@@ -4238,7 +4238,8 @@ public Action UseRage(Handle hTimer, any dist)
                 if (Special != VSHSpecial_HHH)
                 {
                     flags |= TF_STUNFLAG_NOSOUNDOREFFECT;
-                    AttachParticle(i, "yikes_fx", 5.0, {0.0,0.0,75.0}, true);
+                    float offset[] = {0.0, 0.0, 75.0};
+                    AttachParticle(i, "yikes_fx", 5.0, offset, true);
                 }
                 if (VSHRoundState != VSHRState_Waiting)
                     TF2_StunPlayer(i, 5.0, _, flags, (Special == VSHSpecial_HHH ? 0 : Hale));
@@ -4255,7 +4256,8 @@ public Action UseRage(Handle hTimer, any dist)
         if (distance < dist)    //(!mode && (distance < RageDist)) || (mode && (distance < RageDist/2)))
         {
             SetEntProp(i, Prop_Send, "m_bDisabled", 1);
-            AttachParticle(i, "yikes_fx", 3.0, {0.0,0.0,75.0}, true);
+            float offset[] = {0.0, 0.0, 75.0};
+            AttachParticle(i, "yikes_fx", 5.0, offset, true);
             if (newRageSentry)
             {
                 SetVariantInt(GetEntProp(i, Prop_Send, "m_iHealth")/2);
@@ -7229,7 +7231,7 @@ stock bool RemoveCond(int iClient, TFCond iCond)
 // true if removed, false if not found / etc
 stock bool RemoveDemoShield(int iClient)
 {
-    new iEnt = MaxClients + 1;
+    int iEnt = MaxClients + 1;
     while ((iEnt = FindEntityByClassname2(iEnt, "tf_wearable_demoshield")) != -1)
     {
         if (GetEntPropEnt(iEnt, Prop_Send, "m_hOwnerEntity") == iClient && !GetEntProp(iEnt, Prop_Send, "m_bDisguiseWearable"))
