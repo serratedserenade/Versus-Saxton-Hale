@@ -5904,94 +5904,85 @@ public int NewPanelH(Menu menu, MenuAction action, int param1, int param2)
     return 0;
 }
 
-public Action:NewPanelCmd(client, args)
+public Action NewPanelCmd(int client, int args)
 {
-    if (!client) return Plugin_Handled;
+    if (!client)
+        return Plugin_Handled;
     NewPanel(client, maxversion);
     return Plugin_Handled;
 }
-public Action:NewPanel(client, versionindex)
+
+public Action NewPanel(int client, int versionindex)
 {
     if (!g_bAreEnoughPlayersPlaying)
         return Plugin_Continue;
     curHelp[client] = versionindex;
-    new Handle:panel = CreatePanel();
-    decl String:s[90];
+    Panel panel = new Panel();
+    char s[90];
     SetGlobalTransTarget(client);
     Format(s, 90, "=%t%s:=", "vsh_whatsnew", haleversiontitles[versionindex]);
-    SetPanelTitle(panel, s);
+    panel.SetTitle(s);
     FindVersionData(panel, versionindex);
-
     if (versionindex > 0)
     {
         if (strcmp(haleversiontitles[versionindex], haleversiontitles[versionindex-1], false) == 0)
-        {
             Format(s, 90, "Next Page");
-        }
         else
-        {
             Format(s, 90, "Older v%s", haleversiontitles[versionindex-1]);
-        }
-        DrawPanelItem(panel, s);
+        panel.DrawItem(s);
     }
     else
     {
         Format(s, 90, "%t", "vsh_noolder");
-        DrawPanelItem(panel, s, ITEMDRAW_DISABLED);
+        panel.DrawItem(s, ITEMDRAW_DISABLED);
     }
-
     if (versionindex < maxversion)
     {
         if (strcmp(haleversiontitles[versionindex], haleversiontitles[versionindex+1], false) == 0)
-        {
             Format(s, 90, "Prev Page");
-        }
         else
-        {
             Format(s, 90, "Newer v%s", haleversiontitles[versionindex+1]);
-        }
-        DrawPanelItem(panel, s);
+        panel.DrawItem(s);
     }
     else
     {
         Format(s, 90, "%t", "vsh_nonewer");
-        DrawPanelItem(panel, s, ITEMDRAW_DISABLED);
+        panel.DrawItem(s, ITEMDRAW_DISABLED);
     }
-
     Format(s, 512, "%t", "vsh_menu_exit");
-    DrawPanelItem(panel, s);
-
-    SendPanelToClient(panel, client, NewPanelH, 9001);
-    CloseHandle(panel);
+    panel.DrawItem(s);
+    panel.Send(client, NewPanelH, 9001);
+    delete panel;
     return Plugin_Continue;
 }
-FindVersionData(Handle:panel, versionindex)
+
+void FindVersionData(Panel panel, int versionindex)
 {
-    switch (versionindex) // DrawPanelText(panel, "1) .");
+    switch (versionindex) // panel.DrawText("1) .");
     {
         // Unnerfed the Easter Bunny's rage.
         case 70: //1.53
         {
-            DrawPanelText(panel, "1) Ported VSH over to 1.7 syntax.(WildCard65)");
+            panel.DrawText("1) Ported VSH over to 1.7 syntax.(WildCard65)");
         }
         case 69: //1.52
         {
-            DrawPanelText(panel, "1) Added the new festive/other weapons!");
-            DrawPanelText(panel, "2) Check out v1.51 because we skipped a version!");
-            DrawPanelText(panel, "3) Maps without health/ammo now randomly spawn some in spawn");
+            panel.DrawText("1) Added the new festive/other weapons!");
+            panel.DrawText("2) Check out v1.51 because we skipped a version!");
+            panel.DrawText("3) Maps without health/ammo now randomly spawn some in spawn");
         }
         case 68: //1.51
         {
-            DrawPanelText(panel, "1) Boss became Hale HUD no longer overlaps final score HUD.");
-            DrawPanelText(panel, "2) Must touch ground again after market gardening (Can no longer screw HHH over).");
-            DrawPanelText(panel, "3) Parachuting reduces market garden dmg by 33% and disables your parachute.");
+            panel.DrawText("1) Boss became Hale HUD no longer overlaps final score HUD.");
+            panel.DrawText("2) Must touch ground again after market gardening (Can no longer screw HHH over).");
+            panel.DrawText("3) Parachuting reduces market garden dmg by 33% and disables your parachute.");
         }
         case 67: // 1.50
         {
-            DrawPanelText(panel, "1) Removed gamedata dependency.");
-            DrawPanelText(panel, "2) Optimized some code.");
-            DrawPanelText(panel, "3) Reserve shooter no longer Thriller taunts.");
-            DrawPanelText(panel, "4) Fixed mantreads not giving increased jump height.");
+            panel.DrawText("1) Removed gamedata dependency.");
+            panel.DrawText("2) Optimized some code.");
+            panel.DrawText("3) Reserve shooter no longer Thriller taunts.");
+            panel.DrawText("4) Fixed mantreads not giving increased jump height.");
             // Should be in sync with github now
             // Fixed SM1.7 compiler warning
             // FlaminSarge's timer/requestframe changes
@@ -6000,655 +5991,656 @@ FindVersionData(Handle:panel, versionindex)
         }
         case 66: //1.49
         {
-            DrawPanelText(panel, "1) Updated again for the latest version of sourcemod (1.6.1 or higher)");
-            DrawPanelText(panel, "2) Hopefully botkillers are fixed now?");
-            DrawPanelText(panel, "3) Fixed wrong number of players displaying when control point is enabled.");
-            DrawPanelText(panel, "4) Fixed festive GRU's stats and festive/bread jarate not removing rage.");
-            DrawPanelText(panel, "5) Fixed issues with HHH teleporting to spawn.");
-            DrawPanelText(panel, "6) Added configs/saxton_spawn_teleport.cfg");
-            DrawPanelText(panel, "--) This version courtesy of the TF2Data community.");
+            panel.DrawText("1) Updated again for the latest version of sourcemod (1.6.1 or higher)");
+            panel.DrawText("2) Hopefully botkillers are fixed now?");
+            panel.DrawText("3) Fixed wrong number of players displaying when control point is enabled.");
+            panel.DrawText("4) Fixed festive GRU's stats and festive/bread jarate not removing rage.");
+            panel.DrawText("5) Fixed issues with HHH teleporting to spawn.");
+            panel.DrawText("6) Added configs/saxton_spawn_teleport.cfg");
+            panel.DrawText("--) This version courtesy of the TF2Data community.");
         }
         case 65: //1.48
         {
-            DrawPanelText(panel, "1) Can call medic to rage.");
-            DrawPanelText(panel, "2) Harder to double tap taunt and fail rage.");
-            DrawPanelText(panel, "3) Cannot spam super duper jump as much when falling into pits.");
-            DrawPanelText(panel, "4) Hale only takes 5% of his max health as damage while in pits, at a max of 500.");
-            DrawPanelText(panel, "--) This version courtesy of the TF2Data community.");
+            panel.DrawText("1) Can call medic to rage.");
+            panel.DrawText("2) Harder to double tap taunt and fail rage.");
+            panel.DrawText("3) Cannot spam super duper jump as much when falling into pits.");
+            panel.DrawText("4) Hale only takes 5% of his max health as damage while in pits, at a max of 500.");
+            panel.DrawText("--) This version courtesy of the TF2Data community.");
         }
         case 64: //1.48
         {
-            DrawPanelText(panel, "5) Blocked boss from using voice commands unless he's CBS or Bunny");
-            DrawPanelText(panel, "6) HHH always teleports to spawn after falling off the map.");
-            DrawPanelText(panel, "7) HHH takes 50 seconds to get his first teleport instead of 25.");
-            DrawPanelText(panel, "--) This version courtesy of the TF2Data community.");
+            panel.DrawText("5) Blocked boss from using voice commands unless he's CBS or Bunny");
+            panel.DrawText("6) HHH always teleports to spawn after falling off the map.");
+            panel.DrawText("7) HHH takes 50 seconds to get his first teleport instead of 25.");
+            panel.DrawText("--) This version courtesy of the TF2Data community.");
         }
         case 63: //1.47
         {
-            DrawPanelText(panel, "1) Updated for the latest version of sourcemod (1.6.1)");
-            DrawPanelText(panel, "2) Fixed final player disconnect not giving the remaining players mini/crits.");
-            DrawPanelText(panel, "3) Fixed cap not starting enabled when the round starts with low enough players to enable it.");
-            DrawPanelText(panel, "--) This version courtesy of the TF2Data community.");
+            panel.DrawText("1) Updated for the latest version of sourcemod (1.6.1)");
+            panel.DrawText("2) Fixed final player disconnect not giving the remaining players mini/crits.");
+            panel.DrawText("3) Fixed cap not starting enabled when the round starts with low enough players to enable it.");
+            panel.DrawText("--) This version courtesy of the TF2Data community.");
         }
         case 62: //1.47
         {
-            DrawPanelText(panel, "5) !haleclass as Hale now shows boss info instead of class info.");
-            DrawPanelText(panel, "6) Fixed Hale's anchor to work against sentries. Crouch walking negates all knockback.");
-            DrawPanelText(panel, "7) Being cloaked next to a dispenser now drains your cloak to prevent camping.");
-            DrawPanelText(panel, "--) This version courtesy of the TF2Data community.");
+            panel.DrawText("5) !haleclass as Hale now shows boss info instead of class info.");
+            panel.DrawText("6) Fixed Hale's anchor to work against sentries. Crouch walking negates all knockback.");
+            panel.DrawText("7) Being cloaked next to a dispenser now drains your cloak to prevent camping.");
+            panel.DrawText("--) This version courtesy of the TF2Data community.");
         }
         case 61: //1.46
         {
-            DrawPanelText(panel, "1) Fixed botkillers (thanks rswallen).");
-            DrawPanelText(panel, "2) Fixed Tide Turner & Razorback not being unequipped/removed properly.");
-            DrawPanelText(panel, "3) Hale can no longer pick up health packs.");
-            DrawPanelText(panel, "4) Fixed maps like military area where BLU can't pick up ammo packs in the first arena round.");
-            DrawPanelText(panel, "5) Fixed unbalanced team joining in the first arena round.");
-            DrawPanelText(panel, "--) This version courtesy of the TF2Data community.");
+            panel.DrawText("1) Fixed botkillers (thanks rswallen).");
+            panel.DrawText("2) Fixed Tide Turner & Razorback not being unequipped/removed properly.");
+            panel.DrawText("3) Hale can no longer pick up health packs.");
+            panel.DrawText("4) Fixed maps like military area where BLU can't pick up ammo packs in the first arena round.");
+            panel.DrawText("5) Fixed unbalanced team joining in the first arena round.");
+            panel.DrawText("--) This version courtesy of the TF2Data community.");
         }
         case 60: //1.46
         {
-            DrawPanelText(panel, "6) Can now type !resetq to reset your queue points.");
-            DrawPanelText(panel, "7) !infotoggle can disable the !haleclass info popups on round start.");
-            DrawPanelText(panel, "8) Easter Bunny has 40pct knockback resist in light of the crit eggs.");
-            DrawPanelText(panel, "9) Phlog damage reduced by half when not under the effects of CritMmmph.");
-            DrawPanelText(panel, "10) Quiet decloak moved from Letranger to Your Eternal Reward / Wanga Prick.");
-            DrawPanelText(panel, "---) This version courtesy of the TF2Data community.");
+            panel.DrawText("6) Can now type !resetq to reset your queue points.");
+            panel.DrawText("7) !infotoggle can disable the !haleclass info popups on round start.");
+            panel.DrawText("8) Easter Bunny has 40pct knockback resist in light of the crit eggs.");
+            panel.DrawText("9) Phlog damage reduced by half when not under the effects of CritMmmph.");
+            panel.DrawText("10) Quiet decloak moved from Letranger to Your Eternal Reward / Wanga Prick.");
+            panel.DrawText("---) This version courtesy of the TF2Data community.");
         }
         case 59: //1.46
         {
-            DrawPanelText(panel, "11) YER no longer disguises you.");
-            DrawPanelText(panel, "12) Changed /halenew pagination a little.");
-            DrawPanelText(panel, "13) Nerfed demo shield crits to minicrits. He was overpowered compared to other classes.");
-            DrawPanelText(panel, "14) Added Cvar 'hale_shield_crits' to re-enable shield crits for servers balanced around taunt crits/goomba.");
-            DrawPanelText(panel, "15) Added cvar 'hale_hp_display' to toggle displaying Hale's Health at all times on the hud.");
-            DrawPanelText(panel, "---) This version courtesy of the TF2Data community.");
+            panel.DrawText("11) YER no longer disguises you.");
+            panel.DrawText("12) Changed /halenew pagination a little.");
+            panel.DrawText("13) Nerfed demo shield crits to minicrits. He was overpowered compared to other classes.");
+            panel.DrawText("14) Added Cvar 'hale_shield_crits' to re-enable shield crits for servers balanced around taunt crits/goomba.");
+            panel.DrawText("15) Added cvar 'hale_hp_display' to toggle displaying Hale's Health at all times on the hud.");
+            panel.DrawText("---) This version courtesy of the TF2Data community.");
         }
         case 58: //1.45
         {
-            DrawPanelText(panel, "1) Fixed equippable wearables (thanks fiagram & Powerlord).");
-            DrawPanelText(panel, "2) Fixed flickering HUD text.");
-            DrawPanelText(panel, "3) Implemented anti-suicide as Hale measures.");
-            DrawPanelText(panel, "4) Hale cannot suicide until around 30 seconds have passed.");
-            DrawPanelText(panel, "5) Hale can no longer switch teams to suicide.");
-            DrawPanelText(panel, "6) Repositioned 'player became x boss' message off of your crosshair.");
-            DrawPanelText(panel, "--) This version courtesy of the TF2Data community."); // Blatant advertising
+            panel.DrawText("1) Fixed equippable wearables (thanks fiagram & Powerlord).");
+            panel.DrawText("2) Fixed flickering HUD text.");
+            panel.DrawText("3) Implemented anti-suicide as Hale measures.");
+            panel.DrawText("4) Hale cannot suicide until around 30 seconds have passed.");
+            panel.DrawText("5) Hale can no longer switch teams to suicide.");
+            panel.DrawText("6) Repositioned 'player became x boss' message off of your crosshair.");
+            panel.DrawText("--) This version courtesy of the TF2Data community."); // Blatant advertising
         }
         case 57: //1.45
         {
-            DrawPanelText(panel, "7) Removed annoying no yes no no you're Hale next message.");
-            DrawPanelText(panel, "8) Market Gardens do damage similar to backstabs.");
-            DrawPanelText(panel, "9) Deadringer now displays its status.");
-            DrawPanelText(panel, "10) Phlog is invulnerable during taunt activation.");
-            DrawPanelText(panel, "11) Phlog Crit Mmmph duration has 75% damage resistance.");
-            DrawPanelText(panel, "12) Phlog disables flaregun crits.");
-            DrawPanelText(panel, "13) Fixed Bread Bite and Festive Eyelander.");
-            DrawPanelText(panel, "---) This version courtesy of the TF2Data community.");
+            panel.DrawText("7) Removed annoying no yes no no you're Hale next message.");
+            panel.DrawText("8) Market Gardens do damage similar to backstabs.");
+            panel.DrawText("9) Deadringer now displays its status.");
+            panel.DrawText("10) Phlog is invulnerable during taunt activation.");
+            panel.DrawText("11) Phlog Crit Mmmph duration has 75% damage resistance.");
+            panel.DrawText("12) Phlog disables flaregun crits.");
+            panel.DrawText("13) Fixed Bread Bite and Festive Eyelander.");
+            panel.DrawText("---) This version courtesy of the TF2Data community.");
         }
         case 56: //1.45
         {
-            DrawPanelText(panel, "14) Can now see uber meter with melee or syringe equipped.");
-            DrawPanelText(panel, "15) Soda Popper & BFB replaced with scattergun.");
-            DrawPanelText(panel, "16) Bonk replaced with crit-a-cola.");
-            DrawPanelText(panel, "17) All 3 might be rebalanced in the future.");
-            DrawPanelText(panel, "18) Reserve shooter crits in place of minicrits. Still 3 clip.");
-            DrawPanelText(panel, "19) Re-enabled Darwin's Danger Shield. Overhealed sniper can tank a hit!");
-            DrawPanelText(panel, "---) This version courtesy of the TF2Data community.");
+            panel.DrawText("14) Can now see uber meter with melee or syringe equipped.");
+            panel.DrawText("15) Soda Popper & BFB replaced with scattergun.");
+            panel.DrawText("16) Bonk replaced with crit-a-cola.");
+            panel.DrawText("17) All 3 might be rebalanced in the future.");
+            panel.DrawText("18) Reserve shooter crits in place of minicrits. Still 3 clip.");
+            panel.DrawText("19) Re-enabled Darwin's Danger Shield. Overhealed sniper can tank a hit!");
+            panel.DrawText("---) This version courtesy of the TF2Data community.");
         }
         case 55: //1.45
         {
-            DrawPanelText(panel, "20) Batt's Backup has 75% knockback resist.");
-            DrawPanelText(panel, "21) Air Strike relaxed to 200 dmg per clip.");
-            DrawPanelText(panel, "22) Fixed backstab rarely doing 1/3 damage glitch.");
-            DrawPanelText(panel, "23) Big Earner gives full cloak on backstab.");
-            DrawPanelText(panel, "24) Fixed SteamTools not changing gamedesc.");
-            DrawPanelText(panel, "25) Reverted 3/5ths backstab assist for medics and fixed no assist glitch.");
-            DrawPanelText(panel, "---) This version courtesy of the TF2Data community.");
+            panel.DrawText("20) Batt's Backup has 75% knockback resist.");
+            panel.DrawText("21) Air Strike relaxed to 200 dmg per clip.");
+            panel.DrawText("22) Fixed backstab rarely doing 1/3 damage glitch.");
+            panel.DrawText("23) Big Earner gives full cloak on backstab.");
+            panel.DrawText("24) Fixed SteamTools not changing gamedesc.");
+            panel.DrawText("25) Reverted 3/5ths backstab assist for medics and fixed no assist glitch.");
+            panel.DrawText("---) This version courtesy of the TF2Data community.");
         }
         case 54: //1.45
         {
-            DrawPanelText(panel, "26) HHH can wallclimb.");
-            DrawPanelText(panel, "27) HHH's weighdown timer is reset on wallclimb.");
-            DrawPanelText(panel, "28) HHH now alerts their teleport target that he teleported to them.");
-            DrawPanelText(panel, "29) HHH can get stuck in soldiers and scouts, but not other classes on teleport.");
-            DrawPanelText(panel, "30) Can now charge super jump while holding space.");
-            DrawPanelText(panel, "31) Nerfed Easter Bunny's rage eggs by 40% damage.");
-            DrawPanelText(panel, "---) This version courtesy of the TF2Data community.");
+            panel.DrawText("26) HHH can wallclimb.");
+            panel.DrawText("27) HHH's weighdown timer is reset on wallclimb.");
+            panel.DrawText("28) HHH now alerts their teleport target that he teleported to them.");
+            panel.DrawText("29) HHH can get stuck in soldiers and scouts, but not other classes on teleport.");
+            panel.DrawText("30) Can now charge super jump while holding space.");
+            panel.DrawText("31) Nerfed Easter Bunny's rage eggs by 40% damage.");
+            panel.DrawText("---) This version courtesy of the TF2Data community.");
         }
         case 53: //1.44
         {
-            DrawPanelText(panel, "1) Fixed first round glich (thanks nergal).");
-            DrawPanelText(panel, "2) Kunai starts at 65 HP instead of 60. Max 270 HP.");
-            DrawPanelText(panel, "3) Kunai gives 180 HP on backstab instead of 100.");
-            DrawPanelText(panel, "4) Demo boots now reduce fall damage like soldier boots and do stomp damage.");
-            DrawPanelText(panel, "5) Fixed bushwacka disabling crits.");
-            DrawPanelText(panel, "6) Air Strike gains ammo based on every 500 damage dealt.");
-            DrawPanelText(panel, "--) This version courtesy of the TF2Data community.");
+            panel.DrawText("1) Fixed first round glich (thanks nergal).");
+            panel.DrawText("2) Kunai starts at 65 HP instead of 60. Max 270 HP.");
+            panel.DrawText("3) Kunai gives 180 HP on backstab instead of 100.");
+            panel.DrawText("4) Demo boots now reduce fall damage like soldier boots and do stomp damage.");
+            panel.DrawText("5) Fixed bushwacka disabling crits.");
+            panel.DrawText("6) Air Strike gains ammo based on every 500 damage dealt.");
+            panel.DrawText("--) This version courtesy of the TF2Data community.");
         }
         case 52: //1.44
         {
-            DrawPanelText(panel, "7) Sydney Sleeper generates half the usual rage for Hale.");
-            DrawPanelText(panel, "8) Other sniper rifles just do 3x damage as usual.");
-            DrawPanelText(panel, "9) Huntsman gets 2x ammo, fortified compound fixed.");
-            DrawPanelText(panel, "10) Festive flare gun now acts like mega-detonator.");
-            DrawPanelText(panel, "11) Medic crossbow now gives 15pct uber instead of 10.");
-            DrawPanelText(panel, "12) Festive crossbow is fixed to be like normal crossbow.");
-            DrawPanelText(panel, "13) Medics now get 3/5 the damage of a backstab for assisting.");
-            DrawPanelText(panel, "---) This version courtesy of the TF2Data community.");
+            panel.DrawText("7) Sydney Sleeper generates half the usual rage for Hale.");
+            panel.DrawText("8) Other sniper rifles just do 3x damage as usual.");
+            panel.DrawText("9) Huntsman gets 2x ammo, fortified compound fixed.");
+            panel.DrawText("10) Festive flare gun now acts like mega-detonator.");
+            panel.DrawText("11) Medic crossbow now gives 15pct uber instead of 10.");
+            panel.DrawText("12) Festive crossbow is fixed to be like normal crossbow.");
+            panel.DrawText("13) Medics now get 3/5 the damage of a backstab for assisting.");
+            panel.DrawText("---) This version courtesy of the TF2Data community.");
         }
         case 51: //1.43
         {
-            DrawPanelText(panel, "1) Backstab formula rebalanced to do better damage to lower HP Hales.");
-            DrawPanelText(panel, "2) Damage Dealt now work properly with backstabs.");
-            DrawPanelText(panel, "3) Slightly reworked Hale health formula.");
-            DrawPanelText(panel, "4) (Anchor) Bosses take no pushback from damage while ducking on the ground.");
-            DrawPanelText(panel, "5) Short circuit blocked until further notice.");
-            DrawPanelText(panel, "--) This version courtesy of the TF2Data community.");
+            panel.DrawText("1) Backstab formula rebalanced to do better damage to lower HP Hales.");
+            panel.DrawText("2) Damage Dealt now work properly with backstabs.");
+            panel.DrawText("3) Slightly reworked Hale health formula.");
+            panel.DrawText("4) (Anchor) Bosses take no pushback from damage while ducking on the ground.");
+            panel.DrawText("5) Short circuit blocked until further notice.");
+            panel.DrawText("--) This version courtesy of the TF2Data community.");
         }
         case 50: //1.43
         {
-            DrawPanelText(panel, "6) Bushwacka blocks healing while in use.");
-            DrawPanelText(panel, "7) Cannot wallclimb if your HP is low enough that it'll kill you.");
-            DrawPanelText(panel, "8) Bushwacka doesn't disable crits.");
-            DrawPanelText(panel, "9) 2013 festives and bread now get crits.");
-            DrawPanelText(panel, "10) Fixed telefrag and mantread stomp damage.");
-            DrawPanelText(panel, "---) This version courtesy of the TF2Data community.");
+            panel.DrawText("6) Bushwacka blocks healing while in use.");
+            panel.DrawText("7) Cannot wallclimb if your HP is low enough that it'll kill you.");
+            panel.DrawText("8) Bushwacka doesn't disable crits.");
+            panel.DrawText("9) 2013 festives and bread now get crits.");
+            panel.DrawText("10) Fixed telefrag and mantread stomp damage.");
+            panel.DrawText("---) This version courtesy of the TF2Data community.");
         }
         case 49: //1.43
         {
-            DrawPanelText(panel, "11) L'etranger's 40% cloak is replaced with quiet decloak and -25% cloak regen rate.");
-            DrawPanelText(panel, "12) Ambassador does 2.5x damage on headshots.");
-            DrawPanelText(panel, "13) Diamondback gets 3 crits on backstab.");
-            DrawPanelText(panel, "14) Diamondback crit shots do bonus damage similar to the Ambassador.");
-            DrawPanelText(panel, "15) Manmelter always crits, while revenge crits do bonus damage.");
-            DrawPanelText(panel, "---) This version courtesy of the TF2Data community.");
+            panel.DrawText("11) L'etranger's 40% cloak is replaced with quiet decloak and -25% cloak regen rate.");
+            panel.DrawText("12) Ambassador does 2.5x damage on headshots.");
+            panel.DrawText("13) Diamondback gets 3 crits on backstab.");
+            panel.DrawText("14) Diamondback crit shots do bonus damage similar to the Ambassador.");
+            panel.DrawText("15) Manmelter always crits, while revenge crits do bonus damage.");
+            panel.DrawText("---) This version courtesy of the TF2Data community.");
         }
         case 48: //142
         {
-            DrawPanelText(panel, "1) Festive fixes");
-            DrawPanelText(panel, "2) Hopefully fixed targes disappearing");
+            panel.DrawText("1) Festive fixes");
+            panel.DrawText("2) Hopefully fixed targes disappearing");
 #if defined EASTER_BUNNY_ON
-            DrawPanelText(panel, "3) Easter and April Fool's Day so close together... hmmm...");
+            panel.DrawText("3) Easter and April Fool's Day so close together... hmmm...");
 #endif
         }
         case 47: //141
         {
-            DrawPanelText(panel, "1) Fixed bosses disguising");
-            DrawPanelText(panel, "2) Updated action slot whitelist");
-            DrawPanelText(panel, "3) Updated sniper rifle list, Fest. Huntsman");
-            DrawPanelText(panel, "4) Medigun speed works like Quick-Fix");
-            DrawPanelText(panel, "5) Medigun+gunslinger vm fix");
-            DrawPanelText(panel, "6) CBS gets Fest. Huntsman");
-            DrawPanelText(panel, "7) Spies take more dmg while cloaked (normal watch)");
-            DrawPanelText(panel, "8) Experimental backstab block animation");
+            panel.DrawText("1) Fixed bosses disguising");
+            panel.DrawText("2) Updated action slot whitelist");
+            panel.DrawText("3) Updated sniper rifle list, Fest. Huntsman");
+            panel.DrawText("4) Medigun speed works like Quick-Fix");
+            panel.DrawText("5) Medigun+gunslinger vm fix");
+            panel.DrawText("6) CBS gets Fest. Huntsman");
+            panel.DrawText("7) Spies take more dmg while cloaked (normal watch)");
+            panel.DrawText("8) Experimental backstab block animation");
         }
         case 46: //140
         {
-            DrawPanelText(panel, "1) Dead Ringers have no cloak defense buff. Normal cloaks do.");
-            DrawPanelText(panel, "2) Fixed Sniper Rifle reskin behavior");
-            DrawPanelText(panel, "3) Boss has small amount of stun resistance after rage");
-            DrawPanelText(panel, "4) Fixed HHH/CBS models");
+            panel.DrawText("1) Dead Ringers have no cloak defense buff. Normal cloaks do.");
+            panel.DrawText("2) Fixed Sniper Rifle reskin behavior");
+            panel.DrawText("3) Boss has small amount of stun resistance after rage");
+            panel.DrawText("4) Fixed HHH/CBS models");
         }
         case 45: //139c
         {
-            DrawPanelText(panel, "1) Backstab disguising smoother/less obvious");
-            DrawPanelText(panel, "2) Rage 'dings' dispenser/tele, to help locate Hale");
-            DrawPanelText(panel, "3) Improved skip panel");
-            DrawPanelText(panel, "4) Removed crits from sniper rifles, now do 2.9x damage");
-            DrawPanelText(panel, "-- Sleeper does 2.4x damage, 2.9x if Hale's rage is >90pct");
-            DrawPanelText(panel, "-- Bushwacka nerfs still apply");
-            DrawPanelText(panel, "-- Minicrit- less damage, more knockback");
-            DrawPanelText(panel, "5) Scaled sniper rifle glow time a bit better");
-            DrawPanelText(panel, "6) Fixed Dead Ringer spy death icon");
+            panel.DrawText("1) Backstab disguising smoother/less obvious");
+            panel.DrawText("2) Rage 'dings' dispenser/tele, to help locate Hale");
+            panel.DrawText("3) Improved skip panel");
+            panel.DrawText("4) Removed crits from sniper rifles, now do 2.9x damage");
+            panel.DrawText("-- Sleeper does 2.4x damage, 2.9x if Hale's rage is >90pct");
+            panel.DrawText("-- Bushwacka nerfs still apply");
+            panel.DrawText("-- Minicrit- less damage, more knockback");
+            panel.DrawText("5) Scaled sniper rifle glow time a bit better");
+            panel.DrawText("6) Fixed Dead Ringer spy death icon");
         }
         case 44: //139c
         {
-            DrawPanelText(panel, "7) BabyFaceBlaster will fill boost normally, but will hit 100 and drain+minicrits");
-            DrawPanelText(panel, "8) Can't Eureka+destroy dispenser to insta-tele");
-            DrawPanelText(panel, "9) Phlogger invuln during the taunt");
-            DrawPanelText(panel, "10) Added !hale_resetq");
-            DrawPanelText(panel, "11) Heatmaker gains Focus on hit (varies by charge)");
-            DrawPanelText(panel, "12) Bosses get short defense buff after rage");
-            DrawPanelText(panel, "13) Cozy Camper comes with SMG - 1.5s bleed, no random crit, -15% dmg");
-            DrawPanelText(panel, "14) Valve buffed Crossbow. Balancing.");
-            DrawPanelText(panel, "15) New cvars-hale_force_team, hale_enable_eureka");
+            panel.DrawText("7) BabyFaceBlaster will fill boost normally, but will hit 100 and drain+minicrits");
+            panel.DrawText("8) Can't Eureka+destroy dispenser to insta-tele");
+            panel.DrawText("9) Phlogger invuln during the taunt");
+            panel.DrawText("10) Added !hale_resetq");
+            panel.DrawText("11) Heatmaker gains Focus on hit (varies by charge)");
+            panel.DrawText("12) Bosses get short defense buff after rage");
+            panel.DrawText("13) Cozy Camper comes with SMG - 1.5s bleed, no random crit, -15% dmg");
+            panel.DrawText("14) Valve buffed Crossbow. Balancing.");
+            panel.DrawText("15) New cvars-hale_force_team, hale_enable_eureka");
         }
         case 43: //139c
         {
-            DrawPanelText(panel, "16) Powerlord's Better Backstab Detection");
-            DrawPanelText(panel, "17) Backburner has charged airblast");
-            DrawPanelText(panel, "18) Skip Hale notification mixes things up");
-            DrawPanelText(panel, "19) Bosses may or may not obey Pyrovision voice rules. Or both.");
+            panel.DrawText("16) Powerlord's Better Backstab Detection");
+            panel.DrawText("17) Backburner has charged airblast");
+            panel.DrawText("18) Skip Hale notification mixes things up");
+            panel.DrawText("19) Bosses may or may not obey Pyrovision voice rules. Or both.");
         }
         case 42: //139
         {
-            DrawPanelText(panel, "1) !hale_resetqueuepoints");
-            DrawPanelText(panel, "-- From chat, asks for confirmation");
-            DrawPanelText(panel, "-- From console, no confirmation!");
-            DrawPanelText(panel, "2) Help panel stops repeatedly popping up");
-            DrawPanelText(panel, "3) Medic is credited 100% of damage done during uber");
-            DrawPanelText(panel, "4) Bushwacka changes:");
-            DrawPanelText(panel, "-- Hit a wall to climb it");
-            DrawPanelText(panel, "-- Slower fire rate");
-            DrawPanelText(panel, "-- Disables crits on rifles (not Huntsman)");
-            DrawPanelText(panel, "-- Effect does not occur during HHH round");
-            DrawPanelText(panel, "...contd.");
+            panel.DrawText("1) !hale_resetqueuepoints");
+            panel.DrawText("-- From chat, asks for confirmation");
+            panel.DrawText("-- From console, no confirmation!");
+            panel.DrawText("2) Help panel stops repeatedly popping up");
+            panel.DrawText("3) Medic is credited 100% of damage done during uber");
+            panel.DrawText("4) Bushwacka changes:");
+            panel.DrawText("-- Hit a wall to climb it");
+            panel.DrawText("-- Slower fire rate");
+            panel.DrawText("-- Disables crits on rifles (not Huntsman)");
+            panel.DrawText("-- Effect does not occur during HHH round");
+            panel.DrawText("...contd.");
         }
 
         case 41: //139
         {
-            DrawPanelText(panel, "5) Late December increases chances of CBS appearing");
-            DrawPanelText(panel, "6) If map changes mid-round, queue points not lost");
-            DrawPanelText(panel, "7) Fixed HHH tele (again).");
-            DrawPanelText(panel, "8) HHH tele removes Sniper Rifle glow");
-            DrawPanelText(panel, "9) Mantread stomp deals 5x damage to Hale");
-            DrawPanelText(panel, "10) Rage stun range- Vagineer increased, CBS decreased");
-            DrawPanelText(panel, "11) Balanced CBS arrows");
-            DrawPanelText(panel, "12) Minicrits will not play loud sound to all players");
-            DrawPanelText(panel, "13) Dead Ringer will not be able to activate for 2s after backstab");
-            DrawPanelText(panel, "-- Other spy watches can");
-            DrawPanelText(panel, "14) Fixed crit issues");
-            DrawPanelText(panel, "15) Hale queue now accepts negative points");
-            DrawPanelText(panel, "...contd.");
+            panel.DrawText("5) Late December increases chances of CBS appearing");
+            panel.DrawText("6) If map changes mid-round, queue points not lost");
+            panel.DrawText("7) Fixed HHH tele (again).");
+            panel.DrawText("8) HHH tele removes Sniper Rifle glow");
+            panel.DrawText("9) Mantread stomp deals 5x damage to Hale");
+            panel.DrawText("10) Rage stun range- Vagineer increased, CBS decreased");
+            panel.DrawText("11) Balanced CBS arrows");
+            panel.DrawText("12) Minicrits will not play loud sound to all players");
+            panel.DrawText("13) Dead Ringer will not be able to activate for 2s after backstab");
+            panel.DrawText("-- Other spy watches can");
+            panel.DrawText("14) Fixed crit issues");
+            panel.DrawText("15) Hale queue now accepts negative points");
+            panel.DrawText("...contd.");
         }
         case 40: //139
         {
-            DrawPanelText(panel, "16) For server owners:");
-            DrawPanelText(panel, "-- Translations updated");
-            DrawPanelText(panel, "-- Added hale_spec_force_boss cvar");
-            DrawPanelText(panel, "-- Now attempts to integrate tf2items config");
-            DrawPanelText(panel, "-- With SteamTools, changes game desc");
-            DrawPanelText(panel, "-- Plugin may warn if config is outdated");
-            DrawPanelText(panel, "-- Jump/tele charge defines at top of code");
-            DrawPanelText(panel, "17) For mapmakers:");
-            DrawPanelText(panel, "-- Indicate that your map has music:");
-            DrawPanelText(panel, "-- Add info_target with name 'hale_no_music'");
-            DrawPanelText(panel, "18) Third Degree hit adds uber to healers");
-            DrawPanelText(panel, "19) Knockback resistance on Hale/HHH");
+            panel.DrawText("16) For server owners:");
+            panel.DrawText("-- Translations updated");
+            panel.DrawText("-- Added hale_spec_force_boss cvar");
+            panel.DrawText("-- Now attempts to integrate tf2items config");
+            panel.DrawText("-- With SteamTools, changes game desc");
+            panel.DrawText("-- Plugin may warn if config is outdated");
+            panel.DrawText("-- Jump/tele charge defines at top of code");
+            panel.DrawText("17) For mapmakers:");
+            panel.DrawText("-- Indicate that your map has music:");
+            panel.DrawText("-- Add info_target with name 'hale_no_music'");
+            panel.DrawText("18) Third Degree hit adds uber to healers");
+            panel.DrawText("19) Knockback resistance on Hale/HHH");
         }
         case 39: //138
         {
-            DrawPanelText(panel, "1) Bots will use rage.");
-            DrawPanelText(panel, "2) Doors only forced open on specified maps");
-            DrawPanelText(panel, "3) CBS spawns more during Winter holidays");
-            DrawPanelText(panel, "4) Deathspam for teamswitch gone");
-            DrawPanelText(panel, "5) More notice for next Hale");
-            DrawPanelText(panel, "6) Wrap Assassin has 2 ammo");
-            DrawPanelText(panel, "7) Holiday Punch slightly disorients Hale");
-            DrawPanelText(panel, "-- If stunned Heavy punches Hale, removes stun");
-            DrawPanelText(panel, "8) Mantreads increase rocketjump distance");
+            panel.DrawText("1) Bots will use rage.");
+            panel.DrawText("2) Doors only forced open on specified maps");
+            panel.DrawText("3) CBS spawns more during Winter holidays");
+            panel.DrawText("4) Deathspam for teamswitch gone");
+            panel.DrawText("5) More notice for next Hale");
+            panel.DrawText("6) Wrap Assassin has 2 ammo");
+            panel.DrawText("7) Holiday Punch slightly disorients Hale");
+            panel.DrawText("-- If stunned Heavy punches Hale, removes stun");
+            panel.DrawText("8) Mantreads increase rocketjump distance");
         }
         case 38: //138
         {
-            DrawPanelText(panel, "9) Fixed CBS Huntsman rate of fire");
-            DrawPanelText(panel, "10) Fixed permanent invuln Vagineer glitch");
-            DrawPanelText(panel, "11) Jarate removes some Vagineer uber time and 1 CBS arrow");
-            DrawPanelText(panel, "12) Low-end Medic assist damage now counted");
-            DrawPanelText(panel, "13) Hitting Dead Ringers does more damage (as balancing)");
-            DrawPanelText(panel, "14) Eureka Effect temporarily removed)");
-            DrawPanelText(panel, "15) HHH won't get stuck in ceilings when teleporting");
-            DrawPanelText(panel, "16) Further updates pending");
+            panel.DrawText("9) Fixed CBS Huntsman rate of fire");
+            panel.DrawText("10) Fixed permanent invuln Vagineer glitch");
+            panel.DrawText("11) Jarate removes some Vagineer uber time and 1 CBS arrow");
+            panel.DrawText("12) Low-end Medic assist damage now counted");
+            panel.DrawText("13) Hitting Dead Ringers does more damage (as balancing)");
+            panel.DrawText("14) Eureka Effect temporarily removed)");
+            panel.DrawText("15) HHH won't get stuck in ceilings when teleporting");
+            panel.DrawText("16) Further updates pending");
         }
         case 37:    //137
         {
-            DrawPanelText(panel, "1) Fixed taunt/rage.");
-            DrawPanelText(panel, "2) Fixed rage+high five.");
-            DrawPanelText(panel, "3) hale_circuit_stun - Circuit Stun time (0 to disable)");
-            DrawPanelText(panel, "4) Fixed coaching bug");
-            DrawPanelText(panel, "5) Config file for map doors");
-            DrawPanelText(panel, "6) Fixed floor-Hale");
-            DrawPanelText(panel, "7) Fixed Circuit stun");
-            DrawPanelText(panel, "8) Fixed negative health bug");
-            DrawPanelText(panel, "9) hale_enabled isn't a dummy cvar anymore");
-            DrawPanelText(panel, "10) hale_special cmd fixes");
+            panel.DrawText("1) Fixed taunt/rage.");
+            panel.DrawText("2) Fixed rage+high five.");
+            panel.DrawText("3) hale_circuit_stun - Circuit Stun time (0 to disable)");
+            panel.DrawText("4) Fixed coaching bug");
+            panel.DrawText("5) Config file for map doors");
+            panel.DrawText("6) Fixed floor-Hale");
+            panel.DrawText("7) Fixed Circuit stun");
+            panel.DrawText("8) Fixed negative health bug");
+            panel.DrawText("9) hale_enabled isn't a dummy cvar anymore");
+            panel.DrawText("10) hale_special cmd fixes");
         }
         case 36: //137
         {
-            DrawPanelText(panel, "11) 1st-round cap enables after 1 min.");
-            DrawPanelText(panel, "12) More invalid Hale checks.");
-            DrawPanelText(panel, "13) Backstabs act like Razorbackstab (2s)");
-            DrawPanelText(panel, "14) Fixed map check error");
-            DrawPanelText(panel, "15) Wanga Prick -> Eternal Reward effect");
-            DrawPanelText(panel, "16) Jarate removes 8% of Hale's rage meter");
-            DrawPanelText(panel, "17) The Fan O' War removes 5% of the rage meter on hit");
-            DrawPanelText(panel, "18) Removed Shortstop reload penalty");
-            DrawPanelText(panel, "19) VSH_OnMusic forward");
+            panel.DrawText("11) 1st-round cap enables after 1 min.");
+            panel.DrawText("12) More invalid Hale checks.");
+            panel.DrawText("13) Backstabs act like Razorbackstab (2s)");
+            panel.DrawText("14) Fixed map check error");
+            panel.DrawText("15) Wanga Prick -> Eternal Reward effect");
+            panel.DrawText("16) Jarate removes 8% of Hale's rage meter");
+            panel.DrawText("17) The Fan O' War removes 5% of the rage meter on hit");
+            panel.DrawText("18) Removed Shortstop reload penalty");
+            panel.DrawText("19) VSH_OnMusic forward");
         }
         case 35: //1369
         {
-            DrawPanelText(panel, "1) Fixed spawn door blocking.");
-            DrawPanelText(panel, "2) Cleaned up HUD text (health, etc).");
-            DrawPanelText(panel, "3) VSH_OnDoJump now has a bool for superduper.");
-            DrawPanelText(panel, "4) !halenoclass changed to !haleclassinfotoggle.");
-            DrawPanelText(panel, "5) Fixed invalid clients becoming Hale");
-            DrawPanelText(panel, "6) Removed teamscramble from first round.");
-            DrawPanelText(panel, "7) Vagineer noises:");
-            DrawPanelText(panel, "-- Nope for no");
-            DrawPanelText(panel, "-- Gottam/mottag (same as jump but quieter) for Move Up");
-            DrawPanelText(panel, "-- Hurr for everything else");
+            panel.DrawText("1) Fixed spawn door blocking.");
+            panel.DrawText("2) Cleaned up HUD text (health, etc).");
+            panel.DrawText("3) VSH_OnDoJump now has a bool for superduper.");
+            panel.DrawText("4) !halenoclass changed to !haleclassinfotoggle.");
+            panel.DrawText("5) Fixed invalid clients becoming Hale");
+            panel.DrawText("6) Removed teamscramble from first round.");
+            panel.DrawText("7) Vagineer noises:");
+            panel.DrawText("-- Nope for no");
+            panel.DrawText("-- Gottam/mottag (same as jump but quieter) for Move Up");
+            panel.DrawText("-- Hurr for everything else");
         }
         case 34: //1369
         {
-            DrawPanelText(panel, "8) All map dispensers will be on the non-Hale team (fixes health bug)");
-            DrawPanelText(panel, "9) Fixed command flags on overlay command");
-            DrawPanelText(panel, "10) Fixed soldier shotgun not dealing midair minicrits.");
-            DrawPanelText(panel, "11) Fixed invalid weapons on clients");
-            DrawPanelText(panel, "12) Damage indicator (+spec damage indicator)");
-            DrawPanelText(panel, "13) Hale speed remains during humiliation time");
-            DrawPanelText(panel, "14) SuperDuperTele for HHH stuns for 4s instead of regular 2");
+            panel.DrawText("8) All map dispensers will be on the non-Hale team (fixes health bug)");
+            panel.DrawText("9) Fixed command flags on overlay command");
+            panel.DrawText("10) Fixed soldier shotgun not dealing midair minicrits.");
+            panel.DrawText("11) Fixed invalid weapons on clients");
+            panel.DrawText("12) Damage indicator (+spec damage indicator)");
+            panel.DrawText("13) Hale speed remains during humiliation time");
+            panel.DrawText("14) SuperDuperTele for HHH stuns for 4s instead of regular 2");
         }
         case 33: //1369
         {
-            DrawPanelText(panel, "15) Battalion's Backup adds +10 max hp, but still only overheal to 300");
-            DrawPanelText(panel, "-- Full rage meter when hit by Hale. Buff causes drastic defense boost.");
-            DrawPanelText(panel, "16) Fixed a telefrag glitch");
-            DrawPanelText(panel, "17) Powerjack is now +25hp on hit, heal up to +50 overheal");
-            DrawPanelText(panel, "18) Backstab now shows the regular hit indicator (like other weapons do)");
-            DrawPanelText(panel, "19) Kunai adds 100hp on backstab, up to 270");
-            DrawPanelText(panel, "20) FaN/Scout crit knockback not nerfed to oblivion anymore");
-            DrawPanelText(panel, "21) Removed Short Circuit stun (better effect being made)");
+            panel.DrawText("15) Battalion's Backup adds +10 max hp, but still only overheal to 300");
+            panel.DrawText("-- Full rage meter when hit by Hale. Buff causes drastic defense boost.");
+            panel.DrawText("16) Fixed a telefrag glitch");
+            panel.DrawText("17) Powerjack is now +25hp on hit, heal up to +50 overheal");
+            panel.DrawText("18) Backstab now shows the regular hit indicator (like other weapons do)");
+            panel.DrawText("19) Kunai adds 100hp on backstab, up to 270");
+            panel.DrawText("20) FaN/Scout crit knockback not nerfed to oblivion anymore");
+            panel.DrawText("21) Removed Short Circuit stun (better effect being made)");
         }
         case 32: //1368
         {
-            DrawPanelText(panel, "1) Now FaN and Scout crit knockback is REALLY lessened.");
-            DrawPanelText(panel, "2) Medic says 'I'm charged' when he gets fully uber-charge with syringegun.");
-            DrawPanelText(panel, "3) Team will scramble in 1st round, if 1st round is default arena.");
-            DrawPanelText(panel, "4) Now client can disable info about changes of classes, displayed when round started.");
-            DrawPanelText(panel, "5) Powerjack adds 50HPs per hit.");
-            DrawPanelText(panel, "6) Short Circuit stuns Hale for 2.0 seconds.");
-            DrawPanelText(panel, "7) Vagineer says \"hurr\"");
-            //DrawPanelText(panel, "8) Added support of VSH achievements.");
+            panel.DrawText("1) Now FaN and Scout crit knockback is REALLY lessened.");
+            panel.DrawText("2) Medic says 'I'm charged' when he gets fully uber-charge with syringegun.");
+            panel.DrawText("3) Team will scramble in 1st round, if 1st round is default arena.");
+            panel.DrawText("4) Now client can disable info about changes of classes, displayed when round started.");
+            panel.DrawText("5) Powerjack adds 50HPs per hit.");
+            panel.DrawText("6) Short Circuit stuns Hale for 2.0 seconds.");
+            panel.DrawText("7) Vagineer says \"hurr\"");
+            //panel.DrawText("8) Added support of VSH achievements.");
         }
         case 31: //1367
         {
-            DrawPanelText(panel, "1) Map-specific fixes:");
-            DrawPanelText(panel, "-- Oilrig's pit no longer allows HHH to instatele");
-            DrawPanelText(panel, "-- Arakawa's pit damage drastically lessened");
-            DrawPanelText(panel, "2) General map fixes: disable spawn-blocking walls");
-            DrawPanelText(panel, "3) Cap point now properly un/locks instead of fake-unlocking.");
-            DrawPanelText(panel, "4) Tried fixing double-music playing.");
-            DrawPanelText(panel, "5) Fixed Eternal Reward disguise glitch - edge case.");
-            DrawPanelText(panel, "6) Help menus no longer glitch votes.");
+            panel.DrawText("1) Map-specific fixes:");
+            panel.DrawText("-- Oilrig's pit no longer allows HHH to instatele");
+            panel.DrawText("-- Arakawa's pit damage drastically lessened");
+            panel.DrawText("2) General map fixes: disable spawn-blocking walls");
+            panel.DrawText("3) Cap point now properly un/locks instead of fake-unlocking.");
+            panel.DrawText("4) Tried fixing double-music playing.");
+            panel.DrawText("5) Fixed Eternal Reward disguise glitch - edge case.");
+            panel.DrawText("6) Help menus no longer glitch votes.");
         }
         case 30: //1366
         {
-            DrawPanelText(panel, "1) Fixed superjump velocity code.");
-            DrawPanelText(panel, "2) Fixed replaced Rocket Jumpers not minicritting Hale in midair.");
+            panel.DrawText("1) Fixed superjump velocity code.");
+            panel.DrawText("2) Fixed replaced Rocket Jumpers not minicritting Hale in midair.");
         }
         case 29: //1365
         {
-            DrawPanelText(panel, "1) Half-Zatoichi is now allowed. Heal 35 health on hit, but must hit Hale to remove Honorbound.");
-            DrawPanelText(panel, "-- Can add up to 25 overheal");
-            DrawPanelText(panel, "-- Starts the round bloodied.");
-            DrawPanelText(panel, "2) Fixed Hale not building rage when only Scouts remain.");
-            DrawPanelText(panel, "3) Tried fixing Hale disconnect/nextround glitches (including music).");
-            DrawPanelText(panel, "4) Candycane spawns healthpack on hit.");
+            panel.DrawText("1) Half-Zatoichi is now allowed. Heal 35 health on hit, but must hit Hale to remove Honorbound.");
+            panel.DrawText("-- Can add up to 25 overheal");
+            panel.DrawText("-- Starts the round bloodied.");
+            panel.DrawText("2) Fixed Hale not building rage when only Scouts remain.");
+            panel.DrawText("3) Tried fixing Hale disconnect/nextround glitches (including music).");
+            panel.DrawText("4) Candycane spawns healthpack on hit.");
         }
         case 28:    //1364
         {
-            DrawPanelText(panel, "1) Added convar hale_first_round (default 0). If it's 0, first round will be default arena.");
-            DrawPanelText(panel, "2) Added more translations.");
+            panel.DrawText("1) Added convar hale_first_round (default 0). If it's 0, first round will be default arena.");
+            panel.DrawText("2) Added more translations.");
         }
         case 27:    //1363
         {
-            DrawPanelText(panel, "1) Fixed a queue point exploit (VoiDeD is mean)");
-            DrawPanelText(panel, "2) HHH has backstab/death sound now");
-            DrawPanelText(panel, "3) First rounds are normal arena");
-            DrawPanelText(panel, "-- Some weapon replacements still apply!");
-            DrawPanelText(panel, "-- Teambalance is still off, too.");
-            DrawPanelText(panel, "4) Fixed arena_ maps not switching teams occasionally");
-            DrawPanelText(panel, "-- After 3 rounds with a team, has a chance to switch");
-            DrawPanelText(panel, "-- Will add a cvar to keep Hale always blue/force team, soon");
-            DrawPanelText(panel, "5) Fixed pit damage");
+            panel.DrawText("1) Fixed a queue point exploit (VoiDeD is mean)");
+            panel.DrawText("2) HHH has backstab/death sound now");
+            panel.DrawText("3) First rounds are normal arena");
+            panel.DrawText("-- Some weapon replacements still apply!");
+            panel.DrawText("-- Teambalance is still off, too.");
+            panel.DrawText("4) Fixed arena_ maps not switching teams occasionally");
+            panel.DrawText("-- After 3 rounds with a team, has a chance to switch");
+            panel.DrawText("-- Will add a cvar to keep Hale always blue/force team, soon");
+            panel.DrawText("5) Fixed pit damage");
         }
         case 26:    //1361 and 2
         {
-            DrawPanelText(panel, "1) CBS music");
-            DrawPanelText(panel, "2) Soldiers minicrit Hale while he's in midair.");
-            DrawPanelText(panel, "3) Direct Hit crits instead of minicrits");
-            DrawPanelText(panel, "4) Reserve Shooter switches faster, +10% dmg");
-            DrawPanelText(panel, "5) Added hale_stop_music cmd - admins stop music for all");
-            DrawPanelText(panel, "6) FaN and Scout crit knockback is lessened");
-            DrawPanelText(panel, "7) Your halemusic/halevoice settings are saved");
-            DrawPanelText(panel, "1.362) Sounds aren't stupid .mdl files anymore");
-            DrawPanelText(panel, "1.362) Fixed translations");
+            panel.DrawText("1) CBS music");
+            panel.DrawText("2) Soldiers minicrit Hale while he's in midair.");
+            panel.DrawText("3) Direct Hit crits instead of minicrits");
+            panel.DrawText("4) Reserve Shooter switches faster, +10% dmg");
+            panel.DrawText("5) Added hale_stop_music cmd - admins stop music for all");
+            panel.DrawText("6) FaN and Scout crit knockback is lessened");
+            panel.DrawText("7) Your halemusic/halevoice settings are saved");
+            panel.DrawText("1.362) Sounds aren't stupid .mdl files anymore");
+            panel.DrawText("1.362) Fixed translations");
         }
         case 25:    //136
         {
-            DrawPanelText(panel, "MEGA UPDATE by FlaminSarge! Check next few pages");
-            DrawPanelText(panel, "SUGGEST MANNO-TECH WEAPON CHANGES");
-            DrawPanelText(panel, "1) Updated CBS model");
-            DrawPanelText(panel, "2) Fixed last man alive sound");
-            DrawPanelText(panel, "3) Removed broken hale line, fixed one");
-            DrawPanelText(panel, "4) New HHH rage sound");
-            DrawPanelText(panel, "5) HHH music (/halemusic)");
-            DrawPanelText(panel, "6) CBS jump noise");
-            DrawPanelText(panel, "7) /halevoice and /halemusic to turn off voice/music");
-            DrawPanelText(panel, "8) Updated natives/forwards (can change rage dist in fwd)");
+            panel.DrawText("MEGA UPDATE by FlaminSarge! Check next few pages");
+            panel.DrawText("SUGGEST MANNO-TECH WEAPON CHANGES");
+            panel.DrawText("1) Updated CBS model");
+            panel.DrawText("2) Fixed last man alive sound");
+            panel.DrawText("3) Removed broken hale line, fixed one");
+            panel.DrawText("4) New HHH rage sound");
+            panel.DrawText("5) HHH music (/halemusic)");
+            panel.DrawText("6) CBS jump noise");
+            panel.DrawText("7) /halevoice and /halemusic to turn off voice/music");
+            panel.DrawText("8) Updated natives/forwards (can change rage dist in fwd)");
         }
         case 24:    //136
         {
-            DrawPanelText(panel, "9) hale_crits cvar to turn off hale random crits");
-            DrawPanelText(panel, "10) Fixed sentries not repairing when raged");
-            DrawPanelText(panel, "-- Set hale_ragesentrydamagemode 0 to force engineer to pick up sentry to repair");
-            DrawPanelText(panel, "11) Now uses sourcemod autoconfig (tf/cfg/sourcemod/)");
-            DrawPanelText(panel, "12) No longer requires saxton_hale_points.cfg file");
-            DrawPanelText(panel, "-- Now using clientprefs for queue points");
-            DrawPanelText(panel, "13) When on non-VSH map, team switch does not occur so often.");
-            DrawPanelText(panel, "14) Should have full replay compatibility");
-            DrawPanelText(panel, "15) Bots work with queue, are Hale less often");
+            panel.DrawText("9) hale_crits cvar to turn off hale random crits");
+            panel.DrawText("10) Fixed sentries not repairing when raged");
+            panel.DrawText("-- Set hale_ragesentrydamagemode 0 to force engineer to pick up sentry to repair");
+            panel.DrawText("11) Now uses sourcemod autoconfig (tf/cfg/sourcemod/)");
+            panel.DrawText("12) No longer requires saxton_hale_points.cfg file");
+            panel.DrawText("-- Now using clientprefs for queue points");
+            panel.DrawText("13) When on non-VSH map, team switch does not occur so often.");
+            panel.DrawText("14) Should have full replay compatibility");
+            panel.DrawText("15) Bots work with queue, are Hale less often");
         }
         case 23:    //136
         {
-            DrawPanelText(panel, "16) Hale's health increased by 1 (in code)");
-            DrawPanelText(panel, "17) Many many many many many fixes");
-            DrawPanelText(panel, "18) Crossbow +150% damage +10 uber on hit");
-            DrawPanelText(panel, "19) Syringegun has overdose speed boost");
-            DrawPanelText(panel, "20) Sniper glow time scales with charge (2 to 8 seconds)");
-            DrawPanelText(panel, "21) Eyelander/reskins add heads on hit");
-            DrawPanelText(panel, "22) Axetinguisher/reskins use fire axe attributes");
-            DrawPanelText(panel, "23) GRU/KGB is +50% speed but -7hp/s");
-            DrawPanelText(panel, "24) Airblasting boss adds rage (no airblast reload though)");
-            DrawPanelText(panel, "25) Airblasting uber vagineer adds time to uber and takes extra ammo");
+            panel.DrawText("16) Hale's health increased by 1 (in code)");
+            panel.DrawText("17) Many many many many many fixes");
+            panel.DrawText("18) Crossbow +150% damage +10 uber on hit");
+            panel.DrawText("19) Syringegun has overdose speed boost");
+            panel.DrawText("20) Sniper glow time scales with charge (2 to 8 seconds)");
+            panel.DrawText("21) Eyelander/reskins add heads on hit");
+            panel.DrawText("22) Axetinguisher/reskins use fire axe attributes");
+            panel.DrawText("23) GRU/KGB is +50% speed but -7hp/s");
+            panel.DrawText("24) Airblasting boss adds rage (no airblast reload though)");
+            panel.DrawText("25) Airblasting uber vagineer adds time to uber and takes extra ammo");
         }
         case 22:    //136
         {
-            DrawPanelText(panel, "26) Frontier Justice allowed, crits only when sentry sees Hale");
-            DrawPanelText(panel, "27) Boss weighdown (look down + crouch) after 5 seconds in midair");
-            DrawPanelText(panel, "28) FaN is back");
-            DrawPanelText(panel, "29) Scout crits/minicrits do less knockback if not melee");
-            DrawPanelText(panel, "30) Saxton has his own fists");
-            DrawPanelText(panel, "31) Unlimited /halehp but after 3, longer cooldown");
-            DrawPanelText(panel, "32) Fist kill icons");
-            DrawPanelText(panel, "33) Fixed CBS arrow count (start at 9, but if less than 9 players, uses only that number of players)");
-            DrawPanelText(panel, "34) Spy primary minicrits");
-            DrawPanelText(panel, "35) Dead ringer fixed");
+            panel.DrawText("26) Frontier Justice allowed, crits only when sentry sees Hale");
+            panel.DrawText("27) Boss weighdown (look down + crouch) after 5 seconds in midair");
+            panel.DrawText("28) FaN is back");
+            panel.DrawText("29) Scout crits/minicrits do less knockback if not melee");
+            panel.DrawText("30) Saxton has his own fists");
+            panel.DrawText("31) Unlimited /halehp but after 3, longer cooldown");
+            panel.DrawText("32) Fist kill icons");
+            panel.DrawText("33) Fixed CBS arrow count (start at 9, but if less than 9 players, uses only that number of players)");
+            panel.DrawText("34) Spy primary minicrits");
+            panel.DrawText("35) Dead ringer fixed");
         }
         case 21:    //136
         {
-            DrawPanelText(panel, "36) Flare gun replaced with detonator. Has large jump but more self-damage (like old detonator beta)");
-            DrawPanelText(panel, "37) Eternal Reward backstab disguises as random faster classes");
-            DrawPanelText(panel, "38) Kunai adds 60 health on backstab");
-            DrawPanelText(panel, "39) Randomizer compatibility.");
-            DrawPanelText(panel, "40) Medic uber works as normal with crits added (multiple targets, etc)");
-            DrawPanelText(panel, "41) Crits stay when being healed, but adds minicrits too (for sentry, etc)");
-            DrawPanelText(panel, "42) Fixed Sniper back weapon replacement");
+            panel.DrawText("36) Flare gun replaced with detonator. Has large jump but more self-damage (like old detonator beta)");
+            panel.DrawText("37) Eternal Reward backstab disguises as random faster classes");
+            panel.DrawText("38) Kunai adds 60 health on backstab");
+            panel.DrawText("39) Randomizer compatibility.");
+            panel.DrawText("40) Medic uber works as normal with crits added (multiple targets, etc)");
+            panel.DrawText("41) Crits stay when being healed, but adds minicrits too (for sentry, etc)");
+            panel.DrawText("42) Fixed Sniper back weapon replacement");
         }
         case 20:    //136
         {
-            DrawPanelText(panel, "43) Vagineer NOPE and Well Don't That Beat All!");
-            DrawPanelText(panel, "44) Telefrags do 9001 damage");
-            DrawPanelText(panel, "45) Speed boost when healing scouts (like Quick-Fix)");
-            DrawPanelText(panel, "46) Rage builds (VERY slowly) if there are only Scouts left");
-            DrawPanelText(panel, "47) Healing assist damage split between healers");
-            DrawPanelText(panel, "48) Fixed backstab assist damage");
-            DrawPanelText(panel, "49) Fixed HHH attacking during tele");
-            DrawPanelText(panel, "50) Soldier boots - 1/10th fall damage");
-            DrawPanelText(panel, "AND MORE! (I forget all of them)");
+            panel.DrawText("43) Vagineer NOPE and Well Don't That Beat All!");
+            panel.DrawText("44) Telefrags do 9001 damage");
+            panel.DrawText("45) Speed boost when healing scouts (like Quick-Fix)");
+            panel.DrawText("46) Rage builds (VERY slowly) if there are only Scouts left");
+            panel.DrawText("47) Healing assist damage split between healers");
+            panel.DrawText("48) Fixed backstab assist damage");
+            panel.DrawText("49) Fixed HHH attacking during tele");
+            panel.DrawText("50) Soldier boots - 1/10th fall damage");
+            panel.DrawText("AND MORE! (I forget all of them)");
         }
         case 19:    //135_3
         {
-            DrawPanelText(panel, "1)Added point system (/halenext).");
-            DrawPanelText(panel, "2)Added [VSH] to VSH messages.");
-            DrawPanelText(panel, "3)Removed native VSH_GetSaxtonHaleHealth() added native VSH_GetRoundState().");
-            DrawPanelText(panel, "4)There is mini-crits for scout's pistols. Not full crits, like before.");
-            DrawPanelText(panel, "5)Fixed issues associated with crits.");
-            DrawPanelText(panel, "6)Added FORCE_GENERATION flag to stop errorlogs.");
-            DrawPanelText(panel, "135_2 and 135_3)Bugfixes and updated translations.");
+            panel.DrawText("1)Added point system (/halenext).");
+            panel.DrawText("2)Added [VSH] to VSH messages.");
+            panel.DrawText("3)Removed native VSH_GetSaxtonHaleHealth() added native VSH_GetRoundState().");
+            panel.DrawText("4)There is mini-crits for scout's pistols. Not full crits, like before.");
+            panel.DrawText("5)Fixed issues associated with crits.");
+            panel.DrawText("6)Added FORCE_GENERATION flag to stop errorlogs.");
+            panel.DrawText("135_2 and 135_3)Bugfixes and updated translations.");
         }
         case 18:    //135
         {
-            DrawPanelText(panel, "1)Special crits will not removed by Medic.");
-            DrawPanelText(panel, "2)Sniper's glow is working again.");
-            DrawPanelText(panel, "3)Less errors in console.");
-            DrawPanelText(panel, "4)Less messages in chat.");
-            DrawPanelText(panel, "5)Added more natives.");
-            DrawPanelText(panel, "6)\"Over 9000\" sound returns! Thx you, FlaminSarge.");
-            DrawPanelText(panel, "7)Hopefully no more errors in logs.");
+            panel.DrawText("1)Special crits will not removed by Medic.");
+            panel.DrawText("2)Sniper's glow is working again.");
+            panel.DrawText("3)Less errors in console.");
+            panel.DrawText("4)Less messages in chat.");
+            panel.DrawText("5)Added more natives.");
+            panel.DrawText("6)\"Over 9000\" sound returns! Thx you, FlaminSarge.");
+            panel.DrawText("7)Hopefully no more errors in logs.");
         }
         case 17:    //134
         {
-            DrawPanelText(panel, "1)Biohazard skin for CBS");
-            DrawPanelText(panel, "2)TF2_IsPlayerInCondition() fixed");
-            DrawPanelText(panel, "3)Now sniper rifle must be 100perc.charged to glow Hale.");
-            DrawPanelText(panel, "4)Fixed Vagineer's model.");
-            DrawPanelText(panel, "5)Added Natives.");
-            DrawPanelText(panel, "6)Hunstman deals more damage.");
-            DrawPanelText(panel, "7)Added reload time (5sec) for Pyro's airblast. ");
-            DrawPanelText(panel, "1.34_1 1)Fixed airblast reload when VSH is disabled.");
-            DrawPanelText(panel, "1.34_1 2)Fixed airblast reload after detonator's alt-fire.");
-            DrawPanelText(panel, "1.34_1 3)Airblast reload time reduced to 3 seconds.");
-            DrawPanelText(panel, "1.34_1 4)hale_special 3 is disabled.");
+            panel.DrawText("1)Biohazard skin for CBS");
+            panel.DrawText("2)TF2_IsPlayerInCondition() fixed");
+            panel.DrawText("3)Now sniper rifle must be 100perc.charged to glow Hale.");
+            panel.DrawText("4)Fixed Vagineer's model.");
+            panel.DrawText("5)Added Natives.");
+            panel.DrawText("6)Hunstman deals more damage.");
+            panel.DrawText("7)Added reload time (5sec) for Pyro's airblast. ");
+            panel.DrawText("1.34_1 1)Fixed airblast reload when VSH is disabled.");
+            panel.DrawText("1.34_1 2)Fixed airblast reload after detonator's alt-fire.");
+            panel.DrawText("1.34_1 3)Airblast reload time reduced to 3 seconds.");
+            panel.DrawText("1.34_1 4)hale_special 3 is disabled.");
         }
         case 16:    //133
         {
-            DrawPanelText(panel, "1)Fixed bugs, associated with Uber-update.");
-            DrawPanelText(panel, "2)FaN replaced with Soda Popper.");
-            DrawPanelText(panel, "3)Bazaar Bargain replaced with Sniper Rifle.");
-            DrawPanelText(panel, "4)Sniper Rifle adding glow to Hale - anyone can see him for 5 seconds.");
-            DrawPanelText(panel, "5)Crusader's Crossbow deals more damage.");
-            DrawPanelText(panel, "6)Code optimizing.");
+            panel.DrawText("1)Fixed bugs, associated with Uber-update.");
+            panel.DrawText("2)FaN replaced with Soda Popper.");
+            panel.DrawText("3)Bazaar Bargain replaced with Sniper Rifle.");
+            panel.DrawText("4)Sniper Rifle adding glow to Hale - anyone can see him for 5 seconds.");
+            panel.DrawText("5)Crusader's Crossbow deals more damage.");
+            panel.DrawText("6)Code optimizing.");
         }
         case 15:    //132
         {
-            DrawPanelText(panel, "1)Added new Saxton's lines on...");
-            DrawPanelText(panel, "  a)round start");
-            DrawPanelText(panel, "  b)jump");
-            DrawPanelText(panel, "  c)backstab");
-            DrawPanelText(panel, "  d)destroy Sentry");
-            DrawPanelText(panel, "  e)kill Scout, Pyro, Heavy, Engineer, Spy");
-            DrawPanelText(panel, "  f)last man standing");
-            DrawPanelText(panel, "  g)killing spree");
-            DrawPanelText(panel, "2)Fixed bugged count of CBS' arrows.");
-            DrawPanelText(panel, "3)Reduced Hale's damage versus DR by 20 HPs.");
-            DrawPanelText(panel, "4)Now two specials can not be at a stretch.");
-            DrawPanelText(panel, "v1.32_1 1)Fixed bug with replay.");
-            DrawPanelText(panel, "v1.32_1 2)Fixed bug with help menu.");
+            panel.DrawText("1)Added new Saxton's lines on...");
+            panel.DrawText("  a)round start");
+            panel.DrawText("  b)jump");
+            panel.DrawText("  c)backstab");
+            panel.DrawText("  d)destroy Sentry");
+            panel.DrawText("  e)kill Scout, Pyro, Heavy, Engineer, Spy");
+            panel.DrawText("  f)last man standing");
+            panel.DrawText("  g)killing spree");
+            panel.DrawText("2)Fixed bugged count of CBS' arrows.");
+            panel.DrawText("3)Reduced Hale's damage versus DR by 20 HPs.");
+            panel.DrawText("4)Now two specials can not be at a stretch.");
+            panel.DrawText("v1.32_1 1)Fixed bug with replay.");
+            panel.DrawText("v1.32_1 2)Fixed bug with help menu.");
         }
         case 14:    //131
-            DrawPanelText(panel, "1)Now \"replay\" will not change team.");
+            panel.DrawText("1)Now \"replay\" will not change team.");
         case 13:    //130
-            DrawPanelText(panel, "1)Fixed bugs, associated with crushes, error logs, scores.");
+            panel.DrawText("1)Fixed bugs, associated with crushes, error logs, scores.");
         case 12:    //129
         {
-            DrawPanelText(panel, "1)Fixed random crushes associated with CBS.");
-            DrawPanelText(panel, "2)Now Hale's HP formula is ((760+x-1)*(x-1))^1.04");
-            DrawPanelText(panel, "3)Added hale_special0. Use it to change next boss to Hale.");
-            DrawPanelText(panel, "4)CBS has 9 arrows for bow-rage. Also he has stun rage, but on little distantion.");
-            DrawPanelText(panel, "5)Teammates gets 2 scores per each 600 damage");
-            DrawPanelText(panel, "6)Demoman with Targe has crits on his primary weapon.");
-            DrawPanelText(panel, "7)Removed support of non-Arena maps, because nobody wasn't use it.");
-            DrawPanelText(panel, "8)Pistol/Lugermorph has crits.");
+            panel.DrawText("1)Fixed random crushes associated with CBS.");
+            panel.DrawText("2)Now Hale's HP formula is ((760+x-1)*(x-1))^1.04");
+            panel.DrawText("3)Added hale_special0. Use it to change next boss to Hale.");
+            panel.DrawText("4)CBS has 9 arrows for bow-rage. Also he has stun rage, but on little distantion.");
+            panel.DrawText("5)Teammates gets 2 scores per each 600 damage");
+            panel.DrawText("6)Demoman with Targe has crits on his primary weapon.");
+            panel.DrawText("7)Removed support of non-Arena maps, because nobody wasn't use it.");
+            panel.DrawText("8)Pistol/Lugermorph has crits.");
         }
         case 11:    //128
         {
-            DrawPanelText(panel, "VS Saxton Hale Mode is back!");
-            DrawPanelText(panel, "1)Christian Brutal Sniper is a regular character.");
-            DrawPanelText(panel, "2)CBS has 3 melee weapons ad bow-rage.");
-            DrawPanelText(panel, "3)Added new lines for Vagineer.");
-            DrawPanelText(panel, "4)Updated models of Vagineer and HHH jr.");
+            panel.DrawText("VS Saxton Hale Mode is back!");
+            panel.DrawText("1)Christian Brutal Sniper is a regular character.");
+            panel.DrawText("2)CBS has 3 melee weapons ad bow-rage.");
+            panel.DrawText("3)Added new lines for Vagineer.");
+            panel.DrawText("4)Updated models of Vagineer and HHH jr.");
         }
         case 10:    //999
-            DrawPanelText(panel, "Attachables are broken. Many \"thx\" to Valve.");
+            panel.DrawText("Attachables are broken. Many \"thx\" to Valve.");
         case 9: //126
         {
-            DrawPanelText(panel, "1)Added the second URL for auto-update.");
-            DrawPanelText(panel, "2)Fixed problems, when auto-update was corrupt plugin.");
-            DrawPanelText(panel, "3)Added a question for the next Hale, if he want to be him. (/haleme)");
-            DrawPanelText(panel, "4)Eyelander and Half-Zatoichi was replaced with Claidheamh Mor.");
-            DrawPanelText(panel, "5)Fan O'War replaced with Bat.");
-            DrawPanelText(panel, "6)Dispenser and TP won't be destoyed after Engineer's death.");
-            DrawPanelText(panel, "7)Mode uses the localization file.");
-            DrawPanelText(panel, "8)Saxton Hale will be choosed randomly for the first 3 rounds (then by queue).");
+            panel.DrawText("1)Added the second URL for auto-update.");
+            panel.DrawText("2)Fixed problems, when auto-update was corrupt plugin.");
+            panel.DrawText("3)Added a question for the next Hale, if he want to be him. (/haleme)");
+            panel.DrawText("4)Eyelander and Half-Zatoichi was replaced with Claidheamh Mor.");
+            panel.DrawText("5)Fan O'War replaced with Bat.");
+            panel.DrawText("6)Dispenser and TP won't be destoyed after Engineer's death.");
+            panel.DrawText("7)Mode uses the localization file.");
+            panel.DrawText("8)Saxton Hale will be choosed randomly for the first 3 rounds (then by queue).");
         }
         case 8: //125
         {
-            DrawPanelText(panel, "1)Fixed silent HHHjr's rage.");
-            DrawPanelText(panel, "2)Now bots (sourcetv too) do not will be Hale");
-            DrawPanelText(panel, "3)Fixed invalid uber on Vagineer's head.");
-            DrawPanelText(panel, "4)Fixed other little bugs.");
+            panel.DrawText("1)Fixed silent HHHjr's rage.");
+            panel.DrawText("2)Now bots (sourcetv too) do not will be Hale");
+            panel.DrawText("3)Fixed invalid uber on Vagineer's head.");
+            panel.DrawText("4)Fixed other little bugs.");
         }
         case 7: //124
         {
-            DrawPanelText(panel, "1)Fixed destroyed buildables associated with spy's fake death.");
-            DrawPanelText(panel, "2)Syringe Gun replaced with Blutsauger.");
-            DrawPanelText(panel, "3)Blutsauger, on hit: +5 to uber-charge.");
-            DrawPanelText(panel, "4)Removed crits from Blutsauger.");
-            DrawPanelText(panel, "5)CnD replaced with Invis Watch.");
-            DrawPanelText(panel, "6)Fr.Justice replaced with shotgun");
-            DrawPanelText(panel, "7)Fists of steel replaced with fists.");
-            DrawPanelText(panel, "8)KGB replaced with GRU.");
-            DrawPanelText(panel, "9)Added /haleclass.");
-            DrawPanelText(panel, "10)Medic gets assist damage scores (1/2 from healing target's damage scores, 1/1 when uber-charged)");
+            panel.DrawText("1)Fixed destroyed buildables associated with spy's fake death.");
+            panel.DrawText("2)Syringe Gun replaced with Blutsauger.");
+            panel.DrawText("3)Blutsauger, on hit: +5 to uber-charge.");
+            panel.DrawText("4)Removed crits from Blutsauger.");
+            panel.DrawText("5)CnD replaced with Invis Watch.");
+            panel.DrawText("6)Fr.Justice replaced with shotgun");
+            panel.DrawText("7)Fists of steel replaced with fists.");
+            panel.DrawText("8)KGB replaced with GRU.");
+            panel.DrawText("9)Added /haleclass.");
+            panel.DrawText("10)Medic gets assist damage scores (1/2 from healing target's damage scores, 1/1 when uber-charged)");
         }
         case 6: //123
         {
-            DrawPanelText(panel, "1)Added Super Duper Jump to rescue Hale from pit");
-            DrawPanelText(panel, "2)Removed pyro's ammolimit");
-            DrawPanelText(panel, "3)Fixed little bugs.");
+            panel.DrawText("1)Added Super Duper Jump to rescue Hale from pit");
+            panel.DrawText("2)Removed pyro's ammolimit");
+            panel.DrawText("3)Fixed little bugs.");
         }
         case 5: //122
         {
-            DrawPanelText(panel, "1.21)Point will be enabled when X or less players be alive.");
-            DrawPanelText(panel, "1.22)Now it's working :) Also little optimize about player count.");
+            panel.DrawText("1.21)Point will be enabled when X or less players be alive.");
+            panel.DrawText("1.22)Now it's working :) Also little optimize about player count.");
         }
         case 4: //120
         {
-            DrawPanelText(panel, "1)Added new Hale's phrases.");
-            DrawPanelText(panel, "2)More bugfixes.");
-            DrawPanelText(panel, "3)Improved super-jump.");
+            panel.DrawText("1)Added new Hale's phrases.");
+            panel.DrawText("2)More bugfixes.");
+            panel.DrawText("3)Improved super-jump.");
         }
         case 3: //112
         {
-            DrawPanelText(panel, "1)More bugfixes.");
-            DrawPanelText(panel, "2)Now \"(Hale)<mapname>\" can be nominated for nextmap.");
-            DrawPanelText(panel, "3)Medigun's uber gets uber and crits for Medic and his target.");
-            DrawPanelText(panel, "4)Fixed infinite Specials.");
-            DrawPanelText(panel, "5)And more bugfixes.");
+            panel.DrawText("1)More bugfixes.");
+            panel.DrawText("2)Now \"(Hale)<mapname>\" can be nominated for nextmap.");
+            panel.DrawText("3)Medigun's uber gets uber and crits for Medic and his target.");
+            panel.DrawText("4)Fixed infinite Specials.");
+            panel.DrawText("5)And more bugfixes.");
         }
         case 2: //111
         {
-            DrawPanelText(panel, "1)Fixed immortal spy");
-            DrawPanelText(panel, "2)Fixed crashes associated with classlimits.");
+            panel.DrawText("1)Fixed immortal spy");
+            panel.DrawText("2)Fixed crashes associated with classlimits.");
         }
         case 1: //110
         {
-            DrawPanelText(panel, "1)Not important changes on code.");
-            DrawPanelText(panel, "2)Added hale_enabled convar.");
-            DrawPanelText(panel, "3)Fixed bug, when all hats was removed...why?");
+            panel.DrawText("1)Not important changes on code.");
+            panel.DrawText("2)Added hale_enabled convar.");
+            panel.DrawText("3)Fixed bug, when all hats was removed...why?");
         }
         case 0: //100
         {
-            DrawPanelText(panel, "Released!!!");
-            DrawPanelText(panel, "On new version you will get info about changes.");
+            panel.DrawText("Released!!!");
+            panel.DrawText("On new version you will get info about changes.");
         }
         default:
         {
-            DrawPanelText(panel, "-- Somehow you've managed to find a glitched version page!");
-            DrawPanelText(panel, "-- Congratulations. Now go fight Hale.");
+            panel.DrawText("-- Somehow you've managed to find a glitched version page!");
+            panel.DrawText("-- Congratulations. Now go fight Hale.");
         }
     }
 }//75% port mark
+
 public HelpPanelH(Handle:menu, MenuAction:action, param1, param2)
 {
     if (action == MenuAction_Select)
