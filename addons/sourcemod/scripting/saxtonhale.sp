@@ -361,7 +361,7 @@ static bool g_bReloadVSHOnRoundEnd = false;
 #define VSHFLAG_HASONGIVED  (1 << 5)
 int VSHFlags[TF_MAX_PLAYERS], Hale = -1, HaleHealthMax, HaleHealth, HaleHealthLast, HaleCharge = 0, HaleRage, NextHale, KSpreeCount = 1, HHHClimbCount;
 float g_flStabbed, g_flMarketed, WeighDownTimer, UberRageCount, GlowTimer, HaleSpeed = 340.0, RageDist = 800.0, Announce = 120.0, tf_scout_hype_pep_max;
-bool bEnableSuperDuperJump, bTenSecStart[2] = {false, false}, bSpawnTeleOnTriggerHurt = false, bNoTaunt = false, g_bEnabled = false, g_bAreEnoughPlayersPlaying = false;
+bool bEnableSuperDuperJump, bSpawnTeleOnTriggerHurt = false, g_bEnabled = false, g_bAreEnoughPlayersPlaying = false;
 ConVar cvarVersion, cvarHaleSpeed, cvarPointDelay, cvarRageDMG, cvarRageDist, cvarAnnounce, cvarSpecials, cvarEnabled, cvarAliveToEnable, cvarPointType, cvarCrits, cvarRageSentry;
 ConVar cvarFirstRound, cvarDemoShieldCrits, cvarDisplayHaleHP, cvarEnableEurekaEffect, cvarForceHaleTeam;
 Handle PointCookie, MusicCookie, VoiceCookie, ClasshelpinfoCookie, doorchecktimer, jumpHUD, rageHUD, healthHUD, infoHUD, MusicTimer;
@@ -7299,33 +7299,33 @@ stock int FindPlayerBack(int client, int[] indices, int len)
     return -1;
 }
 
-stock Float:fmax(Float:a,Float:b) { return (a > b) ? a : b; }
-stock Float:fmin(Float:a,Float:b) { return (a < b) ? a : b; }
-stock Float:fclamp(Float:n,Float:mi,Float:ma)
+stock float fmax(float a, float b) { return (a > b) ? a : b; }
+stock float fmin(float a, float b) { return (a < b) ? a : b; }
+stock float fclamp(float n, float mi, float ma)
 {
     n = fmin(n,ma);
     return fmax(n,mi);
 }
 
-static float g_flNext[m_flNext];
-static float g_flNext2[m_flNext][TF_MAX_PLAYERS];
+static float g_flNext[e_flNext];
+static float g_flNext2[e_flNext2][TF_MAX_PLAYERS];
 
-stock bool IsNextTime(m_flNext iIndex, float flAdditional = 0.0)
+stock bool IsNextTime(e_flNext iIndex, float flAdditional = 0.0)
 {
     return (GetEngineTime() >= g_flNext[iIndex]+flAdditional);
 }
 
-stock void SetNextTime(m_flNext iIndex, float flTime, bool bAbsolute = false)
+stock void SetNextTime(e_flNext iIndex, float flTime, bool bAbsolute = false)
 {
-    g_flNext[iIndex] = bAbsolute ? flSeconds : GetEngineTime() + flSeconds;
+    g_flNext[iIndex] = bAbsolute ? flTime : GetEngineTime() + flTime;
 }
 
-stock float GetNextTime(m_flNext iIndex)
+stock float GetNextTime(e_flNext iIndex)
 {
     return g_flNext[iIndex];
 }
 
-stock float GetTimeTilNextTime(m_flNext iIndex, bool bNonNegative = true)
+stock float GetTimeTilNextTime(e_flNext iIndex, bool bNonNegative = true)
 {
     return bNonNegative ? fmax(g_flNext[iIndex] - GetEngineTime(), 0.0) : (g_flNext[iIndex] - GetEngineTime());
 }
@@ -7333,7 +7333,7 @@ stock float GetTimeTilNextTime(m_flNext iIndex, bool bNonNegative = true)
 /*
     If next time occurs, we also add time on for when it is next allowed.
 */
-stock bool IfDoNextTime(m_flNext iIndex, float flThenAdd)
+stock bool IfDoNextTime(e_flNext iIndex, float flThenAdd)
 {
     if (IsNextTime(iIndex))
     {
@@ -7345,17 +7345,17 @@ stock bool IfDoNextTime(m_flNext iIndex, float flThenAdd)
 
 // Start of plural NextTime versions
 
-stock bool IsNextTime2(int iClient, m_flNext2 iIndex, float flAdditional = 0.0)
+stock bool IsNextTime2(int iClient, e_flNext2 iIndex, float flAdditional = 0.0)
 {
     return (GetEngineTime() >= g_flNext2[iIndex][iClient]+flAdditional);
 }
 
-stock void SetNextTime2(int iClient, m_flNext2 iIndex, float flTime, bool bAbsolute = false)
+stock void SetNextTime2(int iClient, e_flNext2 iIndex, float flTime, bool bAbsolute = false)
 {
-    g_flNext2[iIndex][iClient] = bAbsolute ? flSeconds : GetEngineTime() + flSeconds;
+    g_flNext2[iIndex][iClient] = bAbsolute ? flTime : GetEngineTime() + flTime;
 }
 
-stock float GetNextTime2(int iClient, m_flNext2 iIndex)
+stock float GetNextTime2(int iClient, e_flNext2 iIndex)
 {
     return g_flNext2[iIndex][iClient];
 }
@@ -7363,7 +7363,7 @@ stock float GetNextTime2(int iClient, m_flNext2 iIndex)
 /*
     If next time occurs, we also add time on for when it is next allowed.
 */
-stock bool IfDoNextTime2(int iClient, m_flNext2 iIndex, float flThenAdd)
+stock bool IfDoNextTime2(int iClient, e_flNext2 iIndex, float flThenAdd)
 {
     if (IsNextTime2(iClient, iIndex))
     {
@@ -7459,7 +7459,7 @@ stock void PriorityCenterTextAllEx(int iPriority = -2147483647, const char[] szF
     }
     if (iPriority > s_iLastPriority[0])
     {
-        IncNextTime2(0, e_flNextEndPriority, 5.0);
+        SetNextTime2(0, e_flNextEndPriority, 5.0);
         s_iLastPriority[0] = iPriority;
         for (int i = 1; i <= MaxClients; i++)
             s_iLastPriority[i] = MAX_INT;
@@ -7977,7 +7977,7 @@ stock int TeleportToMultiMapSpawn(int iClient, TFTeam iTeam = TFTeam_Unassigned)
 {
     int iSpawn, iIndex;
     TFTeam iTeleTeam;
-    if (iTeam <= 1)
+    if (iTeam <= TFTeam_Spectator)
         iSpawn = EntRefToEntIndex(GetRandBlockCellEx(s_hSpawnArray));
     else
     {
