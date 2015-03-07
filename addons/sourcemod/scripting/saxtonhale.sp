@@ -5511,13 +5511,13 @@ public Action TF2_CalcIsAttackCritical(int client, int weapon, char[] weaponname
     return Plugin_Continue;
 }
 
-public Timer_NoAttacking(any ref)
+public void Timer_NoAttacking(any ref)
 {
     int weapon = EntRefToEntIndex(ref);
     SetNextAttack(weapon, 1.56);
 }
 
-SickleClimbWalls(int client, int weapon)     //Credit to Mecha the Slag
+void SickleClimbWalls(int client, int weapon)     //Credit to Mecha the Slag
 {
     if (!IsValidClient(client) || (GetClientHealth(client)<=15))
         return;
@@ -5552,7 +5552,7 @@ SickleClimbWalls(int client, int weapon)     //Credit to Mecha the Slag
     RequestFrame(Timer_NoAttacking, EntIndexToEntRef(weapon));
 }
 
-public bool TraceRayDontHitSelf(intt entity, int mask, any data)
+public bool TraceRayDontHitSelf(int entity, int mask, any data)
 {
     return (entity != data);
 }
@@ -5594,7 +5594,7 @@ void ForceTeamWin(TFTeam team)
         DispatchSpawn(ent);
         AcceptEntityInput(ent, "Enable");
     }
-    SetVariantInt(team);
+    SetVariantInt(view_as<int>(team));
     AcceptEntityInput(ent, "SetWinner");
 }
 
@@ -5736,7 +5736,7 @@ public Action ResetQueuePointsCmd(int client, int args)
     if (GetCmdReplySource() == SM_REPLY_TO_CHAT)
         TurnToZeroPanel(client);
     else
-        TurnToZeroPanelH(INVALID_HANDLE, MenuAction_Select, client, 1);
+        TurnToZeroPanelH(null, MenuAction_Select, client, 1);
     return Plugin_Handled;
 }
 
@@ -5745,7 +5745,7 @@ public Action TurnToZeroPanel(int client)
     if (!g_bAreEnoughPlayersPlaying)
         return Plugin_Continue;
     Panel panel = new Panel();
-    decl String:s[512];
+    char s[512];
     SetGlobalTransTarget(client);
     Format(s, 512, "%t", "vsh_to0_title");
     SetPanelTitle(panel, s);
