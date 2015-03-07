@@ -6860,7 +6860,15 @@ public int VoiceTogglePanelH(Menu menu, MenuAction action, int param1, int param
     return 0;
 }
 
-public Action HookSound(int clients[64], int &numClients, char sample[], int &entity, int &channel, float &volume, int &level, int &pitch, int &flags)
+public Action HookSound(int clients[64],
+  int &numClients,
+  char sample[PLATFORM_MAX_PATH],
+  int &entity,
+  int &channel,
+  float &volume,
+  int &level,
+  int &pitch,
+  int &flags)
 {
     if (!g_bEnabled || ((entity != Hale) && ((entity <= 0) || !IsValidClient(Hale) || (entity != GetPlayerWeaponSlot(Hale, 0)))))
         return Plugin_Continue;
