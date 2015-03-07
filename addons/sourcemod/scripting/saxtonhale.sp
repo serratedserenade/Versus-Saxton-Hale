@@ -7354,22 +7354,22 @@ stock bool IfDoNextTime(m_flNext iIndex, float flThenAdd)
 
 // Start of plural NextTime versions
 
-stock bool IsNextTime2(int iClient, m_flNext iIndex, float flAdditional = 0.0)
+stock bool IsNextTime2(int iClient, m_flNext2 iIndex, float flAdditional = 0.0)
 {
     return (GetEngineTime() >= g_flNext2[iIndex][iClient]+flAdditional);
 }
 
-stock void IncNextTime2(int iClient, m_flNext iIndex, float flSeconds)
+stock void IncNextTime2(int iClient, m_flNext2 iIndex, float flSeconds)
 {
     g_flNext2[iIndex][iClient] = GetEngineTime() + flSeconds;
 }
 
-stock void SetNextTime2(int iClient, m_flNext iIndex, float flTime)
+stock void SetNextTime2(int iClient, m_flNext2 iIndex, float flTime)
 {
     g_flNext2[iIndex][iClient] = flTime;
 }
 
-stock float GetNextTime2(int iClient, m_flNext iIndex)
+stock float GetNextTime2(int iClient, m_flNext2 iIndex)
 {
     return g_flNext2[iIndex][iClient];
 }
@@ -7377,7 +7377,7 @@ stock float GetNextTime2(int iClient, m_flNext iIndex)
 /*
     If next time occurs, we also add time on for when it is next allowed.
 */
-stock bool IfDoNextTime2(int iClient, m_flNext iIndex, float flThenAdd)
+stock bool IfDoNextTime2(int iClient, m_flNext2 iIndex, float flThenAdd)
 {
     if (IsNextTime2(iClient, iIndex))
     {
@@ -7407,52 +7407,43 @@ static int s_iLastPriority[TF_MAX_PLAYERS] = {MIN_INT,...};
     IF old priority == new priority THEN old message is overwritten by new message.
 
 */
-stock PriorityCenterText(iClient, iPriority = MIN_INT, const String:szFormat[], any:...)
+stock void PriorityCenterText(int iClient, int iPriority = MIN_INT, const char[] szFormat, any ...)
 {
     if (!IsValidClient(iClient))
-    {
         ThrowError("Client index %i is invalid or not in game.", iClient);
-    }
-
     if (s_iLastPriority[iClient] > iPriority)
     {
         if (IsNextTime2(iClient, m_flNextEndPriority))
-        {
             s_iLastPriority[iClient] = MIN_INT;
-        }
         else
-        {
             return;
-        }
     }
-
     if (iPriority > s_iLastPriority[iClient])
     {
         IncNextTime2(iClient, m_flNextEndPriority, 5.0);
         s_iLastPriority[iClient] = iPriority;
     }
 
-    decl String:szBuffer[MAX_CENTER_TEXT];
+    char szBuffer[MAX_CENTER_TEXT];
     SetGlobalTransTarget(iClient);
     VFormat(szBuffer, sizeof(szBuffer), szFormat, 4);
-    PrintCenterText(iClient, "%s", szBuffer);
+    PrintCenterText(iClient, szBuffer);
 }
 
 /*
     Send priority center text to everyone.
     This will obey priority sent to via PriorityCenterText() and not overwrite if it's lower priority
 */
-stock PriorityCenterTextAll(iPriority = MIN_INT, const String:szFormat[], any:...)
+stock void PriorityCenterTextAll(int iPriority = MIN_INT, char[] szFormat, any ...)
 {
-    decl String:szBuffer[MAX_CENTER_TEXT];
-
-    for (new i = 1; i <= MaxClients; i++)
+    char szBuffer[MAX_CENTER_TEXT];
+    for (int i = 1; i <= MaxClients; i++)
     {
         if (IsClientInGame(i))
         {
             SetGlobalTransTarget(i);
             VFormat(szBuffer, sizeof(szBuffer), szFormat, 3);
-            PriorityCenterText(i, iPriority, "%s", szBuffer);
+            PriorityCenterText(i, iPriority, szBuffer);
         }
     }
 }
@@ -7465,45 +7456,31 @@ stock PriorityCenterTextAll(iPriority = MIN_INT, const String:szFormat[], any:..
 
     The priority of all players will be completely maxed out to achieve this.
 */
-stock PriorityCenterTextAllEx(iPriority = -2147483647, const String:szFormat[], any:...) // -2147483647 == MIN_INT+1
+stock void PriorityCenterTextAllEx(int iPriority = -2147483647, const char[] szFormat, any ...) // -2147483647 == MIN_INT+1
 {
     if (iPriority == MIN_INT)
-    {
         iPriority++;
-    }
-
     if (s_iLastPriority[0] > iPriority)
     {
         if (IsNextTime2(0, m_flNextEndPriority))
         {
             s_iLastPriority[0] = MIN_INT;
-
-            for (new i = 1; i <= MaxClients; i++)
-            {
+            for (int i = 1; i <= MaxClients; i++)
                 s_iLastPriority[i] = MIN_INT;
-            }
         }
         else
-        {
             return;
-        }
     }
-
     if (iPriority > s_iLastPriority[0])
     {
         IncNextTime2(0, m_flNextEndPriority, 5.0);
-
         s_iLastPriority[0] = iPriority;
-
-        for (new i = 1; i <= MaxClients; i++)
-        {
+        for (int i = 1; i <= MaxClients; i++)
             s_iLastPriority[i] = MAX_INT;
-        }
     }
+    char szBuffer[MAX_CENTER_TEXT];
 
-    decl String:szBuffer[MAX_CENTER_TEXT];
-
-    for (new i = 1; i <= MaxClients; i++)
+    for (int i = 1; i <= MaxClients; i++)
     {
         if (IsClientInGame(i))
         {
@@ -7530,84 +7507,76 @@ stock PriorityCenterTextAllEx(iPriority = -2147483647, const String:szFormat[], 
     IsDate(Month_Dec, 15) == IsDecemberHoliday()
 
 */
-stock bool:IsDate(StartMonth = Month_None, StartDay = 0, EndMonth = Month_None, EndDay = 0, bool:bForceRecalc = false)
+stock bool IsDate(int StartMonth = Month_None, int StartDay = 0, int EndMonth = Month_None, int EndDay = 0, bool bForceRecalc = false)
 {
-    static iMonth;
-    static iDate;
-    static bool:bFound = false;
-
+    static int iMonth;
+    static int iDate;
+    static bool bFound = false;
     if (bForceRecalc)
     {
         bFound = false;
         iMonth = 0;
         iDate = 0;
     }
-
     if (!bFound)
     {
-        new iTimeStamp = GetTime();
-        decl String:szMonth[MAX_DIGITS], String:szDate[MAX_DIGITS];
-
+        int iTimeStamp = GetTime();
+        char szMonth[MAX_DIGITS], szDate[MAX_DIGITS];
         FormatTime(szMonth, sizeof(szMonth), "%m", iTimeStamp);
         FormatTime(szDate, sizeof(szDate),   "%d", iTimeStamp);
-
         iMonth = StringToInt(szMonth);
         iDate = StringToInt(szDate);
         bFound = true;
     }
-
     return (StartMonth == iMonth && StartDay <= iDate) || (EndMonth && EndDay && (StartMonth < iMonth && iMonth <= EndMonth) && (iDate <= EndDay));
 }
 
-stock SetArenaCapEnableTime(Float:time)
+stock void SetArenaCapEnableTime(float time)
 {
-    new ent = -1;
-    decl String:strTime[32];
+    int ent = -1;
+    char strTime[32];
     FloatToString(time, strTime, sizeof(strTime));
     if ((ent = FindEntityByClassname2(-1, "tf_logic_arena")) != -1 && IsValidEdict(ent))
-    {
         DispatchKeyValue(ent, "CapEnableDelay", strTime);
-    }
 }
 
-stock bool:IsNearSpencer(client)
+stock bool IsNearSpencer(int client)
 {
-    new bool:dispenserheal, medics = 0;
-    new healers = GetEntProp(client, Prop_Send, "m_nNumHealers");
+    int medics = 0, healers = GetEntProp(client, Prop_Send, "m_nNumHealers");
     if (healers > 0)
     {
-        for (new i = 1; i <= MaxClients; i++)
+        for (int i = 1; i <= MaxClients; i++)
         {
             if (IsClientInGame(i) && IsPlayerAlive(i) && GetHealingTarget(i) == client)
                 medics++;
         }
     }
-    dispenserheal = (healers > medics) ? true : false;
-    return dispenserheal;
+    return healers > medics;
 }
 
-stock FindSentry(client)
+stock int FindSentry(int client)
 {
-    new i=-1;
+    int i=-1;
     while ((i = FindEntityByClassname2(i, "obj_sentrygun")) != -1)
     {
-        if (GetEntPropEnt(i, Prop_Send, "m_hBuilder") == client) return i;
+        if (GetEntPropEnt(i, Prop_Send, "m_hBuilder") == client)
+            return i;
     }
     return -1;
 }
 
-stock GetIndexOfWeaponSlot(client, slot)
+stock int GetIndexOfWeaponSlot(int client, int slot)
 {
-    new weapon = GetPlayerWeaponSlot(client, slot);
+    int weapon = GetPlayerWeaponSlot(client, slot);
     return (weapon > MaxClients && IsValidEntity(weapon) ? GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex") : -1);
 }
 
-stock GetClientCloakIndex(iClient)
+stock int GetClientCloakIndex(int iClient)
 {
-    return GetWeaponIndex(GetPlayerWeaponSlot(iClient, TFWeaponSlot_Watch));
+    return GetIndexOfWeaponSlot(iClient, TFWeaponSlot_Watch);
 }
 
-stock GetWeaponIndex(iWeapon)
+/*stock GetWeaponIndex(iWeapon)
 {
     return IsValidEnt(iWeapon) ? GetEntProp(iWeapon, Prop_Send, "m_iItemDefinitionIndex"):-1;
 }
@@ -7617,7 +7586,7 @@ stock bool:IsValidEnt(iEnt)
     return iEnt > MaxClients && IsValidEntity(iEnt);
 }
 
-/*stock GetClientCloakIndex(client)
+stock GetClientCloakIndex(client)
 {
     if (!IsValidClient(client, false)) return -1; // IsValidClient(client, false)
     new wep = GetPlayerWeaponSlot(client, 4);
@@ -7628,7 +7597,7 @@ stock bool:IsValidEnt(iEnt)
     return GetEntProp(wep, Prop_Send, "m_iItemDefinitionIndex");
 }*/
 
-stock IncrementHeadCount(iClient)
+stock void IncrementHeadCount(int iClient)
 {
     InsertCond(iClient, TFCond_DemoBuff);
     SetEntProp(iClient, Prop_Send, "m_iDecapitations", GetEntProp(iClient, Prop_Send, "m_iDecapitations") + 1);
@@ -7636,13 +7605,14 @@ stock IncrementHeadCount(iClient)
     TF2_AddCondition(iClient, TFCond_SpeedBuffAlly, 0.01);  //  Recalculate their speed
 }
 
-stock SwitchToOtherWeapon(client)
+stock void SwitchToOtherWeapon(int client)
 {
-    new ammo = GetAmmo(client, 0);
-    new weapon = GetPlayerWeaponSlot(client, TFWeaponSlot_Primary);
-    new clip = (IsValidEntity(weapon) ? GetEntProp(weapon, Prop_Send, "m_iClip1") : -1);
-    if (!(ammo == 0 && clip <= 0)) SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", weapon);
-    else SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary));
+    int ammo = GetAmmo(client, 0), weapon = GetPlayerWeaponSlot(client, TFWeaponSlot_Primary);
+    int clip = (IsValidEntity(weapon) ? GetEntProp(weapon, Prop_Send, "m_iClip1") : -1);
+    if (!(ammo == 0 && clip <= 0))
+        SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", weapon);
+    else
+        SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary));
 }
 
 stock int FindTeleOwner(int client)
@@ -7664,8 +7634,8 @@ stock bool TF2_IsPlayerCritBuffed(int client)
 {
     return (TF2_IsPlayerInCondition(client, TFCond_Kritzkrieged)
             || TF2_IsPlayerInCondition(client, TFCond_HalloweenCritCandy)
-            || TF2_IsPlayerInCondition(client, TFCond:34)
-            || TF2_IsPlayerInCondition(client, TFCond:35)
+            || TF2_IsPlayerInCondition(client, view_as<TFCond>(34))
+            || TF2_IsPlayerInCondition(client, view_as<TFCond>(35))
             || TF2_IsPlayerInCondition(client, TFCond_CritOnFirstBlood)
             || TF2_IsPlayerInCondition(client, TFCond_CritOnWin)
             || TF2_IsPlayerInCondition(client, TFCond_CritOnFlagCapture)
@@ -7683,7 +7653,7 @@ stock void SetNextAttack(int weapon, float duration = 0.0)
     SetEntPropFloat(weapon, Prop_Send, "m_flNextSecondaryAttack", next);
 }
 
-stock int SpawnWeapon(client, String:name[], index, level, qual, String:att[]) //TF2Items is required.
+stock int SpawnWeapon(int client, char[] name, int index, int level, int qual, char[] att) //TF2Items is required.
 {
     Handle hWeapon = TF2Items_CreateItem(OVERRIDE_ALL|FORCE_GENERATION);
     if (hWeapon == null)
@@ -7803,8 +7773,8 @@ stock int FindEntityByClassname2(int startEnt, const char[] classname)
 */
 stock void ChangeTeam(int iClient, TFTeam iTeam) // iTeam should never be less than 2
 {
-    int iOldTeam = GetEntityTeamNum(iClient);
-    if (iOldTeam != view_as<int>(iTeam) && iOldTeam >= view_as<int>(TFTeam_Red))
+    TFTeam iOldTeam = GetEntityTeamNum(iClient);
+    if (iOldTeam != iTeam && iOldTeam >= TFTeam_Red)
     {
         SetEntProp(iClient, Prop_Send, "m_lifeState", LifeState_Dead);
         TF2_ChangeClientTeam(iClient, iTeam);
@@ -7831,7 +7801,7 @@ stock void AddPlayerHealth(int iClient, int iAdd, int iOverheal = 0, bool bStati
     }
 }
 
-stock PrepareSound(const char[] szSoundPath)
+stock void PrepareSound(const char[] szSoundPath)
 {
     PrecacheSound(szSoundPath, true);
     char s[PLATFORM_MAX_PATH];
@@ -7839,15 +7809,15 @@ stock PrepareSound(const char[] szSoundPath)
     AddFileToDownloadsTable(s);
 }
 
-stock DownloadSoundList(const char[][] szFileList, int iSize)
+stock void DownloadSoundList(const char[][] szFileList, int iSize)
 {
-    for (new i = 0; i < iSize; i++)
+    for (int i = 0; i < iSize; i++)
         PrepareSound(szFileList[i]);
 }
 
 stock void PrecacheSoundList(const char[][] szFileList, int iSize)
 {
-    for (new i = 0; i < iSize; i++)
+    for (int i = 0; i < iSize; i++)
         PrecacheSound(szFileList[i], true);
 }
 
@@ -7919,7 +7889,7 @@ stock TFTeam GetEntityTeamNum(int iEnt)
 /*
     Common check that says whether or not a client index is occupied.
 */
-stock bool IsValidClient(iClient)
+stock bool IsValidClient(int iClient)
 {
     return (0 < iClient && iClient <= MaxClients && IsClientInGame(iClient));
 }
@@ -7927,11 +7897,11 @@ stock bool IsValidClient(iClient)
 /*
     Common checks that says "this player can safely be selected from a queue of players"
 */
-stock bool IsClientParticipating(iClient)
+stock bool IsClientParticipating(int iClient)
 {
     if (IsSpectator(iClient) || IsReplayClient(iClient))
         return false;
-    if (bool GetEntProp(iClient, Prop_Send, "m_bIsCoaching"))
+    if (view_as<bool>(GetEntProp(iClient, Prop_Send, "m_bIsCoaching")))
         return false;
     if (TF2_GetPlayerClass(iClient) == TFClass_Unknown)
         return false;
@@ -8021,7 +7991,7 @@ stock void teamplay_round_start_TeleportToMultiMapSpawn()
 stock int TeleportToMultiMapSpawn(int iClient, TFTeam iTeam = TFTeam_Unassigned)
 {
     int iSpawn, iIndex;
-    TFTeam iTeleTeam
+    TFTeam iTeleTeam;
     if (iTeam <= 1)
         iSpawn = EntRefToEntIndex(GetRandBlockCellEx(s_hSpawnArray));
     else
@@ -8069,7 +8039,8 @@ stock int GetClosestPlayerTo(int iEnt, TFTeam iTeam = TFTeam_Unassigned)
 */
 stock bool TeleMeToYou(int iMe, int iYou, bool bAngles = false)
 {
-    float vPos[3], vAng[3] = NULL_VECTOR;
+    float vPos[3], vAng[3];
+    vAng = NULL_VECTOR;
     GetEntPropVector(iYou, Prop_Send, "m_vecOrigin", vPos);
     if (bAngles)
         GetEntPropVector(iYou, Prop_Send, "m_angRotation", vAng);
