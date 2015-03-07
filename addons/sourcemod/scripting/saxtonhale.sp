@@ -1569,7 +1569,7 @@ bool FixUnbalancedTeams()
         for (int i = 1; i <= MaxClients; i++)
         {
             if (IsClientInGame(i))
-                ChangeTeam(i, i==Hale?view_as<int>(HaleTeam):view_as<int>(OtherTeam));
+                ChangeTeam(i, i==Hale?HaleTeam:OtherTeam);
         }
         return true;
     }
@@ -1820,7 +1820,7 @@ public Action event_round_end(Event event, const char[] name, bool dontBroadcast
             }
         }
         else
-            ChangeTeam(Hale, view_as<int>(HaleTeam));
+            ChangeTeam(Hale, HaleTeam);
         int top[3];
         Damage[0] = 0;
         for (int i = 1; i <= MaxClients; i++)
@@ -1842,21 +1842,21 @@ public Action event_round_end(Event event, const char[] name, bool dontBroadcast
         if (Damage[top[0]] > 9000)
             CreateTimer(1.0, Timer_NineThousand, _, TIMER_FLAG_NO_MAPCHANGE);
         char s1[80];
-        if (IsClientInGame(top[0]) && (GetEntityTeamNum(top[0]) >= 1))
+        if (IsClientInGame(top[0]) && (view_as<int>(GetEntityTeamNum(top[0])) >= 1))
             GetClientName(top[0], s, 80);
         else
         {
             Format(s, 80, "---");
             top[0]=0;
         }
-        if (IsClientInGame(top[1]) && (GetEntityTeamNum(top[1]) >= 1))
+        if (IsClientInGame(top[1]) && (view_as<int>(GetEntityTeamNum(top[1])) >= 1))
             GetClientName(top[1], s1, 80);
         else
         {
             Format(s1, 80, "---");
             top[1]=0;
         }
-        if (IsClientInGame(top[2]) && (GetEntityTeamNum(top[2]) >= 1))
+        if (IsClientInGame(top[2]) && (view_as<int>(GetEntityTeamNum(top[2])) >= 1))
             GetClientName(top[2], s2, 80);
         else
         {
@@ -1921,7 +1921,7 @@ void CalcScores()
                 else
                     SetClientQueuePoints(i, 0);
             }
-            else if (!IsFakeClient(i) && (GetEntityTeamNum(i) > view_as<int>(TFTeam_Spectator)))
+            else if (!IsFakeClient(i) && (GetEntityTeamNum(i) > TFTeam_Spectator))
             {
                 CPrintToChat(i, "{olive}[VSH]{default} %t", "vsh_add_points", 10);
                 SetClientQueuePoints(i, GetClientQueuePoints(i)+10);
@@ -2223,10 +2223,10 @@ public Action StartRound(Handle hTimer)
     VSHRoundState = VSHRState_Active;
     if (IsValidClient(Hale))
     {
-        if (!IsPlayerAlive(Hale) && GetEntityTeamNum(Hale) != view_as<int>(TFTeam_Spectator) && GetEntityTeamNum(Hale) != view_as<int>(TFTeam_Unassigned))
+        if (!IsPlayerAlive(Hale) && GetEntityTeamNum(Hale) != TFTeam_Spectator && GetEntityTeamNum(Hale) != TFTeam_Unassigned)
             TF2_RespawnPlayer(Hale);
-        ChangeTeam(Hale, view_as<int>(HaleTeam));
-        if (GetEntityTeamNum(Hale) == view_as<int>(HaleTeam))
+        ChangeTeam(Hale, HaleTeam);
+        if (GetEntityTeamNum(Hale) == HaleTeam)
         {
             bool pri = IsValidEntity(GetPlayerWeaponSlot(Hale, TFWeaponSlot_Primary)), sec = IsValidEntity(GetPlayerWeaponSlot(Hale, TFWeaponSlot_Secondary)), mel = IsValidEntity(GetPlayerWeaponSlot(Hale, TFWeaponSlot_Melee));
             TF2_RemovePlayerDisguise(Hale);
@@ -2392,7 +2392,7 @@ public Action MakeModelTimer(Handle hTimer)
         case VSHSpecial_Vagineer:
         {
             SetVariantString(VagineerModel);
-//          SetEntProp(Hale, Prop_Send, "m_nSkin", GetEntityTeamNum(Hale)-2);
+//          SetEntProp(Hale, Prop_Send, "m_nSkin", view_as<int>(GetEntityTeamNum(Hale)-TFTeam_Red));
         }
         case VSHSpecial_HHH:
             SetVariantString(HHHModel);
@@ -2475,7 +2475,7 @@ public Action MakeHale(Handle hTimer)
             TF2_SetPlayerClass(Hale, TFClass_Sniper, _, false);
     }
     TF2_RemovePlayerDisguise(Hale);
-    ChangeTeam(Hale, view_as<int>(HaleTeam));
+    ChangeTeam(Hale, HaleTeam);
     if (VSHRoundState < VSHRState_Waiting)
         return Plugin_Continue;
     if (!IsPlayerAlive(Hale))
@@ -2797,7 +2797,7 @@ public Action MakeNoHale(Handle hTimer, any clientid)
         return Plugin_Continue;
 //  SetVariantString("");
 //  AcceptEntityInput(client, "SetCustomModel");
-    ChangeTeam(client, view_as<int>(OtherTeam));
+    ChangeTeam(client, OtherTeam);
     //TF2_RegeneratePlayer(client);   // Added fix by Chdata to correct team colors Edit: I guess it's not necessary
 
 //  SetEntityRenderColor(client, 255, 255, 255, 255);
@@ -2997,7 +2997,7 @@ public Action event_changeclass(Event event, const char[] name, bool dontBroadca
 {
     if (!g_bEnabled)
         return Plugin_Continue;
-    int client = GetCliendOfUserId(event.GetInt("userid"));
+    int client = GetClientOfUserId(event.GetInt("userid"));
     if (client == Hale)
     {
         switch(Special)
@@ -3024,7 +3024,7 @@ public Action event_uberdeployed(Event event, const char[] name, bool dontBroadc
 {
     if (!g_bEnabled)
         return Plugin_Continue;
-    int client = GetCliendOfUserId(event.GetInt("userid"));
+    int client = GetClientOfUserId(event.GetInt("userid"));
     char s[64];
     if (client && IsClientInGame(client) && IsPlayerAlive(client))
     {
@@ -3051,16 +3051,16 @@ public Action event_uberdeployed(Event event, const char[] name, bool dontBroadc
     return Plugin_Continue;
 }
 
-public Action:Timer_Lazor(Handle:hTimer, any:medigunid)
+public Action Timer_Lazor(Handle hTimer, any medigunid)
 {
-    new medigun = EntRefToEntIndex(medigunid);
+    int medigun = EntRefToEntIndex(medigunid);
     if (medigun && IsValidEntity(medigun) && VSHRoundState == VSHRState_Active)
     {
-        new client = GetEntPropEnt(medigun, Prop_Send, "m_hOwnerEntity");
-        new Float:charge = GetEntPropFloat(medigun, Prop_Send, "m_flChargeLevel");
+        int client = GetEntPropEnt(medigun, Prop_Send, "m_hOwnerEntity");
+        float charge = GetEntPropFloat(medigun, Prop_Send, "m_flChargeLevel");
         if (IsValidClient(client) && IsPlayerAlive(client) && GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon") == medigun) // IsValidClient(client, false)
         {
-            new target = GetHealingTarget(client);
+            int target = GetHealingTarget(client);
             if (charge > 0.05)
             {
                 TF2_AddCondition(client, TFCond_HalloweenCritCandy, 0.5);
@@ -3069,7 +3069,8 @@ public Action:Timer_Lazor(Handle:hTimer, any:medigunid)
                     TF2_AddCondition(target, TFCond_HalloweenCritCandy, 0.5);
                     uberTarget[client] = target;
                 }
-                else uberTarget[client] = -1;
+                else
+					uberTarget[client] = -1;
             }
         }
         if (charge <= 0.05)
@@ -3083,20 +3084,24 @@ public Action:Timer_Lazor(Handle:hTimer, any:medigunid)
         return Plugin_Stop;
     return Plugin_Continue;
 }
-public Action:Timer_Lazor2(Handle:hTimer, any:medigunid)
+
+public Action Timer_Lazor2(Handle hTimer, any medigunid)
 {
-    new medigun = EntRefToEntIndex(medigunid);
+    int medigun = EntRefToEntIndex(medigunid);
     if (IsValidEntity(medigun))
         SetEntPropFloat(medigun, Prop_Send, "m_flChargeLevel", GetEntPropFloat(medigun, Prop_Send, "m_flChargeLevel")+0.31);
     return Plugin_Continue;
 }
-public Action:Command_GetHPCmd(client, args)
+
+public Action Command_GetHPCmd(int client, int args)
 {
-    if (!client) return Plugin_Handled;
+    if (!client)
+		return Plugin_Handled;
     Command_GetHP(client);
     return Plugin_Handled;
 }
-public Action:Command_GetHP(client)
+
+public Action Command_GetHP(int client)
 {
     if (!g_bEnabled || VSHRoundState != VSHRState_Active)
         return Plugin_Continue;
@@ -3158,16 +3163,15 @@ public Action:Command_GetHP(client)
         CPrintToChat(client, "{olive}[VSH]{default} %t", "vsh_wait_hp", RoundFloat(HPTime-GetGameTime()), HaleHealthLast);
     return Plugin_Continue;
 }
-public Action:Command_MakeNextSpecial(client, args)
+
+public Action Command_MakeNextSpecial(int client, int args)
 {
     if (!CheckCommandAccess(client, "sm_hale_special", ADMFLAG_CHEATS, true))
     {
         ReplyToCommand(client, "[SM] You do not have access to this command.");
         return Plugin_Handled;
     }
-
-    decl String:arg[32];
-    decl String:name[64];
+    char arg[32], name[64];
     if (!bSpecials)
     {
         CReplyToCommand(client, "{olive}[VSH]{default} This server isn't set up to use special bosses! Set the cvar hale_specials 1 in the VSH config to enable on next map!");
@@ -3214,43 +3218,35 @@ public Action:Command_MakeNextSpecial(client, args)
     CReplyToCommand(client, "{olive}[VSH]{default} Set the next Special to %s", name);
     return Plugin_Handled;
 }
-public Action:Command_NextHale(client, args)
+
+public Action Command_NextHale(int client, int args)
 {
     if (g_bEnabled)
         CreateTimer(0.2, MessageTimer);
     return Plugin_Continue;
 }
-public Action:Command_HaleSelect(client, args)
+
+public Action Command_HaleSelect(int client, int args)
 {
     if (!g_bAreEnoughPlayersPlaying)
         return Plugin_Continue;
-
     if (args < 1)
     {
         CReplyToCommand(client, "{olive}[VSH]{default} Usage: hale_select <target> [\"hidden\"]");
         return Plugin_Handled;
     }
-
-    decl String:s2[12];
-    decl String:targetname[32];
-
+    char s2[12], targetname[32];
     GetCmdArg(1, targetname, sizeof(targetname));
     GetCmdArg(2, s2, sizeof(s2));
-
-    new target = FindTarget(client, targetname);
-
+    int target = FindTarget(client, targetname);
     if (IsValidClient(target) && IsClientParticipating(target))
-    {
         ForceHale(client, target, StrContains(s2, "hidden", false) >= 0);
-    }
     else
-    {
         CReplyToCommand(client, "{olive}[VSH]{default} Target is not valid for being selected as the boss.");
-    }
-
     return Plugin_Handled;
 }
-public Action:Command_Points(client, args)
+
+public Action Command_Points(int client, int args)
 {
     if (!g_bAreEnoughPlayersPlaying)
         return Plugin_Continue;
@@ -3259,20 +3255,17 @@ public Action:Command_Points(client, args)
         CReplyToCommand(client, "{olive}[VSH]{default} Usage: hale_addpoints <target> <points>");
         return Plugin_Handled;
     }
-    decl String:s2[MAX_DIGITS];
-    decl String:targetname[PLATFORM_MAX_PATH];
+    char s2[MAX_DIGITS], targetname[PLATFORM_MAX_PATH], target_name[MAX_TARGET_LENGTH];
     GetCmdArg(1, targetname, sizeof(targetname));
     GetCmdArg(2, s2, sizeof(s2));
-    new points = StringToInt(s2);
+    int points = StringToInt(s2), target_list[TF_MAX_PLAYERS], target_count;
     /**
      * target_name - stores the noun identifying the target(s)
      * target_list - array to store clients
      * target_count - variable to store number of clients
      * tn_is_ml - stores whether the noun must be translated
      */
-    new String:target_name[MAX_TARGET_LENGTH];
-    new target_list[TF_MAX_PLAYERS], target_count;
-    new bool:tn_is_ml;
+    bool tn_is_ml;
     if ((target_count = ProcessTargetString(
             targetname,
             client,
@@ -3287,7 +3280,7 @@ public Action:Command_Points(client, args)
         ReplyToTargetError(client, target_count);
         return Plugin_Handled;
     }
-    for (new i = 0; i < target_count; i++)
+    for (int i = 0; i < target_count; i++)
     {
         SetClientQueuePoints(target_list[i], GetClientQueuePoints(target_list[i])+points);
         LogAction(client, target_list[i], "\"%L\" added %d VSH queue points to \"%L\"", client, points, target_list[i]);
@@ -3295,39 +3288,47 @@ public Action:Command_Points(client, args)
     CReplyToCommand(client, "{olive}[VSH]{default} Added %d queue points to %s", points, target_name);
     return Plugin_Handled;
 }
-StopHaleMusic(client)
+
+void StopHaleMusic(int client)
 {
-    if (!IsValidClient(client)) return;
+    if (!IsValidClient(client))
+		return;
 //  StopSound(client, SNDCHAN_AUTO, HaleTempTheme);
     StopSound(client, SNDCHAN_AUTO, HHHTheme);
     StopSound(client, SNDCHAN_AUTO, CBSTheme);
 }
-public Action:Command_StopMusic(client, args)
+
+public Action Command_StopMusic(int client, int args)
 {
     if (!g_bAreEnoughPlayersPlaying)
         return Plugin_Continue;
-    for (new i = 1; i <= MaxClients; i++)
+    for (int i = 1; i <= MaxClients; i++)
     {
-        if (!IsClientInGame(i)) continue;
+        if (!IsClientInGame(i))
+			continue;
         StopHaleMusic(i);
     }
     CReplyToCommand(client, "{olive}[VSH]{default} Stopped boss music.");
     return Plugin_Handled;
 }
-public Action:Command_Point_Disable(client, args)
+
+public Action Command_Point_Disable(int client, int args)
 {
-    if (g_bEnabled) SetControlPoint(false);
-    return Plugin_Handled;
-}
-public Action:Command_Point_Enable(client, args)
-{
-    if (g_bEnabled) SetControlPoint(true);
+    if (g_bEnabled)
+		SetControlPoint(false);
     return Plugin_Handled;
 }
 
-SetControlPoint(bool:enable)
+public Action Command_Point_Enable(int client, int args)
 {
-    new CPm=-1; //CP = -1;
+    if (g_bEnabled)
+		SetControlPoint(true);
+    return Plugin_Handled;
+}
+
+void SetControlPoint(bool enable)
+{
+    int CPm=-1; //CP = -1;
     while ((CPm = FindEntityByClassname2(CPm, "team_control_point")) != -1)
     {
         if (CPm > MaxClients && IsValidEdict(CPm))
@@ -3339,18 +3340,17 @@ SetControlPoint(bool:enable)
     }
 }
 
-stock ForceHale(admin, client, bool:hidden, bool:forever = false)
+stock void ForceHale(int admin, int client, bool hidden, bool forever = false)
 {
     if (forever)
         Hale = client;
     else
         NextHale = client;
     if (!hidden)
-    {
         CPrintToChatAllEx(client, "{olive}[VSH] {teamcolor}%N {default}%t", client, "vsh_hale_select_text");
-    }
 }
-public OnClientPostAdminCheck(client)
+
+public void OnClientPostAdminCheck(int client)
 {
     VSHFlags[client] = 0;
 //  MusicDisabled[client] = false;
@@ -3362,7 +3362,8 @@ public OnClientPostAdminCheck(client)
     AirDamage[client] = 0;
     uberTarget[client] = -1;
 }
-public OnClientDisconnect(client)
+
+public void OnClientDisconnect(int client)
 {
     Damage[client] = 0;
     AirDamage[client] = 0;
@@ -3374,32 +3375,26 @@ public OnClientDisconnect(client)
         {
             if (VSHRoundState >= VSHRState_Active)
             {
-                decl String:authid[32];
+                char authid[32];
                 GetClientAuthId(client, AuthId_Steam2, authid, sizeof(authid));
-                new Handle:pack;
-                CreateDataTimer(3.0, Timer_SetDisconQueuePoints, pack, TIMER_FLAG_NO_MAPCHANGE);
-                WritePackString(pack, authid);
-                new bool:see[TF_MAX_PLAYERS];
+                DataPack pack;
+                CreateDataTimer(3.0, Timer_SetDisconQueuePoints, view_as<Handle>(pack), TIMER_FLAG_NO_MAPCHANGE);
+                pack.WriteString(authid);
+                bool see[TF_MAX_PLAYERS];
                 see[Hale] = true;
-                new tHale = FindNextHale(see);
+                int tHale = FindNextHale(see);
                 if (NextHale > 0)
-                {
                     tHale = NextHale;
-                }
                 if (IsValidClient(tHale))
-                {
                     ChangeTeam(tHale, HaleTeam);
-                }
             }
             if (VSHRoundState == VSHRState_Active)
-            {
                 ForceTeamWin(OtherTeam);
-            }
             if (VSHRoundState == VSHRState_Waiting)
             {
-                new bool:see[TF_MAX_PLAYERS];
+                bool see[TF_MAX_PLAYERS];
                 see[Hale] = true;
-                new tHale = FindNextHale(see);
+                int tHale = FindNextHale(see);
                 if (NextHale > 0)
                 {
                     tHale = NextHale;
@@ -3419,51 +3414,51 @@ public OnClientDisconnect(client)
         {
             if (IsClientInGame(client))
             {
-                if (IsPlayerAlive(client)) CreateTimer(0.0, CheckAlivePlayers);
-                if (client == FindNextHaleEx()) CreateTimer(1.0, Timer_SkipHalePanel, _, TIMER_FLAG_NO_MAPCHANGE);
+                if (IsPlayerAlive(client))
+					CreateTimer(0.0, CheckAlivePlayers);
+                if (client == FindNextHaleEx())
+					CreateTimer(1.0, Timer_SkipHalePanel, _, TIMER_FLAG_NO_MAPCHANGE);
             }
             if (client == NextHale)
-            {
                 NextHale = -1;
-            }
         }
     }
 }
 
-public Action:Timer_SetDisconQueuePoints(Handle:timer, Handle:pack)
+public Action Timer_SetDisconQueuePoints(Handle timer, Handle pack)
 {
-    ResetPack(pack);
-    decl String:authid[32];
-    ReadPackString(pack, authid, sizeof(authid));
+	DataPack dPack = view_as<DataPack>(pack);
+    dPack.Reset();
+    char authid[32];
+    pack.ReadString(authid, sizeof(authid));
     SetAuthIdQueuePoints(authid, 0);
 }
-public Action:Timer_RegenPlayer(Handle:timer, any:userid)
+
+public Action Timer_RegenPlayer(Handle timer, any userid)
 {
-    new client = GetClientOfUserId(userid);
+    int client = GetClientOfUserId(userid);
     if (client > 0 && client <= MaxClients && IsClientInGame(client) && IsPlayerAlive(client))
-    {
         TF2_RegeneratePlayer(client);
-    }
 }
-public Action:event_player_spawn(Handle:event, const String:name[], bool:dontBroadcast)
+
+public Action event_player_spawn(Event event, const char[] name, bool dontBroadcast)
 {
-    new client = GetClientOfUserId(GetEventInt(event, "userid"));
-    if (!client || !IsClientInGame(client)) return Plugin_Continue; // IsValidClient(client, false)   - You can probably assume the player is valid at this point though.. TODO
-    if (!g_bEnabled) return Plugin_Continue;
+    int client = GetClientOfUserId(event.GetInt("userid"));
+    if (!client || !IsClientInGame(client))
+		return Plugin_Continue; // IsValidClient(client, false)   - You can probably assume the player is valid at this point though.. TODO
+    if (!g_bEnabled)
+		return Plugin_Continue;
     SetVariantString("");
     AcceptEntityInput(client, "SetCustomModel");
     if (client == Hale && VSHRoundState < VSHRState_End && VSHRoundState != VSHRState_Disabled)
-    {
         CreateTimer(0.1, MakeHale);
-    }
-
     if (VSHRoundState != VSHRState_Disabled)
     {
         CreateTimer(0.2, MakeNoHale, GetClientUserId(client));
         if (!(VSHFlags[client] & VSHFLAG_HASONGIVED))
         {
             VSHFlags[client] |= VSHFLAG_HASONGIVED;
-            new array[] = { 57, 133, 231, 405, 444, 608, 642 };
+            int array[] = { 57, 133, 231, 405, 444, 608, 642 };
             RemovePlayerBack(client, array, sizeof(array));
             RemoveDemoShield(client);
             TF2_RemoveAllWeapons(client);
@@ -3480,16 +3475,15 @@ public Action:event_player_spawn(Handle:event, const String:name[], bool:dontBro
     VSHFlags[client] &= ~VSHFLAG_CLASSHELPED;
     return Plugin_Continue;
 }
-public Action:OnPlayerRunCmd(client, &buttons, &impulse, Float:vel[3], Float:angles[3], &weapon)
+
+public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon)
 {
     if (g_bEnabled && client == Hale)
     {
         if (Special == VSHSpecial_HHH)
         {
             if (VSHFlags[client] & VSHFLAG_NEEDSTODUCK)
-            {
                 buttons |= IN_DUCK;
-            }
             if (HaleCharge >= 47 && (buttons & IN_ATTACK))
             {
                 buttons &= ~IN_ATTACK;
@@ -3507,15 +3501,14 @@ public Action:OnPlayerRunCmd(client, &buttons, &impulse, Float:vel[3], Float:ang
     }
     return Plugin_Continue;
 }
-public Action:ClientTimer(Handle:hTimer)
+
+public Action ClientTimer(Handle hTimer)
 {
     if (VSHRoundState != VSHRState_Active)
-    {
         return Plugin_Stop;
-    }
-    decl String:wepclassname[32];
-    new i = -1;
-    for (new client = 1; client <= MaxClients; client++)
+    char wepclassname[32];
+    int i = -1;
+    for (int client = 1; client <= MaxClients; client++)
     {
         if (client != Hale && IsClientInGame(client) && GetEntityTeamNum(client) == OtherTeam)
         {
@@ -7929,14 +7922,13 @@ stock FindEntityByClassname2(startEnt, const String:classname[])
         TODO: -1 not changed, 0 if changed with no respawn, 1 if changed with respawn
 
 */
-stock ChangeTeam(iClient, iTeam) // iTeam should never be less than 2
+stock void ChangeTeam(int iClient, TFTeam iTeam) // iTeam should never be less than 2
 {
-    new iOldTeam = GetEntityTeamNum(iClient);
-
-    if (iOldTeam != iTeam && iOldTeam >= TEAM_RED)
+    int iOldTeam = GetEntityTeamNum(iClient);
+    if (iOldTeam != view_as<int>(iTeam) && iOldTeam >= view_as<int>(TFTeam_Red))
     {
         SetEntProp(iClient, Prop_Send, "m_lifeState", LifeState_Dead);
-        ChangeClientTeam(iClient, iTeam);
+        TF2_ChangeClientTeam(iClient, iTeam);
         SetEntProp(iClient, Prop_Send, "m_lifeState", LifeState_Alive);
         TF2_RespawnPlayer(iClient);
     }
@@ -8056,13 +8048,13 @@ stock PrepareModel(const String:szModelPath[], bool:bMdlOnly = false)
 
     GetEntityTeamNum() doesn't always return properly when tf_arena_use_queue is set to 0
 */
-stock GetEntityTeamNum(iEnt)
+stock TFTeam GetEntityTeamNum(int iEnt)
 {
     // if (GetEntSendPropOffs(iEnt, "m_iTeamNum") <= 0)
     // {
     //     return -1;
     // }
-    return GetEntProp(iEnt, Prop_Send, "m_iTeamNum");
+    return view_as<TFTeam>(GetEntProp(iEnt, Prop_Send, "m_iTeamNum"));
 }
 
 // TODO: Implement this stuff
@@ -8098,12 +8090,12 @@ stock bool:IsClientParticipating(iClient)
     return true;
 }
 
-stock bool:IsSpectator(iClient)
+stock bool IsSpectator(int iClient)
 {
-    return GetEntityTeamNum(iClient) <= TEAM_SPEC;
+    return GetEntityTeamNum(iClient) <= TFTeam_Spectator;
 }
 
-stock bool:IsReplayClient(iClient)
+stock bool IsReplayClient(int iClient)
 {
     return IsClientReplay(iClient) || IsClientSourceTV(iClient);
 }
@@ -8111,9 +8103,9 @@ stock bool:IsReplayClient(iClient)
 /*
     Returns the number of times any team has won a round.
 */
-stock TF2_GetRoundWinCount()
+stock int TF2_GetRoundWinCount()
 {
-    return GetTeamScore(TEAM_RED) + GetTeamScore(TEAM_BLU);
+    return GetTeamScore(view_as<int>(TFTeam_Red)) + GetTeamScore(view_as<int>(TFTeam_Blue));
 }
 
 stock ClearTimer(&Handle:hTimer)
