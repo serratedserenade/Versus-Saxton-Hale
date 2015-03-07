@@ -5839,32 +5839,32 @@ public int HalePanelH(Menu menu, MenuAction action, int param1, int param2)
     return 0;
 }
 
-public Action:HalePanel(client, args)
+public Action HalePanel(int client, int args)
 {
     if (!g_bAreEnoughPlayersPlaying || !client) // IsValidClient(client, false)
         return Plugin_Continue;
-    new Handle:panel = CreatePanel();
+    Panel panel = new Panel();
     new size = 256;
-    decl String:s[size];
+    char[] s = new char[size];
     SetGlobalTransTarget(client);
     Format(s, size, "%t", "vsh_menu_1");
-    SetPanelTitle(panel, s);
+    panel.SetTitle(s);
     Format(s, size, "%t", "vsh_menu_2");
-    DrawPanelItem(panel, s);
+    panel.DrawItem(s);
     Format(s, size, "%t", "vsh_menu_3");
-    DrawPanelItem(panel, s);
+    panel.DrawItem(s);
     Format(s, size, "%t", "vsh_menu_7");
-    DrawPanelItem(panel, s);
+    panel.DrawItem(s);
     Format(s, size, "%t", "vsh_menu_4");
-    DrawPanelItem(panel, s);
+    panel.DrawItem(s);
     Format(s, size, "%t", "vsh_menu_5");
-    DrawPanelItem(panel, s);
+    panel.DrawItem(s);
     Format(s, size, "%t", "vsh_menu_8");
-    DrawPanelItem(panel, s);
+    panel.DrawItem(s);
     Format(s, size, "%t", "vsh_menu_9");
-    DrawPanelItem(panel, s);
+    panel.DrawItem(s);
     Format(s, size, "%t", "vsh_menu_9a");
-    DrawPanelItem(panel, s);
+    panel.DrawItem(s);
 /*  if (ACH_Enabled)
     {
         Format(s, size, "%t", "vsh_menu_10");
@@ -5873,12 +5873,13 @@ public Action:HalePanel(client, args)
         DrawPanelItem(panel, s);
     }*/
     Format(s, size, "%t", "vsh_menu_exit");
-    DrawPanelItem(panel, s);
-    SendPanelToClient(panel, client, HalePanelH, 9001);
-    CloseHandle(panel);
+    panel.DrawItem(s);
+    panel.Send(client, HalePanelH, 9001);
+    delete panel;
     return Plugin_Handled;
 }
-public NewPanelH(Handle:menu, MenuAction:action, param1, param2)
+
+public int NewPanelH(Menu menu, MenuAction action, int param1, int param2)
 {
     if (action == MenuAction_Select)
     {
@@ -5898,10 +5899,11 @@ public NewPanelH(Handle:menu, MenuAction:action, param1, param2)
                 else
                     NewPanel(param1, ++curHelp[param1]);
             }
-            default: return;
         }
     }
+    return 0;
 }
+
 public Action:NewPanelCmd(client, args)
 {
     if (!client) return Plugin_Handled;
