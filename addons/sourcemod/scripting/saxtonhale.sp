@@ -3998,47 +3998,56 @@ public Action HaleTimer(Handle hTimer)
         }
     }
     return Plugin_Continue;
-} //50% port mark
-
-public Action:HHHTeleTimer(Handle:timer)
-{
-    if (IsValidClient(Hale))
-    {
-        SetEntProp(Hale, Prop_Send, "m_CollisionGroup", 5); //Fix HHH's clipping.
-    }
 }
 
-public Action:Timer_StunHHH(Handle:timer, Handle:pack)
+public Action HHHTeleTimer(Handle timer)
 {
-    if (!IsValidClient(Hale)) return; // IsValidClient(Hale, false)
-    ResetPack(pack);
-    new superduper = ReadPackCell(pack);
-    new targetid = ReadPackCell(pack);
-    new target = GetClientOfUserId(targetid);
-    if (!IsValidClient(target)) target = 0; // IsValidClient(target, false)
+    if (IsValidClient(Hale))
+        SetEntProp(Hale, Prop_Send, "m_CollisionGroup", 5); //Fix HHH's clipping.
+}
+
+public Action Timer_StunHHH(Handle timer, Handle pack)
+{
+    if (!IsValidClient(Hale))
+        return; // IsValidClient(Hale, false)
+    DataPack dPack = view_as<DataPack>(pack);
+    dPack.Reset();
+    bool superduper = dPack.ReadCell();
+    int targetid = dPack.ReadCell();
+    int target = GetClientOfUserId(targetid);
+    if (!IsValidClient(target))
+        target = 0; // IsValidClient(target, false)
     VSHFlags[Hale] &= ~VSHFLAG_NEEDSTODUCK;
     TF2_StunPlayer(Hale, (superduper ? 4.0 : 2.0), 0.0, TF_STUNFLAGS_GHOSTSCARE|TF_STUNFLAG_NOSOUNDOREFFECT, target);
 }
-public Action:Timer_BotRage(Handle:timer)
+
+public Action Timer_BotRage(Handle timer)
 {
-    if (!IsValidClient(Hale)) return; // IsValidClient(Hale, false)
-    if (!TF2_IsPlayerInCondition(Hale, TFCond_Taunting)) FakeClientCommandEx(Hale, "taunt");
+    if (!IsValidClient(Hale))
+        return Plugin_Continue; // IsValidClient(Hale, false)
+    if (!TF2_IsPlayerInCondition(Hale, TFCond_Taunting))
+        FakeClientCommandEx(Hale, "voicemenu 0 0");
+    return Plugin_Continue;
 }
-OnlyScoutsLeft()
+
+bool OnlyScoutsLeft()
 {
-    for (new client = 1; client <= MaxClients; client++)
+    for (int client = 1; client <= MaxClients; client++)
     {
         if (IsClientInGame(client) && IsPlayerAlive(client) && client != Hale && TF2_GetPlayerClass(client) != TFClass_Scout)
             return false;
     }
     return true;
 }
-public Action:Timer_GravityCat(Handle:timer, any:userid)
+
+public Action Timer_GravityCat(Handle timer, any userid)
 {
-    new client = GetClientOfUserId(userid);
-    if (client && IsClientInGame(client)) SetEntityGravity(client, 1.0);
+    int client = GetClientOfUserId(userid);
+    if (client && IsClientInGame(client))
+        SetEntityGravity(client, 1.0);
 }
-public Action:Destroy(client, const String:command[], argc)
+
+public Action Destroy(int client, const char[] command, int argc)
 {
     if (!g_bEnabled || client == Hale)
         return Plugin_Continue;
@@ -4047,30 +4056,24 @@ public Action:Destroy(client, const String:command[], argc)
     return Plugin_Continue;
 }
 
-public TF2_OnConditionRemoved(client, TFCond:condition)
+public void TF2_OnConditionRemoved(int client, TFCond condition)
 {
     if (TF2_GetPlayerClass(client) == TFClass_Scout && condition == TFCond_CritHype)
-    {
         TF2_AddCondition(client, TFCond_SpeedBuffAlly, 0.01);   //recalc their speed
-    }
 }
-
 
 /*
  Call medic to rage update by Chdata
 
 */
-public Action:cdVoiceMenu(iClient, const String:sCommand[], iArgc)
+public Action cdVoiceMenu(int client, const char[] command, int argc)
 {
-    if (iArgc < 2) return Plugin_Handled;
-
-    decl String:sCmd1[8], String:sCmd2[8];
-
+    if (iArgc < 2)
+        return Plugin_Handled;
+    char sCmd1[8], sCmd2[8];
     GetCmdArg(1, sCmd1, sizeof(sCmd1));
     GetCmdArg(2, sCmd2, sizeof(sCmd2));
-
     // Capture call for medic commands (represented by "voicemenu 0 0")
-
     if (sCmd1[0] == '0' && sCmd2[0] == '0' && IsPlayerAlive(iClient) && iClient == Hale)
     {
         if (HaleRage / RageDMG >= 1)
@@ -4079,30 +4082,24 @@ public Action:cdVoiceMenu(iClient, const String:sCommand[], iArgc)
             return Plugin_Handled;
         }
     }
-
     return (iClient == Hale && Special != VSHSpecial_CBS && Special != VSHSpecial_Bunny) ? Plugin_Handled : Plugin_Continue;
 }
 
-public Action:DoTaunt(client, const String:command[], argc)
+public Action DoTaunt(int client, const char[] command, int argc)
 {
     if (!g_bEnabled || (client != Hale))
         return Plugin_Continue;
-
     if (bNoTaunt) // Prevent double-tap rages
-    {
         return Plugin_Handled;
-    }
-
-    decl String:s[PLATFORM_MAX_PATH];
+    char s[PLATFORM_MAX_PATH];
     if (HaleRage/RageDMG >= 1)
     {
-        decl Float:pos[3];
+        float pos[3];
         GetEntPropVector(client, Prop_Send, "m_vecOrigin", pos);
         pos[2] += 20.0;
-        new Action:act = Plugin_Continue;
+        Action act = Plugin_Continue;
         Call_StartForward(OnHaleRage);
-        new Float:dist;
-        new Float:newdist;
+        float dist, newdist;
         switch (Special)
         {
             case VSHSpecial_Vagineer: dist = RageDist/(1.5);
@@ -4115,8 +4112,9 @@ public Action:DoTaunt(client, const String:command[], argc)
         Call_Finish(act);
         if (act != Plugin_Continue && act != Plugin_Changed)
             return Plugin_Continue;
-        if (act == Plugin_Changed) dist = newdist;
-        TF2_AddCondition(Hale, TFCond:42, 4.0);
+        else if (act == Plugin_Changed)
+            dist = newdist;
+        TF2_AddCondition(Hale, view_as<TFCond>(42), 4.0);
         switch (Special)
         {
             case VSHSpecial_Vagineer:
@@ -4127,7 +4125,6 @@ public Action:DoTaunt(client, const String:command[], argc)
                     Format(s, PLATFORM_MAX_PATH, "%s%i.wav", VagineerRageSound2, GetRandomInt(1, 2));
                 TF2_AddCondition(Hale, TFCond_Ubercharged, 99.0);
                 UberRageCount = 0.0;
-
                 CreateTimer(0.6, UseRage, dist);
                 CreateTimer(0.1, UseUberRage, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
             }
@@ -4141,7 +4138,7 @@ public Action:DoTaunt(client, const String:command[], argc)
                 strcopy(s, PLATFORM_MAX_PATH, BunnyRage[GetRandomInt(1, sizeof(BunnyRage)-1)]);
                 EmitSoundToAll(s, _, _, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, _, pos, NULL_VECTOR, false, 0.0);
                 TF2_RemoveWeaponSlot(client, TFWeaponSlot_Primary);
-                new weapon = SpawnWeapon(client, "tf_weapon_grenadelauncher", 19, 100, 5, "6 ; 0.1 ; 411 ; 150.0 ; 413 ; 1.0 ; 37 ; 0.0 ; 280 ; 17 ; 477 ; 1.0 ; 467 ; 1.0 ; 181 ; 2.0 ; 252 ; 0.7");
+                int weapon = SpawnWeapon(client, "tf_weapon_grenadelauncher", 19, 100, 5, "6 ; 0.1 ; 411 ; 150.0 ; 413 ; 1.0 ; 37 ; 0.0 ; 280 ; 17 ; 477 ; 1.0 ; 467 ; 1.0 ; 181 ; 2.0 ; 252 ; 0.7");
                 SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", weapon);
                 SetEntProp(weapon, Prop_Send, "m_iClip1", 50);
 //              new vm = CreateVM(client, ReloadEggModel);
@@ -4172,7 +4169,7 @@ public Action:DoTaunt(client, const String:command[], argc)
         }
         EmitSoundToAll(s, client, SNDCHAN_VOICE, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, client, pos, NULL_VECTOR, true, 0.0);
         EmitSoundToAll(s, client, SNDCHAN_VOICE, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, client, pos, NULL_VECTOR, true, 0.0);
-        for (new i = 1; i <= MaxClients; i++)
+        for (int i = 1; i <= MaxClients; i++)
         {
             if (IsClientInGame(i) && i != Hale)
             {
@@ -4183,19 +4180,18 @@ public Action:DoTaunt(client, const String:command[], argc)
         HaleRage = 0;
         VSHFlags[Hale] &= ~VSHFLAG_BOTRAGE;
     }
-
     bNoTaunt = true;
     CreateTimer(1.5, Timer_NoTaunting, _, TIMER_FLAG_NO_MAPCHANGE);
-
     return Plugin_Continue;
 }
 
-public Action:Timer_NoTaunting(Handle:timer)
+public Action Timer_NoTaunting(Handle timer)
 {
     bNoTaunt = false;
+    return Plugin_Continue;
 }
 
-public Action:DoSuicide(client, const String:command[], argc)
+public Action DoSuicide(int client, const char[] command, int argc)
 {
     if (g_bEnabled && (VSHRoundState == VSHRState_Waiting || VSHRoundState == VSHRState_Active))
     {
@@ -4209,7 +4205,8 @@ public Action:DoSuicide(client, const String:command[], argc)
     }
     return Plugin_Continue;
 }
-public Action:DoSuicide2(client, const String:command[], argc)
+
+public Action DoSuicide2(int client, const char[] command, int argc)
 {
     if (g_bEnabled && client == Hale && bTenSecStart[0])
     {
@@ -4218,13 +4215,13 @@ public Action:DoSuicide2(client, const String:command[], argc)
     }
     return Plugin_Continue;
 }
-public Action:UseRage(Handle:hTimer, any:dist)
+
+public Action UseRage(Handle hTimer, any dist)
 {
-    decl Float:pos[3];
-    decl Float:pos2[3];
-    decl i;
-    decl Float:distance;
-    if (!IsValidClient(Hale)) return Plugin_Continue; // IsValidClient(Hale, false)
+    float:pos[3], pos2[3], distance;
+    int i;
+    if (!IsValidClient(Hale))
+        return Plugin_Continue; // IsValidClient(Hale, false)
     if (!GetEntProp(Hale, Prop_Send, "m_bIsReadyToHighFive") && !IsValidEntity(GetEntPropEnt(Hale, Prop_Send, "m_hHighFivePartner")))
     {
         TF2_RemoveCondition(Hale, TFCond_Taunting);
@@ -4245,7 +4242,8 @@ public Action:UseRage(Handle:hTimer, any:dist)
                     flags |= TF_STUNFLAG_NOSOUNDOREFFECT;
                     AttachParticle(i, "yikes_fx", 5.0, Float:{0.0,0.0,75.0}, true);
                 }
-                if (VSHRoundState != VSHRState_Waiting) TF2_StunPlayer(i, 5.0, _, flags, (Special == VSHSpecial_HHH ? 0 : Hale));
+                if (VSHRoundState != VSHRState_Waiting)
+                    TF2_StunPlayer(i, 5.0, _, flags, (Special == VSHSpecial_HHH ? 0 : Hale));
             }
         }
     }
@@ -4254,7 +4252,8 @@ public Action:UseRage(Handle:hTimer, any:dist)
     {
         GetEntPropVector(i, Prop_Send, "m_vecOrigin", pos2);
         distance = GetVectorDistance(pos, pos2);
-        if (dist <= RageDist/3) dist = RageDist/2;
+        if (dist <= RageDist/3)
+            dist = RageDist/2;
         if (distance < dist)    //(!mode && (distance < RageDist)) || (mode && (distance < RageDist/2)))
         {
             SetEntProp(i, Prop_Send, "m_bDisabled", 1);
@@ -4265,9 +4264,7 @@ public Action:UseRage(Handle:hTimer, any:dist)
                 AcceptEntityInput(i, "RemoveHealth");
             }
             else
-            {
                 SetEntProp(i, Prop_Send, "m_iHealth", GetEntProp(i, Prop_Send, "m_iHealth")/2);
-            }
             CreateTimer(8.0, EnableSG, EntIndexToEntRef(i));
         }
     }
@@ -4276,7 +4273,8 @@ public Action:UseRage(Handle:hTimer, any:dist)
     {
         GetEntPropVector(i, Prop_Send, "m_vecOrigin", pos2);
         distance = GetVectorDistance(pos, pos2);
-        if (dist <= RageDist/3) dist = RageDist/2;
+        if (dist <= RageDist/3)
+            dist = RageDist/2;
         if (distance < dist)    //(!mode && (distance < RageDist)) || (mode && (distance < RageDist/2)))
         {
             SetVariantInt(1);
@@ -4288,17 +4286,18 @@ public Action:UseRage(Handle:hTimer, any:dist)
     {
         GetEntPropVector(i, Prop_Send, "m_vecOrigin", pos2);
         distance = GetVectorDistance(pos, pos2);
-        if (dist <= RageDist/3) dist = RageDist/2;
+        if (dist <= RageDist/3)
+            dist = RageDist/2;
         if (distance < dist)    //(!mode && (distance < RageDist)) || (mode && (distance < RageDist/2)))
         {
             SetVariantInt(1);
             AcceptEntityInput(i, "RemoveHealth");
         }
     }
-
     return Plugin_Continue;
 }
-public Action:UseUberRage(Handle:hTimer, any:param)
+
+public Action UseUberRage(Handle hTimer, any param)
 {
     if (!IsValidClient(Hale))
         return Plugin_Stop;
@@ -4313,26 +4312,27 @@ public Action:UseUberRage(Handle:hTimer, any:param)
     }
     else if (UberRageCount >= 100)
     {
-        if (defaulttakedamagetype == 0) defaulttakedamagetype = 2;
+        if (defaulttakedamagetype == 0)
+            defaulttakedamagetype = 2;
         SetEntProp(Hale, Prop_Data, "m_takedamage", defaulttakedamagetype);
         defaulttakedamagetype = 0;
         TF2_RemoveCondition(Hale, TFCond_Ubercharged);
         return Plugin_Stop;
     }
     else if (UberRageCount >= 85 && !TF2_IsPlayerInCondition(Hale, TFCond_UberchargeFading))
-    {
         TF2_AddCondition(Hale, TFCond_UberchargeFading, 3.0);
-    }
     if (!defaulttakedamagetype)
     {
         defaulttakedamagetype = GetEntProp(Hale, Prop_Data, "m_takedamage");
-        if (defaulttakedamagetype == 0) defaulttakedamagetype = 2;
+        if (defaulttakedamagetype == 0)
+            defaulttakedamagetype = 2;
     }
     SetEntProp(Hale, Prop_Data, "m_takedamage", 0);
     UberRageCount += 1.0;
     return Plugin_Continue;
 }
-public Action:UseBowRage(Handle:hTimer)
+
+public Action UseBowRage(Handle hTimer)
 {
     if (!GetEntProp(Hale, Prop_Send, "m_bIsReadyToHighFive") && !IsValidEntity(GetEntPropEnt(Hale, Prop_Send, "m_hHighFivePartner")))
     {
@@ -4344,24 +4344,25 @@ public Action:UseBowRage(Handle:hTimer)
     SetAmmo(Hale, 0, ((RedAlivePlayers >= CBS_MAX_ARROWS) ? CBS_MAX_ARROWS : RedAlivePlayers));
     return Plugin_Continue;
 }
-public Action:event_player_death(Handle:event, const String:name[], bool:dontBroadcast)
+
+public Action event_player_death(Event event, const char[] name, bool dontBroadcast)
 {
     decl String:s[PLATFORM_MAX_PATH];
     if (!g_bEnabled)
         return Plugin_Continue;
-    new client = GetClientOfUserId(GetEventInt(event, "userid"));
+    int client = GetClientOfUserId(event.GetInt("userid"));
     if (!client || !IsClientInGame(client))
         return Plugin_Continue;
-    new attacker = GetClientOfUserId(GetEventInt(event, "attacker"));
-    new deathflags = GetEventInt(event, "death_flags");
-    new customkill = GetEventInt(event, "customkill");
-    if (attacker == Hale && Special == VSHSpecial_Bunny && VSHRoundState == VSHRState_Active)  SpawnManyAmmoPacks(client, EggModel, 1, 5, 120.0);
+    int attacker = GetClientOfUserId(event.GetInt("attacker")), deathflags = event.GetInt("death_flags"), customkill = event.GetInt("customkill");
+    if (attacker == Hale && Special == VSHSpecial_Bunny && VSHRoundState == VSHRState_Active)
+        SpawnManyAmmoPacks(client, EggModel, 1, 5, 120.0);
     if (attacker == Hale && VSHRoundState == VSHRState_Active && (deathflags & TF_DEATHFLAG_DEADRINGER))
     {
         numHaleKills++;
         if (customkill != TF_CUSTOM_BOOTS_STOMP)
         {
-            if (Special == VSHSpecial_Hale) SetEventString(event, "weapon", "fists");
+            if (Special == VSHSpecial_Hale)
+                event.SetString("weapon", "fists");
         }
         return Plugin_Continue;
     }
@@ -6679,7 +6680,7 @@ FindVersionData(Handle:panel, versionindex)
             DrawPanelText(panel, "-- Congratulations. Now go fight Hale.");
         }
     }
-}
+}//75% port mark
 public HelpPanelH(Handle:menu, MenuAction:action, param1, param2)
 {
     if (action == MenuAction_Select)
