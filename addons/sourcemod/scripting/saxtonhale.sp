@@ -4817,41 +4817,28 @@ public Action event_hurt(Event event, const char[] name, bool dontBroadcast)
 {
     if (!g_bEnabled)
         return Plugin_Continue;
-    new client = GetClientOfUserId(GetEventInt(event, "userid"));
-    new attacker = GetClientOfUserId(GetEventInt(event, "attacker"));
-    new damage = GetEventInt(event, "damageamount");
-    new custom = GetEventInt(event, "custom");
-    new weapon = GetEventInt(event, "weaponid");
+    int client = GetClientOfUserId(event.GetInt("userid")), attacker = GetClientOfUserId(event.GetInt("attacker")), damage = event.GetInt("damageamount"), custom = event.GetInt("custom"), weapon = Gevent.GetInt("weaponid");
     if (client != Hale) // || !IsValidEdict(client) || !IsValidEdict(attacker) || (client <= 0) || (attacker <= 0) || (attacker > MaxClients))
         return Plugin_Continue;
-
     if (!IsValidClient(attacker) || !IsValidClient(client) || client == attacker) // || custom == TF_CUSTOM_BACKSTAB)
         return Plugin_Continue;
-
-    if (custom == TF_CUSTOM_TELEFRAG) damage = (IsPlayerAlive(attacker) ? 9001:1);
-
-    if (GetEventBool(event, "minicrit") && GetEventBool(event, "allseecrit")) SetEventBool(event, "allseecrit", false);
-
+    if (custom == TF_CUSTOM_TELEFRAG)
+        damage = (IsPlayerAlive(attacker) ? 9001:1);
+    if (event.GetBool("minicrit") && event.GetBool("allseecrit"))
+        event.SetBool("allseecrit", false);
     HaleHealth -= damage;
     HaleRage += damage;
-
-    if (custom == TF_CUSTOM_TELEFRAG) SetEventInt(event, "damageamount", damage);
-
+    if (custom == TF_CUSTOM_TELEFRAG)
+        event.SetInt("damageamount", damage);
     Damage[attacker] += damage;
-
     if (TF2_GetPlayerClass(attacker) == TFClass_Soldier && GetIndexOfWeaponSlot(attacker, TFWeaponSlot_Primary) == 1104)
     {
         if (weapon == TF_WEAPON_ROCKETLAUNCHER)
-        {
             AirDamage[attacker] += damage;
-        }
-
         SetEntProp(attacker, Prop_Send, "m_iDecapitations", AirDamage[attacker]/200);
     }
-
-    new healers[TF_MAX_PLAYERS];
-    new healercount = 0;
-    for (new i = 1; i <= MaxClients; i++)
+    int healers[TF_MAX_PLAYERS], healercount = 0;
+    for (int i = 1; i <= MaxClients; i++)
     {
         if (IsClientInGame(i) && IsPlayerAlive(i) && (GetHealingTarget(i) == attacker))
         {
@@ -4859,7 +4846,7 @@ public Action event_hurt(Event event, const char[] name, bool dontBroadcast)
             healercount++;
         }
     }
-    for (new i = 0; i < healercount; i++)
+    for (int i = 0; i < healercount; i++)
     {
         if (IsValidClient(healers[i]) && IsPlayerAlive(healers[i]))
         {
@@ -4869,12 +4856,12 @@ public Action event_hurt(Event event, const char[] name, bool dontBroadcast)
                 Damage[healers[i]] += damage/(healercount+1);
         }
     }
-
     if (HaleRage > RageDMG)
         HaleRage = RageDMG;
     return Plugin_Continue;
 }
-public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damagetype, &weapon, Float:damageForce[3], Float:damagePosition[3], damagecustom)
+
+public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
 {
     if (!g_bEnabled || !IsValidEdict(attacker) || ((attacker <= 0) && (client == Hale)) || TF2_IsPlayerInCondition(client, TFCond_Ubercharged))
         return Plugin_Continue;
@@ -4883,7 +4870,7 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
         damage *= 0.0;
         return Plugin_Changed;
     }
-    decl Float:vPos[3];
+    float vPos[3];
     GetEntPropVector(attacker, Prop_Send, "m_vecOrigin", vPos);
     if ((attacker == Hale) && IsValidClient(client) && (client != Hale) && !TF2_IsPlayerInCondition(client, TFCond_Bonked) && !TF2_IsPlayerInCondition(client, TFCond_Ubercharged))
     {
@@ -4902,42 +4889,38 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
         if (TF2_IsPlayerInCondition(client, TFCond_CritMmmph))
         {
             damage *= 0.25;
-
             return Plugin_Changed;
         }
-
         if (RemoveDemoShield(client)) // If the demo had a shield to break
         {
             EmitSoundToClient(client, "player/spy_shield_break.wav", _, _, _, _, 0.7, 100, _, vPos, _, false);
             EmitSoundToClient(attacker, "player/spy_shield_break.wav", _, _, _, _, 0.7, 100, _, vPos, _, false);
-
             TF2_AddCondition(client, TFCond_Bonked, 0.1);
             TF2_AddCondition(client, TFCond_SpeedBuffAlly, 1.0);
             return Plugin_Continue;
         }
-
         if (TF2_GetPlayerClass(client) == TFClass_Spy)  //eggs probably do melee damage to spies, then? That's not ideal, but eh.
         {
             if (GetEntProp(client, Prop_Send, "m_bFeignDeathReady") && !TF2_IsPlayerInCondition(client, TFCond_Cloaked))
             {
-                if (damagetype & DMG_CRIT) damagetype &= ~DMG_CRIT;
+                if (damagetype & DMG_CRIT)
+                    damagetype &= ~DMG_CRIT;
                 damage = 620.0;
-                return Plugin_Changed;
+                //return Plugin_Changed;
             }
-            if (TF2_IsPlayerInCondition(client, TFCond_Cloaked) && TF2_IsPlayerInCondition(client, TFCond_DeadRingered))
+            else if (TF2_IsPlayerInCondition(client, TFCond_Cloaked) && TF2_IsPlayerInCondition(client, TFCond_DeadRingered))
             {
-                if (damagetype & DMG_CRIT) damagetype &= ~DMG_CRIT;
+                if (damagetype & DMG_CRIT)
+                    damagetype &= ~DMG_CRIT;
                 damage = 850.0;
-                return Plugin_Changed;
+                //return Plugin_Changed;
             }
-//          return Plugin_Changed;
+            return Plugin_Changed; //Better to return here.
         }
-        new buffweapon = GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary);
-        new buffindex = (IsValidEntity(buffweapon) && buffweapon > MaxClients ? GetEntProp(buffweapon, Prop_Send, "m_iItemDefinitionIndex") : -1);
+        int buffweapon = GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary);
+        int buffindex = (IsValidEntity(buffweapon) && buffweapon > MaxClients ? GetEntProp(buffweapon, Prop_Send, "m_iItemDefinitionIndex") : -1);
         if (buffindex == 226)
-        {
             CreateTimer(0.25, Timer_CheckBuffRage, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
-        }
         if (damage <= 160.0 && !(Special == VSHSpecial_CBS && inflictor != attacker) && (Special != VSHSpecial_Bunny || weapon == -1 || weapon == GetPlayerWeaponSlot(Hale, TFWeaponSlot_Melee)))
         {
             damage *= 3;
@@ -4948,11 +4931,11 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
     {
         if (attacker <= MaxClients)
         {
-            new wepindex = (IsValidEntity(weapon) && weapon > MaxClients ? GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex") : -1);
+            int wepindex = (IsValidEntity(weapon) && weapon > MaxClients ? GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex") : -1);
             if (inflictor == attacker || inflictor == weapon)
             {
-                new iFlags = GetEntityFlags(Hale);
-                new bChanged = false;
+                int iFlags = GetEntityFlags(Hale);
+                bool bChanged = false;
 
 #if defined _tf2attributes_included
                 if (!(damagetype & DMG_BLAST) && (iFlags & (FL_ONGROUND|FL_DUCKING)) == (FL_ONGROUND|FL_DUCKING))    //If Hale is ducking on the ground, it's harder to knock him back
@@ -4962,9 +4945,7 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                     bChanged = true;
                 }
                 else
-                {
                     TF2Attrib_RemoveByDefIndex(Hale, 252);
-                }
 #else
                 // Does not protect against sentries or FaN, but does against miniguns and rockets
                 if ((iFlags & (FL_ONGROUND|FL_DUCKING)) == (FL_ONGROUND|FL_DUCKING))
@@ -4973,11 +4954,9 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                     bChanged = true;
                 }
 #endif
-
                 if (damagecustom == TF_CUSTOM_BOOTS_STOMP)
                 {
                     damage = 1024.0;
-
                     return Plugin_Changed;
                 }
                 if (damagecustom == TF_CUSTOM_TELEFRAG) //if (!IsValidEntity(weapon) && (damagetype & DMG_CRUSH) == DMG_CRUSH && damage == 1000.0)    //THIS IS A TELEFRAG
@@ -4987,17 +4966,13 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                         damage = 1.0;
                         return Plugin_Changed;
                     }
-
                     damage = 9001.0; //(HaleHealth > 9001 ? 15.0:float(GetEntProp(Hale, Prop_Send, "m_iHealth")) + 90.0);
-
-                    new teleowner = FindTeleOwner(attacker);
-
+                    int teleowner = FindTeleOwner(attacker);
                     if (IsValidClient(teleowner) && teleowner != attacker)
                     {
                         Damage[teleowner] += 5401; //RoundFloat(9001.0 * 3 / 5);
                         PriorityCenterText(teleowner, true, "TELEFRAG ASSIST! Nice job setting up!");
                     }
-
                     PriorityCenterText(attacker, true, "TELEFRAG! You are a pro.");
                     PriorityCenterText(client, true, "TELEFRAG! Be careful around quantum tunneling devices!");
                     return Plugin_Changed;
@@ -5006,8 +4981,7 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                 {
                     case 593:       //Third Degree
                     {
-                        new healers[TF_MAX_PLAYERS];
-                        new healercount = 0;
+                        int healers[TF_MAX_PLAYERS], healercount = 0;
                         for (new i = 1; i <= MaxClients; i++)
                         {
                             if (IsClientInGame(i) && IsPlayerAlive(i) && (GetHealingTarget(i) == attacker))
@@ -5016,21 +4990,22 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                                 healercount++;
                             }
                         }
-                        for (new i = 0; i < healercount; i++)
+                        for (int i = 0; i < healercount; i++)
                         {
                             if (IsValidClient(healers[i]) && IsPlayerAlive(healers[i]))
                             {
-                                new medigun = GetPlayerWeaponSlot(healers[i], TFWeaponSlot_Secondary);
+                                int medigun = GetPlayerWeaponSlot(healers[i], TFWeaponSlot_Secondary);
                                 if (IsValidEntity(medigun))
                                 {
-                                    new String:s[64];
+                                    char s[64];
                                     GetEdictClassname(medigun, s, sizeof(s));
                                     if (strcmp(s, "tf_weapon_medigun", false) == 0)
                                     {
-                                        new Float:uber = GetEntPropFloat(medigun, Prop_Send, "m_flChargeLevel") + (0.1 / healercount);
-                                        new Float:max = 1.0;
-                                        if (GetEntProp(medigun, Prop_Send, "m_bChargeRelease")) max = 1.5;
-                                        if (uber > max) uber = max;
+                                        float uber = GetEntPropFloat(medigun, Prop_Send, "m_flChargeLevel") + (0.1 / healercount), max = 1.0;
+                                        if (GetEntProp(medigun, Prop_Send, "m_bChargeRelease"))
+                                            max = 1.5;
+                                        if (uber > max)
+                                            uber = max;
                                         SetEntPropFloat(medigun, Prop_Send, "m_flChargeLevel", uber);
                                     }
                                 }
@@ -5045,51 +5020,52 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                             {
                                 if (VSHRoundState != VSHRState_End)
                                 {
-                                    new Float:chargelevel = (IsValidEntity(weapon) && weapon > MaxClients ? GetEntPropFloat(weapon, Prop_Send, "m_flChargedDamage") : 0.0);
-                                    new Float:time = (GlowTimer > 10 ? 1.0 : 2.0);
+                                    float chargelevel = (IsValidEntity(weapon) && weapon > MaxClients ? GetEntPropFloat(weapon, Prop_Send, "m_flChargedDamage") : 0.0), time = (GlowTimer > 10 ? 1.0 : 2.0);
                                     time += (GlowTimer > 10 ? (GlowTimer > 20 ? 1 : 2) : 4)*(chargelevel/100);
                                     SetEntProp(client, Prop_Send, "m_bGlowEnabled", 1);
                                     GlowTimer += RoundToCeil(time);
-                                    if (GlowTimer > 30.0) GlowTimer = 30.0;
+                                    if (GlowTimer > 30.0)
+                                        GlowTimer = 30.0;
                                 }
                             }
                         }
                         if (wepindex == 752 && VSHRoundState != VSHRState_End)
                         {
-                            new Float:chargelevel = (IsValidEntity(weapon) && weapon > MaxClients ? GetEntPropFloat(weapon, Prop_Send, "m_flChargedDamage") : 0.0);
-                            new Float:add = 10 + (chargelevel / 10);
-                            if (TF2_IsPlayerInCondition(attacker, TFCond:46)) add /= 3;
-                            new Float:rage = GetEntPropFloat(attacker, Prop_Send, "m_flRageMeter");
+                            float chargelevel = (IsValidEntity(weapon) && weapon > MaxClients ? GetEntPropFloat(weapon, Prop_Send, "m_flChargedDamage") : 0.0);
+                            float add = 10 + (chargelevel / 10);
+                            if (TF2_IsPlayerInCondition(attacker, view_as<TFCond>(46)))
+                                add /= 3;
+                            float rage = GetEntPropFloat(attacker, Prop_Send, "m_flRageMeter");
                             SetEntPropFloat(attacker, Prop_Send, "m_flRageMeter", (rage + add > 100) ? 100.0 : rage + add);
                         }
                         if (!(damagetype & DMG_CRIT))
                         {
-                            new bool:ministatus = (TF2_IsPlayerInCondition(attacker, TFCond_CritCola) || TF2_IsPlayerInCondition(attacker, TFCond_Buffed) || TF2_IsPlayerInCondition(attacker, TFCond_CritHype));
-
+                            bool ministatus = (TF2_IsPlayerInCondition(attacker, TFCond_CritCola) || TF2_IsPlayerInCondition(attacker, TFCond_Buffed) || TF2_IsPlayerInCondition(attacker, TFCond_CritHype));
                             damage *= (ministatus) ? 2.222222 : 3.0;
-
                             if (wepindex == 230)
                             {
                                 HaleRage -= RoundFloat(damage/2.0);
-                                if (HaleRage < 0) HaleRage = 0;
+                                if (HaleRage < 0)
+                                    HaleRage = 0;
                             }
-
                             return Plugin_Changed;
                         }
                         else if (wepindex == 230)
                         {
                             HaleRage -= RoundFloat(damage*3.0/2.0);
-                            if (HaleRage < 0) HaleRage = 0;
+                            if (HaleRage < 0)
+                                HaleRage = 0;
                         }
                     }
                     case 355:
                     {
-                        new Float:rage = 0.05*RageDMG;
+                        float rage = 0.05*RageDMG;
                         HaleRage -= RoundToFloor(rage);
                         if (HaleRage < 0)
                             HaleRage = 0;
                     }
-                    case 132, 266, 482, 1082: IncrementHeadCount(attacker);
+                    case 132, 266, 482, 1082:
+                        IncrementHeadCount(attacker);
                     case 416:   // Chdata's Market Gardener backstab
                     {
                         if (RemoveCond(attacker, TFCond_BlastJumping)) // New way to check explosive jumping status
@@ -5098,29 +5074,20 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                             // {
                             //     TF2_RemoveCondition(attacker, TFCond_BlastJumping);   // Prevent HHH from being market gardened more than once in midair during a teleport
                             // }
-
                             damage = (Pow(float(HaleHealthMax), (0.74074)) + 512.0 - (g_flMarketed/128.0*float(HaleHealthMax)) )/3.0;    //divide by 3 because this is basedamage and lolcrits (0.714286)) + 1024.0)
                             damagetype |= DMG_CRIT;
-
                             if (RemoveCond(attacker, TFCond_Parachute))   // If you parachuted to do this, remove your parachute.
-                            {
                                 damage *= 0.67;                       //  And nerf your damage
-                            }
-
                             if (g_flMarketed < 5.0)
-                            {
                                 g_flMarketed++;
-                            }
-
                             PriorityCenterText(attacker, true, "You market gardened him!");
                             PriorityCenterText(client, true, "You were just market gardened!");
-
                             EmitSoundToAll("player/doubledonk.wav", attacker);
-
                             return Plugin_Changed;
                         }
                     }
-                    case 317: SpawnSmallHealthPackAt(client, GetEntityTeamNum(attacker));
+                    case 317:
+                        SpawnSmallHealthPackAt(client, GetEntityTeamNum(attacker));
                     case 214: // Powerjack
                     {
                         AddPlayerHealth(attacker, 25, 50);
@@ -5140,7 +5107,6 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                         SetEntProp(weapon, Prop_Send, "m_bIsBloody", 1);
                         if (GetEntProp(attacker, Prop_Send, "m_iKillCountSinceLastDeploy") < 1)
                             SetEntProp(attacker, Prop_Send, "m_iKillCountSinceLastDeploy", 1);
-
                         AddPlayerHealth(attacker, 35, 25);
                         RemoveCond(attacker, TFCond_OnFire);
                     }
@@ -5154,8 +5120,7 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                     }
                     case 525, 595:
                     {
-                        new iCrits = GetEntProp(attacker, Prop_Send, "m_iRevengeCrits");
-
+                        int iCrits = GetEntProp(attacker, Prop_Send, "m_iRevengeCrits");
                         if (iCrits > 0) //If a revenge crit was used, give a damage bonus
                         {
                             damage = 85.0;
@@ -5200,30 +5165,7 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                             HaleRage = RageDMG;
                     }
                 }*/
-                static bool:foundDmgCustom = false;
-                static bool:dmgCustomInOTD = false;
-                if (!foundDmgCustom)
-                {
-                    dmgCustomInOTD = (GetFeatureStatus(FeatureType_Capability, "SDKHook_DmgCustomInOTD") == FeatureStatus_Available);
-                    foundDmgCustom = true;
-                }
-                new bool:bIsBackstab = false;
-                if (dmgCustomInOTD) // new way to check backstabs
-                {
-                    if (damagecustom == TF_CUSTOM_BACKSTAB)
-                    {
-                        bIsBackstab = true;
-                    }
-                }
-                else if (weapon != 4095 && IsValidEdict(weapon) && weapon == GetPlayerWeaponSlot(attacker, TFWeaponSlot_Melee) && damage > 1000.0)  //lousy way of checking backstabs
-                {
-                    decl String:wepclassname[32];
-                    if (GetEdictClassname(weapon, wepclassname, sizeof(wepclassname)) && strcmp(wepclassname, "tf_weapon_knife", false) == 0)   //more robust knife check
-                    {
-                        bIsBackstab = true;
-                    }
-                }
-                if (bIsBackstab)
+                if (dmgcustom == TF_CUSTOM_BACKSTAB) //Should always be here with SM 1.7
                 {
                     /*
                      Rebalanced backstab formula.
@@ -5233,12 +5175,10 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                      Weaker against high HP Hale (but still good).
 
                     */
-                    new Float:changedamage = ( (Pow(float(HaleHealthMax)*0.0014, 2.0) + 899.0) - (float(HaleHealthMax)*(g_flStabbed/100.0)) );
+                    float changedamage = ( (Pow(float(HaleHealthMax)*0.0014, 2.0) + 899.0) - (float(HaleHealthMax)*(g_flStabbed/100.0)) );
                     //new iChangeDamage = RoundFloat(changedamage);
-
                     damage = changedamage/3;            // You can level "damage dealt" with backstabs
                     damagetype |= DMG_CRIT;
-
                     /*Damage[attacker] += iChangeDamage;
                     if (HaleHealth > iChangeDamage) damage = 0.0;
                     else damage = changedamage;
@@ -5253,44 +5193,35 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                     SetEntPropFloat(weapon, Prop_Send, "m_flNextPrimaryAttack", GetGameTime() + 2.0);
                     SetEntPropFloat(attacker, Prop_Send, "m_flNextAttack", GetGameTime() + 2.0);
                     SetEntPropFloat(attacker, Prop_Send, "m_flStealthNextChangeTime", GetGameTime() + 2.0);
-                    new vm = GetEntPropEnt(attacker, Prop_Send, "m_hViewModel");
+                    int vm = GetEntPropEnt(attacker, Prop_Send, "m_hViewModel");
                     if (vm > MaxClients && IsValidEntity(vm) && TF2_GetPlayerClass(attacker) == TFClass_Spy)
                     {
-                        new melee = GetIndexOfWeaponSlot(attacker, TFWeaponSlot_Melee);
-                        new anim = 15;
+                        int melee = GetIndexOfWeaponSlot(attacker, TFWeaponSlot_Melee), anim = 15;
                         switch (melee)
                         {
-                            case 727: anim = 41;
-                            case 4, 194, 665, 794, 803, 883, 892, 901, 910: anim = 10;
-                            case 638: anim = 31;
+                            case 727:
+                                anim = 41;
+                            case 4, 194, 665, 794, 803, 883, 892, 901, 910:
+                                anim = 10;
+                            case 638:
+                                anim = 31;
                         }
                         SetEntProp(vm, Prop_Send, "m_nSequence", anim);
                     }
                     PriorityCenterText(attacker, true, "You backstabbed him!");
                     PriorityCenterText(client, true, "You were just backstabbed!");
-
-                    new pistol = GetIndexOfWeaponSlot(attacker, TFWeaponSlot_Primary);
-
+                    int pistol = GetIndexOfWeaponSlot(attacker, TFWeaponSlot_Primary);
                     if (pistol == 525) //Diamondback gives 3 crits on backstab
-                    {
-                        new iCrits = GetEntProp(attacker, Prop_Send, "m_iRevengeCrits");
-                        SetEntProp(attacker, Prop_Send, "m_iRevengeCrits", iCrits+2);
-                    }
-
+                        SetEntProp(attacker, Prop_Send, "m_iRevengeCrits", GetEntProp(attacker, Prop_Send, "m_iRevengeCrits")+2);
                     /*if (wepindex == 225 || wepindex == 574)
                     {
                         CreateTimer(0.3, Timer_DisguiseBackstab, GetClientUserId(attacker));
                     }*/
-
                     if (wepindex == 356) // Kunai
-                    {
                         AddPlayerHealth(attacker, 180, 270, true);
-                    }
                     if (wepindex == 461) // Big Earner gives full cloak on backstab
-                    {
                         SetEntPropFloat(attacker, Prop_Send, "m_flCloakMeter", 100.0);
-                    }
-                    decl String:s[PLATFORM_MAX_PATH];
+                    char s[PLATFORM_MAX_PATH];
                     switch (Special)
                     {
                         case VSHSpecial_Hale:
@@ -5341,11 +5272,8 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                     }*/
                     return Plugin_Changed;
                 }
-
                 if (bChanged)
-                {
                     return Plugin_Changed;
-                }
             }
             if (TF2_GetPlayerClass(attacker) == TFClass_Scout)
             {
@@ -5358,7 +5286,7 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
         }
         else
         {
-            decl String:s[64];
+            char s[64];
             if (GetEdictClassname(attacker, s, sizeof(s)) && strcmp(s, "trigger_hurt", false) == 0) // && damage >= 250)
             {
                 if (bSpawnTeleOnTriggerHurt)
