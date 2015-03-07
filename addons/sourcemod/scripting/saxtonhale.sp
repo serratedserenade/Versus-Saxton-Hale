@@ -4237,11 +4237,11 @@ public Action UseRage(Handle hTimer, any dist)
             distance = GetVectorDistance(pos, pos2);
             if (!TF2_IsPlayerInCondition(i, TFCond_Ubercharged) && distance < dist)
             {
-                new flags = TF_STUNFLAGS_GHOSTSCARE;
+                int flags = TF_STUNFLAGS_GHOSTSCARE;
                 if (Special != VSHSpecial_HHH)
                 {
                     flags |= TF_STUNFLAG_NOSOUNDOREFFECT;
-                    AttachParticle(i, "yikes_fx", 5.0, Float:{0.0,0.0,75.0}, true);
+                    AttachParticle(i, "yikes_fx", 5.0, {0.0,0.0,75.0}, true);
                 }
                 if (VSHRoundState != VSHRState_Waiting)
                     TF2_StunPlayer(i, 5.0, _, flags, (Special == VSHSpecial_HHH ? 0 : Hale));
@@ -4258,7 +4258,7 @@ public Action UseRage(Handle hTimer, any dist)
         if (distance < dist)    //(!mode && (distance < RageDist)) || (mode && (distance < RageDist/2)))
         {
             SetEntProp(i, Prop_Send, "m_bDisabled", 1);
-            AttachParticle(i, "yikes_fx", 3.0, Float:{0.0,0.0,75.0}, true);
+            AttachParticle(i, "yikes_fx", 3.0, {0.0,0.0,75.0}, true);
             if (newRageSentry)
             {
                 SetVariantInt(GetEntProp(i, Prop_Send, "m_iHealth")/2);
@@ -4348,7 +4348,7 @@ public Action UseBowRage(Handle hTimer)
 
 public Action event_player_death(Event event, const char[] name, bool dontBroadcast)
 {
-    decl String:s[PLATFORM_MAX_PATH];
+    char s[PLATFORM_MAX_PATH];
     if (!g_bEnabled)
         return Plugin_Continue;
     int client = GetClientOfUserId(event.GetInt("userid"));
@@ -4418,36 +4418,50 @@ public Action event_player_death(Event event, const char[] name, bool dontBroadc
         {
             case VSHSpecial_Hale:
             {
-                if (customkill != TF_CUSTOM_BOOTS_STOMP) SetEventString(event, "weapon", "fists");
+                if (customkill != TF_CUSTOM_BOOTS_STOMP)
+                    event.SetString("weapon", "fists");
                 if (!GetRandomInt(0, 2) && RedAlivePlayers != 1)
                 {
                     strcopy(s, PLATFORM_MAX_PATH, "");
-                    new TFClassType:playerclass = TF2_GetPlayerClass(client);
+                    TFClassType playerclass = TF2_GetPlayerClass(client);
                     switch (playerclass)
                     {
-                        case TFClass_Scout:     strcopy(s, PLATFORM_MAX_PATH, HaleKillScout132);
-                        case TFClass_Pyro:      strcopy(s, PLATFORM_MAX_PATH, HaleKillPyro132);
-                        case TFClass_DemoMan:   strcopy(s, PLATFORM_MAX_PATH, HaleKillDemo132);
-                        case TFClass_Heavy:     strcopy(s, PLATFORM_MAX_PATH, HaleKillHeavy132);
-                        case TFClass_Medic:     strcopy(s, PLATFORM_MAX_PATH, HaleKillMedic);
+                        case TFClass_Scout:
+                            strcopy(s, PLATFORM_MAX_PATH, HaleKillScout132);
+                        case TFClass_Pyro:
+                            strcopy(s, PLATFORM_MAX_PATH, HaleKillPyro132);
+                        case TFClass_DemoMan:
+                            strcopy(s, PLATFORM_MAX_PATH, HaleKillDemo132);
+                        case TFClass_Heavy:
+                            strcopy(s, PLATFORM_MAX_PATH, HaleKillHeavy132);
+                        case TFClass_Medic:
+                            strcopy(s, PLATFORM_MAX_PATH, HaleKillMedic);
                         case TFClass_Sniper:
                         {
-                            if (GetRandomInt(0, 1)) strcopy(s, PLATFORM_MAX_PATH, HaleKillSniper1);
-                            else strcopy(s, PLATFORM_MAX_PATH, HaleKillSniper2);
+                            if (GetRandomInt(0, 1))
+                                strcopy(s, PLATFORM_MAX_PATH, HaleKillSniper1);
+                            else
+                                strcopy(s, PLATFORM_MAX_PATH, HaleKillSniper2);
                         }
                         case TFClass_Spy:
                         {
-                            new see = GetRandomInt(0, 2);
-                            if (!see) strcopy(s, PLATFORM_MAX_PATH, HaleKillSpy1);
-                            else if (see == 1) strcopy(s, PLATFORM_MAX_PATH, HaleKillSpy2);
-                            else strcopy(s, PLATFORM_MAX_PATH, HaleKillSpy132);
+                            int see = GetRandomInt(0, 2);
+                            if (!see)
+                                strcopy(s, PLATFORM_MAX_PATH, HaleKillSpy1);
+                            else if (see == 1)
+                                strcopy(s, PLATFORM_MAX_PATH, HaleKillSpy2);
+                            else
+                                strcopy(s, PLATFORM_MAX_PATH, HaleKillSpy132);
                         }
                         case TFClass_Engineer:
                         {
-                            new see = GetRandomInt(0, 3);
-                            if (!see) strcopy(s, PLATFORM_MAX_PATH, HaleKillEngie1);
-                            else if (see == 1) strcopy(s, PLATFORM_MAX_PATH, HaleKillEngie2);
-                            else Format(s, PLATFORM_MAX_PATH, "%s%i.wav", HaleKillEngie132, GetRandomInt(1, 2));
+                            int see = GetRandomInt(0, 3);
+                            if (!see)
+                                strcopy(s, PLATFORM_MAX_PATH, HaleKillEngie1);
+                            else if (see == 1)
+                                strcopy(s, PLATFORM_MAX_PATH, HaleKillEngie2);
+                            else
+                                Format(s, PLATFORM_MAX_PATH, "%s%i.wav", HaleKillEngie132, GetRandomInt(1, 2));
                         }
                     }
                     if (!StrEqual(s, ""))
@@ -4480,7 +4494,7 @@ public Action event_player_death(Event event, const char[] name, bool dontBroadc
             {
                 if (!GetRandomInt(0, 3) && RedAlivePlayers != 1)
                 {
-                    new TFClassType:playerclass = TF2_GetPlayerClass(client);
+                    TFClassType playerclass = TF2_GetPlayerClass(client);
                     switch (playerclass)
                     {
                         case TFClass_Spy:
@@ -4491,17 +4505,21 @@ public Action event_player_death(Event event, const char[] name, bool dontBroadc
                         }
                     }
                 }
-                new weapon = GetEntPropEnt(Hale, Prop_Send, "m_hActiveWeapon");
+                int weapon = GetEntPropEnt(Hale, Prop_Send, "m_hActiveWeapon");
                 if (weapon == GetPlayerWeaponSlot(Hale, TFWeaponSlot_Melee))
                 {
                     TF2_RemoveWeaponSlot(Hale, TFWeaponSlot_Melee);
-                    new clubindex, wepswitch = GetRandomInt(0, 3);
+                    int clubindex, wepswitch = GetRandomInt(0, 3);
                     switch (wepswitch)
                     {
-                        case 0: clubindex = 171;
-                        case 1: clubindex = 3;
-                        case 2: clubindex = 232;
-                        case 3: clubindex = 401;
+                        case 0:
+                            clubindex = 171;
+                        case 1:
+                            clubindex = 3;
+                        case 2:
+                            clubindex = 232;
+                        case 3:
+                            clubindex = 401;
                     }
                     weapon = SpawnWeapon(Hale, "tf_weapon_club", clubindex, 100, 5, "68 ; 2.0 ; 2 ; 3.1 ; 259 ; 1.0");
                     SetEntPropEnt(Hale, Prop_Send, "m_hActiveWeapon", weapon);
@@ -4519,7 +4537,7 @@ public Action event_player_death(Event event, const char[] name, bool dontBroadc
             {
                 case VSHSpecial_Hale:
                 {
-                    new see = GetRandomInt(0, 7);
+                    int see = GetRandomInt(0, 7);
                     if (!see || see == 1)
                         strcopy(s, PLATFORM_MAX_PATH, HaleKSpree);
                     else if (see < 5)
@@ -4536,7 +4554,8 @@ public Action event_player_death(Event event, const char[] name, bool dontBroadc
                     else
                         Format(s, PLATFORM_MAX_PATH, "%s%i.wav", VagineerKSpreeNew, GetRandomInt(1, 5));
                 }
-                case VSHSpecial_HHH: Format(s, PLATFORM_MAX_PATH, "%s0%i.wav", HHHLaught, GetRandomInt(1, 4));
+                case VSHSpecial_HHH:
+                    Format(s, PLATFORM_MAX_PATH, "%s0%i.wav", HHHLaught, GetRandomInt(1, 4));
                 case VSHSpecial_CBS:
                 {
                     if (!GetRandomInt(0, 3))
@@ -4548,9 +4567,7 @@ public Action event_player_death(Event event, const char[] name, bool dontBroadc
                     EmitSoundToAllExcept(SOUNDEXCEPT_VOICE, s, _, _, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, _, NULL_VECTOR, NULL_VECTOR, false, 0.0);
                 }
                 case VSHSpecial_Bunny:
-                {
                     strcopy(s, PLATFORM_MAX_PATH, BunnySpree[GetRandomInt(0, sizeof(BunnySpree)-1)]);
-                }
             }
             EmitSoundToAllExcept(SOUNDEXCEPT_VOICE, s, _, SNDCHAN_VOICE, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, Hale, NULL_VECTOR, NULL_VECTOR, false, 0.0);
             EmitSoundToAllExcept(SOUNDEXCEPT_VOICE, s, _, SNDCHAN_ITEM, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, Hale, NULL_VECTOR, NULL_VECTOR, false, 0.0);
@@ -4561,7 +4578,7 @@ public Action event_player_death(Event event, const char[] name, bool dontBroadc
     }
     if ((TF2_GetPlayerClass(client) == TFClass_Engineer) && !(deathflags & TF_DEATHFLAG_DEADRINGER))
     {
-        new ent = -1;
+        int ent = -1;
         while ((ent = FindEntityByClassname2(ent, "obj_sentrygun")) != -1)
         {
             if (GetEntPropEnt(ent, Prop_Send, "m_hBuilder") == client)
@@ -4573,24 +4590,23 @@ public Action event_player_death(Event event, const char[] name, bool dontBroadc
     }
     return Plugin_Continue;
 }
-stock SpawnManyAmmoPacks(client, String:model[], skin=0, num=14, Float:offsz = 30.0)
+
+stock void SpawnManyAmmoPacks(int client, char[] model, int skin=0, int num=14, float offsz = 30.0)
 {
 //  if (hSetAmmoVelocity == INVALID_HANDLE) return;
-    decl Float:pos[3], Float:vel[3], Float:ang[3];
-    ang[0] = 90.0;
-    ang[1] = 0.0;
-    ang[2] = 0.0;
+    float pos[3], vel[3], ang[3] = {90.0, 0.0, 0.0};
     GetClientAbsOrigin(client, pos);
     pos[2] += offsz;
-    for (new i = 0; i < num; i++)
+    for (int i = 0; i < num; i++)
     {
         vel[0] = GetRandomFloat(-400.0, 400.0);
         vel[1] = GetRandomFloat(-400.0, 400.0);
         vel[2] = GetRandomFloat(300.0, 500.0);
         pos[0] += GetRandomFloat(-5.0, 5.0);
         pos[1] += GetRandomFloat(-5.0, 5.0);
-        new ent = CreateEntityByName("tf_ammo_pack");
-        if (!IsValidEntity(ent)) continue;
+        int ent = CreateEntityByName("tf_ammo_pack");
+        if (!IsValidEntity(ent))
+            continue;
         SetEntityModel(ent, model);
         DispatchKeyValue(ent, "OnPlayerTouch", "!self,Kill,,0,-1"); //for safety, but it shouldn't act like a normal ammopack
         SetEntProp(ent, Prop_Send, "m_nSkin", skin);
@@ -4608,7 +4624,7 @@ stock SpawnManyAmmoPacks(client, String:model[], skin=0, num=14, Float:offsz = 3
         TeleportEntity(ent, pos, ang, vel);
 //      SDKCall(hSetAmmoVelocity, ent, vel);
         SetEntProp(ent, Prop_Data, "m_iHealth", 900);
-        new offs = GetEntSendPropOffs(ent, "m_vecInitialVelocity", true);
+        int offs = GetEntSendPropOffs(ent, "m_vecInitialVelocity", true);
         SetEntData(ent, offs-4, 1, _, true);    //Sets to crit candy, offs-8 sets crit candy duration (is a float, 3*float = duration)
         //1358 is offs-14, that byte is for being a sandwich with +50hp, +75 for scouts. The byte after that, 1359, is to... not give the health? I don't know.
 /*      SetEntData(ent, offs-13, 0, 1, true);
@@ -4624,13 +4640,15 @@ stock SpawnManyAmmoPacks(client, String:model[], skin=0, num=14, Float:offsz = 3
         */
     }
 }
-public Action:Timer_Damage(Handle:hTimer, any:id)
+
+public Action Timer_Damage(Handle hTimer, any id)
 {
-    new client = GetClientOfUserId(id);
+    int client = GetClientOfUserId(id);
     if (IsValidClient(client)) // IsValidClient(client, false)
         CPrintToChat(client, "{olive}[VSH] %t. %t %i{default}", "vsh_damage", Damage[client], "vsh_scores", RoundFloat(Damage[client] / 600.0));
     return Plugin_Continue;
 }
+
 /*public Action:Timer_DissolveRagdoll(Handle:timer, any:userid)
 {
     new victim = GetClientOfUserId(userid);
@@ -4640,6 +4658,7 @@ public Action:Timer_Damage(Handle:hTimer, any:id)
         DissolveRagdoll(ragdoll);
     }
 }
+
 DissolveRagdoll(ragdoll)
 {
     new dissolver = CreateEntityByName("env_entity_dissolver");
@@ -4654,8 +4673,9 @@ DissolveRagdoll(ragdoll)
     AcceptEntityInput(dissolver, "Dissolve", ragdoll);
     AcceptEntityInput(dissolver, "Kill");
     return;
-}*/
-/*public Action:Timer_ChangeRagdoll(Handle:timer, any:userid)
+}
+
+public Action:Timer_ChangeRagdoll(Handle:timer, any:userid)
 {
     new victim = GetClientOfUserId(userid);
     new ragdoll;
@@ -4673,69 +4693,75 @@ DissolveRagdoll(ragdoll)
         }
     }
 }*/
-public Action:event_deflect(Handle:event, const String:name[], bool:dontBroadcast)
+
+public Action event_deflect(Event event, const char[] name, bool dontBroadcast)
 {
-    if (!g_bEnabled) return Plugin_Continue;
-    new deflector = GetClientOfUserId(GetEventInt(event, "userid"));
-    new owner = GetClientOfUserId(GetEventInt(event, "ownerid"));
-    new weaponid = GetEventInt(event, "weaponid");
-    if (owner != Hale) return Plugin_Continue;
-    if (weaponid != 0) return Plugin_Continue;
-    new Float:rage = 0.04*RageDMG;
+    if (!g_bEnabled)
+        return Plugin_Continue;
+    int deflector = GetClientOfUserId(event.GetInt("userid")), owner = GetClientOfUserId(event.GetInt("ownerid")), weaponid = event.GetInt("weaponid");
+    if (owner != Hale)
+        return Plugin_Continue;
+    if (weaponid != 0)
+        return Plugin_Continue;
+    float rage = 0.04*RageDMG;
     HaleRage += RoundToCeil(rage);
     if (HaleRage > RageDMG)
         HaleRage = RageDMG;
-    if (Special != VSHSpecial_Vagineer) return Plugin_Continue;
-    if (!TF2_IsPlayerInCondition(owner, TFCond_Ubercharged)) return Plugin_Continue;
-    if (UberRageCount > 11) UberRageCount -= 10;
-    new newammo = GetAmmo(deflector, 0) - 5;
+    if (Special != VSHSpecial_Vagineer)
+        return Plugin_Continue;
+    if (!TF2_IsPlayerInCondition(owner, TFCond_Ubercharged))
+        return Plugin_Continue;
+    if (UberRageCount > 11)
+        UberRageCount -= 10;
+    int newammo = GetAmmo(deflector, 0) - 5;
     SetAmmo(deflector, 0, newammo <= 0 ? 0 : newammo);
     return Plugin_Continue;
 }
-public Action:event_jarate(UserMsg:msg_id, Handle:bf, const players[], playersNum, bool:reliable, bool:init)
+
+public Action event_jarate(UserMsg msg_id, BfRead bf, const int[] players, int playersNum, bool reliable, bool init)
 {
-    new client = BfReadByte(bf);
-    new victim = BfReadByte(bf);
-    if (victim != Hale) return Plugin_Continue;
-    new jar = GetPlayerWeaponSlot(client, 1);
-
-    new jindex = GetEntProp(jar, Prop_Send, "m_iItemDefinitionIndex");
-
+    int client = bf.ReadByte(), victim = bf.ReadByte();
+    if (victim != Hale)
+        return Plugin_Continue;
+    int jar = GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary);
+    int jindex = GetEntProp(jar, Prop_Send, "m_iItemDefinitionIndex");
     if (jar != -1 && (jindex == 58 || jindex == 1083 || jindex == 1105) && GetEntProp(jar, Prop_Send, "m_iEntityLevel") != -122)    //-122 is the Jar of Ants and should not be used in this
     {
-        new Float:rage = 0.08*RageDMG;
+        float rage = 0.08*RageDMG;
         HaleRage -= RoundToFloor(rage);
         if (HaleRage < 0)
             HaleRage = 0;
         if (Special == VSHSpecial_Vagineer && TF2_IsPlayerInCondition(victim, TFCond_Ubercharged) && UberRageCount < 99)
         {
             UberRageCount += 7.0;
-            if (UberRageCount > 99) UberRageCount = 99.0;
+            if (UberRageCount > 99)
+                UberRageCount = 99.0;
         }
-        new ammo = GetAmmo(Hale, 0);
-        if (Special == VSHSpecial_CBS && ammo > 0) SetAmmo(Hale, 0, ammo - 1);
+        int ammo = GetAmmo(Hale, 0);
+        if (Special == VSHSpecial_CBS && ammo > 0)
+            SetAmmo(Hale, 0, ammo - 1);
     }
     return Plugin_Continue;
 }
-public Action:CheckAlivePlayers(Handle:hTimer)
+
+public Action CheckAlivePlayers(Handle hTimer)
 {
     if (VSHRoundState != VSHRState_Active) //(VSHRoundState == VSHRState_End || VSHRoundState == VSHRState_Disabled)
-    {
         return Plugin_Continue;
-    }
     RedAlivePlayers = 0;
-    for (new i = 1; i <= MaxClients; i++)
+    for (int i = 1; i <= MaxClients; i++)
     {
         if (IsClientInGame(i) && IsPlayerAlive(i) && (GetEntityTeamNum(i) == OtherTeam))
             RedAlivePlayers++;
     }
-    if (Special == VSHSpecial_CBS && GetAmmo(Hale, 0) > RedAlivePlayers && RedAlivePlayers != 0) SetAmmo(Hale, 0, RedAlivePlayers);
+    if (Special == VSHSpecial_CBS && GetAmmo(Hale, 0) > RedAlivePlayers && RedAlivePlayers != 0)
+        SetAmmo(Hale, 0, RedAlivePlayers);
     if (RedAlivePlayers == 0)
         ForceTeamWin(HaleTeam);
     else if (RedAlivePlayers == 1 && IsValidClient(Hale) && VSHRoundState == VSHRState_Active)
     {
-        decl Float:pos[3];
-        decl String:s[PLATFORM_MAX_PATH];
+        float pos[3];
+        char s[PLATFORM_MAX_PATH];
         GetEntPropVector(Hale, Prop_Send, "m_vecOrigin", pos);
         if (Special != VSHSpecial_HHH)
         {
@@ -4744,9 +4770,7 @@ public Action:CheckAlivePlayers(Handle:hTimer)
                 if (!GetRandomInt(0, 2))
                     Format(s, PLATFORM_MAX_PATH, "%s", CBS0);
                 else
-                {
                     Format(s, PLATFORM_MAX_PATH, "%s%02i.wav", CBS4, GetRandomInt(1, 25));
-                }
                 EmitSoundToAll(s, _, SNDCHAN_VOICE, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, _, pos, NULL_VECTOR, false, 0.0);
             }
             else if (Special == VSHSpecial_Bunny)
@@ -4755,27 +4779,31 @@ public Action:CheckAlivePlayers(Handle:hTimer)
                 strcopy(s, PLATFORM_MAX_PATH, VagineerLastA);
             else
             {
-                new see = GetRandomInt(0, 5);
+                int see = GetRandomInt(0, 5);
                 switch (see)
                 {
-                    case 0: strcopy(s, PLATFORM_MAX_PATH, HaleComicArmsFallSound);
-                    case 1: Format(s, PLATFORM_MAX_PATH, "%s0%i.wav", HaleLastB, GetRandomInt(1, 4));
-                    case 2: strcopy(s, PLATFORM_MAX_PATH, HaleKillLast132);
-                    default: Format(s, PLATFORM_MAX_PATH, "%s%i.wav", HaleLastMan, GetRandomInt(1, 5));
+                    case 0:
+                        strcopy(s, PLATFORM_MAX_PATH, HaleComicArmsFallSound);
+                    case 1:
+                        Format(s, PLATFORM_MAX_PATH, "%s0%i.wav", HaleLastB, GetRandomInt(1, 4));
+                    case 2:
+                        strcopy(s, PLATFORM_MAX_PATH, HaleKillLast132);
+                    default:
+                        Format(s, PLATFORM_MAX_PATH, "%s%i.wav", HaleLastMan, GetRandomInt(1, 5));
                 }
             }
             EmitSoundToAll(s, _, SNDCHAN_VOICE, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, Hale, pos, NULL_VECTOR, false, 0.0);
             EmitSoundToAll(s, _, SNDCHAN_ITEM, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, Hale, pos, NULL_VECTOR, false, 0.0);
         }
     }
-
     if (!PointType && (RedAlivePlayers <= (AliveToEnable = GetConVarInt(cvarAliveToEnable))) && !PointReady)
     {
         PrintHintTextToAll("%t", "vsh_point_enable", RedAlivePlayers);
-        if (RedAlivePlayers == AliveToEnable) EmitSoundToAll("vo/announcer_am_capenabled02.wav");
+        if (RedAlivePlayers == AliveToEnable)
+            EmitSoundToAll("vo/announcer_am_capenabled02.wav");
         else if (RedAlivePlayers < AliveToEnable)
         {
-            decl String:s[PLATFORM_MAX_PATH];
+            char s[PLATFORM_MAX_PATH];
             Format(s, PLATFORM_MAX_PATH, "vo/announcer_am_capincite0%i.wav", GetRandomInt(0, 1) ? 1 : 3);
             EmitSoundToAll(s);
         }
@@ -4784,7 +4812,8 @@ public Action:CheckAlivePlayers(Handle:hTimer)
     }
     return Plugin_Continue;
 }
-public Action:event_hurt(Handle:event, const String:name[], bool:dontBroadcast)
+
+public Action event_hurt(Event event, const char[] name, bool dontBroadcast)
 {
     if (!g_bEnabled)
         return Plugin_Continue;
