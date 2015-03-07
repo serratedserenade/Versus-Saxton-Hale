@@ -6860,7 +6860,7 @@ public int VoiceTogglePanelH(Menu menu, MenuAction action, int param1, int param
     return 0;
 }
 
-public Action:HookSound(clients[64], &numClients, String:sample[PLATFORM_MAX_PATH], &entity, &channel, &Float:volume, &level, &pitch, &flags)
+public Action HookSound(int clients[64], int &numClients, char sample[], int &entity, int &channel, float &volume, int &level, int &pitch, int &flags)
 {
     if (!g_bEnabled || ((entity != Hale) && ((entity <= 0) || !IsValidClient(Hale) || (entity != GetPlayerWeaponSlot(Hale, 0)))))
         return Plugin_Continue;
@@ -6906,23 +6906,24 @@ public Action:HookSound(clients[64], &numClients, String:sample[PLATFORM_MAX_PAT
     return Plugin_Continue;
 }
 
-public OnEntityCreated(entity, const String:classname[])
+public void OnEntityCreated(int entity, const char[] classname)
 {
     if (g_bEnabled && VSHRoundState == VSHRState_Active && strcmp(classname, "tf_projectile_pipe", false) == 0)
         SDKHook(entity, SDKHook_SpawnPost, OnEggBombSpawned);
 }
-public OnEggBombSpawned(entity)
+public OnEggBombSpawned(int entity)
 {
-    new owner = GetEntPropEnt(entity, Prop_Send, "m_hOwnerEntity");
+    int owner = GetEntPropEnt(entity, Prop_Send, "m_hOwnerEntity");
     if (IsValidClient(owner) && owner == Hale && Special == VSHSpecial_Bunny)
         RequestFrame(Timer_SetEggBomb, EntIndexToEntRef(entity));
 }
-public Timer_SetEggBomb(any:ref)
+
+public void Timer_SetEggBomb(any ref)
 {
-    new entity = EntRefToEntIndex(ref);
+    int entity = EntRefToEntIndex(ref);
     if (FileExists(EggModel) && IsModelPrecached(EggModel) && IsValidEntity(entity))
     {
-        new att = AttachProjectileModel(entity, EggModel);
+        int att = AttachProjectileModel(entity, EggModel);
         SetEntProp(att, Prop_Send, "m_nSkin", 0);
         SetEntityRenderMode(entity, RENDER_TRANSCOLOR);
         SetEntityRenderColor(entity, 255, 255, 255, 0);
@@ -6952,14 +6953,14 @@ public Timer_SetEggBomb(any:ref)
     SDKCall(hEquipWearable, client, entity);
 }*/
 
-stock AttachProjectileModel(entity, String:strModel[], String:strAnim[] = "")
+stock int AttachProjectileModel(int entity, char[] strModel, char[] strAnim = "")
 {
-    if (!IsValidEntity(entity)) return -1;
-    new model = CreateEntityByName("prop_dynamic");
+    if (!IsValidEntity(entity))
+        return -1;
+    int model = CreateEntityByName("prop_dynamic");
     if (IsValidEdict(model))
     {
-        decl Float:pos[3];
-        decl Float:ang[3];
+        float pos[3], ang[3];
         GetEntPropVector(entity, Prop_Send, "m_vecOrigin", pos);
         GetEntPropVector(entity, Prop_Send, "m_angRotation", ang);
         TeleportEntity(model, pos, ang, NULL_VECTOR);
