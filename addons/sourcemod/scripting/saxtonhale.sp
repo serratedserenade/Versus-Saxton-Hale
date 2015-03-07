@@ -4056,10 +4056,11 @@ public Action Destroy(int client, const char[] command, int argc)
     return Plugin_Continue;
 }
 
-public void TF2_OnConditionRemoved(int client, TFCond condition)
+public int TF2_OnConditionRemoved(int client, TFCond condition)
 {
     if (TF2_GetPlayerClass(client) == TFClass_Scout && condition == TFCond_CritHype)
         TF2_AddCondition(client, TFCond_SpeedBuffAlly, 0.01);   //recalc their speed
+    return -1; //Temp till tf2.inc is transitionalled.
 }
 
 /*
@@ -4068,21 +4069,21 @@ public void TF2_OnConditionRemoved(int client, TFCond condition)
 */
 public Action cdVoiceMenu(int client, const char[] command, int argc)
 {
-    if (iArgc < 2)
+    if (argc < 2)
         return Plugin_Handled;
     char sCmd1[8], sCmd2[8];
     GetCmdArg(1, sCmd1, sizeof(sCmd1));
     GetCmdArg(2, sCmd2, sizeof(sCmd2));
     // Capture call for medic commands (represented by "voicemenu 0 0")
-    if (sCmd1[0] == '0' && sCmd2[0] == '0' && IsPlayerAlive(iClient) && iClient == Hale)
+    if (sCmd1[0] == '0' && sCmd2[0] == '0' && IsPlayerAlive(client) && client == Hale)
     {
         if (HaleRage / RageDMG >= 1)
         {
-            DoTaunt(iClient, "", 0);
+            DoTaunt(client, "", 0);
             return Plugin_Handled;
         }
     }
-    return (iClient == Hale && Special != VSHSpecial_CBS && Special != VSHSpecial_Bunny) ? Plugin_Handled : Plugin_Continue;
+    return (client == Hale && Special != VSHSpecial_CBS && Special != VSHSpecial_Bunny) ? Plugin_Handled : Plugin_Continue;
 }
 
 public Action DoTaunt(int client, const char[] command, int argc)
@@ -4218,7 +4219,7 @@ public Action DoSuicide2(int client, const char[] command, int argc)
 
 public Action UseRage(Handle hTimer, any dist)
 {
-    float:pos[3], pos2[3], distance;
+    float pos[3], pos2[3], distance;
     int i;
     if (!IsValidClient(Hale))
         return Plugin_Continue; // IsValidClient(Hale, false)
