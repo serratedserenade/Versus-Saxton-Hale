@@ -96,7 +96,21 @@ enum
     Month_Dec
 }
 
-// START FILE DEFINTIONS
+// START FILE DEFINTIONS & ENUMS
+
+enum e_flNext
+{
+    e_flNextBossTaunt = 0,
+    e_flNextAllowBossSuicide,
+    e_flNextAllowOtherSpawnTele,
+    e_flNextBossKillSpreeEnd,
+    e_flNextHealthQuery
+}
+
+enum e_flNext2
+{
+    e_flNextEndPriority = 0
+}
 
 // Saxton Hale Files
 
@@ -380,7 +394,7 @@ new bool:bEnableSuperDuperJump;
 //new bool:bTenSecStart[2] = {false, false};
 new bool:bSpawnTeleOnTriggerHurt = false;
 new HHHClimbCount;
-new bool:bNoTaunt = false;
+//new bool:bNoTaunt = false;
 new Handle:cvarVersion;
 new Handle:cvarHaleSpeed;
 new Handle:cvarPointDelay;
@@ -1716,7 +1730,7 @@ public Action:event_round_start(Handle:event, const String:name[], bool:dontBroa
     CreateTimer(9.1, StartHaleTimer, _, TIMER_FLAG_NO_MAPCHANGE);
     CreateTimer(3.5, StartResponceTimer, _, TIMER_FLAG_NO_MAPCHANGE);
     CreateTimer(9.6, MessageTimer, true, TIMER_FLAG_NO_MAPCHANGE);
-    bNoTaunt = false;
+    //bNoTaunt = false;
     HaleRage = 0;
     g_flStabbed = 0.0;
     g_flMarketed = 0.0;
@@ -4487,7 +4501,7 @@ public Action:DoSuicide(client, const String:command[], argc)
 {
     if (g_bEnabled && (VSHRoundState == VSHRState_Waiting || VSHRoundState == VSHRState_Active))
     {
-        if (client == Hale && !IsNextTime(m_flNextAllowBossSuicide))
+        if (client == Hale && !IsNextTime(e_flNextAllowBossSuicide))
         {
             CPrintToChat(client, "Do not suicide as Hale. Use !resetq instead.");
             return Plugin_Handled;
@@ -4499,7 +4513,7 @@ public Action:DoSuicide(client, const String:command[], argc)
 }
 public Action:DoSuicide2(client, const String:command[], argc)
 {
-    if (g_bEnabled && client == Hale && !IsNextTime(m_flNextAllowBossSuicide))
+    if (g_bEnabled && client == Hale && !IsNextTime(e_flNextAllowBossSuicide))
     {
         CPrintToChat(client, "You can't change teams this early.");
         return Plugin_Handled;
@@ -5631,14 +5645,14 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                     // Teleport the boss back to one of the spawns.
                     // And during the first 30 seconds, he can only teleport to his own spawn.
                     //TeleportToSpawn(Hale, (bTenSecStart[1]) ? HaleTeam : 0);
-                    TeleportToMultiMapSpawn(Hale, (!IsNextTime(m_flNextAllowOtherSpawnTele)) ? HaleTeam : 0);
+                    TeleportToMultiMapSpawn(Hale, (!IsNextTime(e_flNextAllowOtherSpawnTele)) ? HaleTeam : 0);
                 }
                 else if (damage >= 250.0)
                 {
                     if (Special == VSHSpecial_HHH)
                     {
-                        //TeleportToSpawn(Hale, (!IsNextTime(m_flNextAllowOtherSpawnTele)) ? HaleTeam : 0);
-                        TeleportToMultiMapSpawn(Hale, (!IsNextTime(m_flNextAllowOtherSpawnTele)) ? HaleTeam : 0);
+                        //TeleportToSpawn(Hale, (!IsNextTime(e_flNextAllowOtherSpawnTele)) ? HaleTeam : 0);
+                        TeleportToMultiMapSpawn(Hale, (!IsNextTime(e_flNextAllowOtherSpawnTele)) ? HaleTeam : 0);
                     }
                     else if (HaleCharge >= 0)
                     {
@@ -7659,18 +7673,12 @@ stock FindPlayerBack(client, indices[], len)
     return -1;
 }
 
-enum e_flNext
+stock Float:fmax(Float:a,Float:b) { return (a > b) ? a : b; }
+stock Float:fmin(Float:a,Float:b) { return (a < b) ? a : b; }
+stock Float:fclamp(Float:n,Float:mi,Float:ma)
 {
-    e_flNextBossTaunt = 0,
-    e_flNextAllowBossSuicide,
-    e_flNextAllowOtherSpawnTele,
-    e_flNextBossKillSpreeEnd,
-    e_flNextHealthQuery
-}
-
-enum e_flNext2
-{
-    e_flNextEndPriority = 0
+    n = fmin(n,ma);
+    return fmax(n,mi);
 }
 
 static Float:g_flNext[e_flNext];
@@ -7681,9 +7689,9 @@ stock bool:IsNextTime(iIndex, Float:flAdditional = 0.0)
     return (GetEngineTime() >= g_flNext[iIndex]+flAdditional);
 }
 
-stock SetNextTime(iIndex, Float:flTime, bool:bAbsolute = false)
+stock SetNextTime(iIndex, Float:flSeconds, bool:bAbsolute = false)
 {
-    g_flNext[iIndex] = bAbsolute ? flTime : GetEngineTime() + flSeconds;
+    g_flNext[iIndex] = bAbsolute ? flSeconds : GetEngineTime() + flSeconds;
 }
 
 stock GetNextTime(iIndex)
@@ -7716,9 +7724,9 @@ stock bool:IsNextTime2(iClient, iIndex, Float:flAdditional = 0.0)
     return (GetEngineTime() >= g_flNext2[iIndex][iClient]+flAdditional);
 }
 
-stock SetNextTime2(iClient, iIndex, Float:flTime, bool:bAbsolute = false)
+stock SetNextTime2(iClient, iIndex, Float:flSeconds, bool:bAbsolute = false)
 {
-    g_flNext2[iIndex][iClient] = bAbsolute ? flTime : GetEngineTime() + flSeconds;
+    g_flNext2[iIndex][iClient] = bAbsolute ? flSeconds : GetEngineTime() + flSeconds;
 }
 
 stock GetNextTime2(iClient, iIndex)
@@ -7780,7 +7788,7 @@ stock PriorityCenterText(iClient, iPriority = MIN_INT, const String:szFormat[], 
 
     if (iPriority > s_iLastPriority[iClient])
     {
-        IncNextTime2(iClient, e_flNextEndPriority, 5.0);
+        SetNextTime2(iClient, e_flNextEndPriority, 5.0);
         s_iLastPriority[iClient] = iPriority;
     }
 
