@@ -2950,16 +2950,16 @@ public Action MakeNoHale(Handle hTimer, any clientid)
     return Plugin_Continue;
 }
 
-public Action:Timer_NoHonorBound(Handle:timer, any:userid)
+public Action Timer_NoHonorBound(Handle timer, any userid)
 {
-    new client = GetClientOfUserId(userid);
+    int client = GetClientOfUserId(userid);
     if (client && IsClientInGame(client) && IsPlayerAlive(client))
     {
-        new weapon = GetPlayerWeaponSlot(client, TFWeaponSlot_Melee);
-        new index = ((IsValidEntity(weapon) && weapon > MaxClients) ? GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex") : -1);
-        new active = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
-        new String:classname[64];
-        if (IsValidEdict(active)) GetEdictClassname(active, classname, sizeof(classname));
+        int weapon = GetPlayerWeaponSlot(client, TFWeaponSlot_Melee);
+        int index = ((IsValidEntity(weapon) && weapon > MaxClients) ? GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex") : -1), active = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
+        char classname[64];
+        if (IsValidEdict(active))
+			GetEdictClassname(active, classname, sizeof(classname));
         if (index == 357 && active == weapon && strcmp(classname, "tf_weapon_katana", false) == 0)
         {
             SetEntProp(weapon, Prop_Send, "m_bIsBloody", 1);
@@ -2968,20 +2968,21 @@ public Action:Timer_NoHonorBound(Handle:timer, any:userid)
         }
     }
 }
-public Action:event_destroy(Handle:event, const String:name[], bool:dontBroadcast)
+
+public Action event_destroy(Event event, const char[] name, bool dontBroadcast)
 {
     if (g_bEnabled)
     {
-        new attacker = GetClientOfUserId(GetEventInt(event, "attacker"));
-        new customkill = GetEventInt(event, "customkill");
+        int attacker = GetClientOfUserId(event.GetInt("attacker")), customkill = event.GetInt("customkill");
         if (attacker == Hale) /* || (attacker == Companion)*/
         {
             if (Special == VSHSpecial_Hale)
             {
-                if (customkill != TF_CUSTOM_BOOTS_STOMP) SetEventString(event, "weapon", "fists");
+                if (customkill != TF_CUSTOM_BOOTS_STOMP)
+					event.SetString("weapon", "fists");
                 if (!GetRandomInt(0, 4))
                 {
-                    decl String:s[PLATFORM_MAX_PATH];
+                    char s[PLATFORM_MAX_PATH];
                     strcopy(s, PLATFORM_MAX_PATH, HaleSappinMahSentry132);
                     EmitSoundToAllExcept(SOUNDEXCEPT_VOICE, s, _, SNDCHAN_VOICE, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, Hale, NULL_VECTOR, NULL_VECTOR, false, 0.0);
                     EmitSoundToAllExcept(SOUNDEXCEPT_VOICE, s, _, SNDCHAN_ITEM, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, Hale, NULL_VECTOR, NULL_VECTOR, false, 0.0);
@@ -2991,11 +2992,12 @@ public Action:event_destroy(Handle:event, const String:name[], bool:dontBroadcas
     }
     return Plugin_Continue;
 }
-public Action:event_changeclass(Handle:event, const String:name[], bool:dontBroadcast)
+
+public Action event_changeclass(Event event, const char[] name, bool dontBroadcast)
 {
     if (!g_bEnabled)
         return Plugin_Continue;
-    new client = GetClientOfUserId(GetEventInt(event, "userid"));
+    int client = GetCliendOfUserId(event.GetInt("userid"));
     if (client == Hale)
     {
         switch(Special)
@@ -3017,28 +3019,30 @@ public Action:event_changeclass(Handle:event, const String:name[], bool:dontBroa
     }
     return Plugin_Continue;
 }
-public Action:event_uberdeployed(Handle:event, const String:name[], bool:dontBroadcast)
+
+public Action event_uberdeployed(Event event, const char[] name, bool dontBroadcast)
 {
     if (!g_bEnabled)
         return Plugin_Continue;
-    new client = GetClientOfUserId(GetEventInt(event, "userid"));
-    new String:s[64];
+    int client = GetCliendOfUserId(event.GetInt("userid"));
+    char s[64];
     if (client && IsClientInGame(client) && IsPlayerAlive(client))
     {
-        new medigun = GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary);
+        int medigun = GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary);
         if (IsValidEntity(medigun))
         {
             GetEdictClassname(medigun, s, sizeof(s));
             if (strcmp(s, "tf_weapon_medigun", false) == 0)
             {
                 TF2_AddCondition(client, TFCond_HalloweenCritCandy, 0.5, client);
-                new target = GetHealingTarget(client);
+                int target = GetHealingTarget(client);
                 if (IsValidClient(target) && IsPlayerAlive(target)) // IsValidClient(target, false)
                 {
                     TF2_AddCondition(target, TFCond_HalloweenCritCandy, 0.5, client);
                     uberTarget[client] = target;
                 }
-                else uberTarget[client] = -1;
+                else
+					uberTarget[client] = -1;
                 SetEntPropFloat(medigun, Prop_Send, "m_flChargeLevel", 1.51);
                 CreateTimer(0.4, Timer_Lazor, EntIndexToEntRef(medigun), TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
             }
@@ -3046,6 +3050,7 @@ public Action:event_uberdeployed(Handle:event, const String:name[], bool:dontBro
     }
     return Plugin_Continue;
 }
+
 public Action:Timer_Lazor(Handle:hTimer, any:medigunid)
 {
     new medigun = EntRefToEntIndex(medigunid);
@@ -8338,15 +8343,15 @@ stock AttachParticle(iEnt, const String:szParticleType[], Float:flTimeToDie = -1
     return -1;
 }
 
-stock SetParent(iParent, iChild)
+stock void SetParent(int iParent, int iChild)
 {
     SetVariantString("!activator");
     AcceptEntityInput(iChild, "SetParent", iParent, iChild);
 }
 
-stock killEntityIn(iEnt, Float:flSeconds)
+stock void killEntityIn(int iEnt, float flSeconds)
 {
-    decl String:szAddOutput[32];
+    char szAddOutput[32];
     Format(szAddOutput, sizeof(szAddOutput), "OnUser1 !self,Kill,,%0.2f,1", flSeconds);
     SetVariantString(szAddOutput);
     AcceptEntityInput(iEnt, "AddOutput");
@@ -8365,27 +8370,23 @@ stock killEntityIn(iEnt, Float:flSeconds)
  * @param particleSystem    Name of the particle system to precache.
  * @return                  Returns the particle system index, INVALID_STRING_INDEX on error.
  */
-stock PrecacheParticleSystem(const String:particleSystem[])
+stock int PrecacheParticleSystem(const char[] particleSystem)
 {
-    static particleEffectNames = INVALID_STRING_TABLE;
-
+    static int particleEffectNames = INVALID_STRING_TABLE;
     if (particleEffectNames == INVALID_STRING_TABLE) {
         if ((particleEffectNames = FindStringTable("ParticleEffectNames")) == INVALID_STRING_TABLE) {
             return INVALID_STRING_INDEX;
         }
     }
-
-    new index = FindStringIndex2(particleEffectNames, particleSystem);
+    int index = FindStringIndex2(particleEffectNames, particleSystem);
     if (index == INVALID_STRING_INDEX) {
-        new numStrings = GetStringTableNumStrings(particleEffectNames);
+        int numStrings = GetStringTableNumStrings(particleEffectNames);
         if (numStrings >= GetStringTableMaxStrings(particleEffectNames)) {
             return INVALID_STRING_INDEX;
         }
-
         AddToStringTable(particleEffectNames, particleSystem);
         index = numStrings;
     }
-
     return index;
 }
 
@@ -8398,19 +8399,16 @@ stock PrecacheParticleSystem(const String:particleSystem[])
  * @param str           String to find.
  * @return              String index if found, INVALID_STRING_INDEX otherwise.
  */
-stock FindStringIndex2(tableidx, const String:str[])
+stock int FindStringIndex2(int tableidx, const char[] str)
 {
-    decl String:buf[1024];
-
-    new numStrings = GetStringTableNumStrings(tableidx);
-    for (new i=0; i < numStrings; i++) {
+    char buf[1024];
+    int numStrings = GetStringTableNumStrings(tableidx);
+    for (int i=0; i < numStrings; i++) {
         ReadStringTable(tableidx, i, buf, sizeof(buf));
-
         if (StrEqual(buf, str)) {
             return i;
         }
     }
-
     return INVALID_STRING_INDEX;
 }
 #endif
