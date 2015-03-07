@@ -337,7 +337,7 @@ bool steamtools = false;
 TFTeam OtherTeam = TFTeam_Red, HaleTeam = TFTeam_Blue;
 VSHRState VSHRoundState = VSHRState_Disabled;
 VSHSpecial Special, Incoming;
-int playing, healthcheckused, RedAlivePlayers, RoundCount, Damage[TF_MAX_PLAYERS], AirDamage[TF_MAX_PLAYERS], ourHelp[TF_MAX_PLAYERS], uberTarget[TF_MAX_PLAYERS];
+int playing, healthcheckused, RedAlivePlayers, RoundCount, Damage[TF_MAX_PLAYERS], AirDamage[TF_MAX_PLAYERS], curHelp[TF_MAX_PLAYERS], uberTarget[TF_MAX_PLAYERS];
 static bool g_bReloadVSHOnRoundEnd = false;
 #define VSHFLAG_HELPED          (1 << 0)
 #define VSHFLAG_UBERREADY       (1 << 1)
@@ -5844,7 +5844,7 @@ public Action HalePanel(int client, int args)
     if (!g_bAreEnoughPlayersPlaying || !client) // IsValidClient(client, false)
         return Plugin_Continue;
     Panel panel = new Panel();
-    new size = 256;
+    int size = 256;
     char[] s = new char[size];
     SetGlobalTransTarget(client);
     Format(s, size, "%t", "vsh_menu_1");
