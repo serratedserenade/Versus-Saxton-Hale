@@ -7171,14 +7171,14 @@ public int Native_GetRoundState(Handle plugin, int numParams)
 
 public int Native_GetDamage(Handle plugin, int numParams)
 {
-    new client = GetNativeCell(1);
+    int client = GetNativeCell(1);
     if (!IsValidClient(client))
         return 0;
     return Damage[client];
 }
 
 // Chdata's plugin reload command
-public Action:Debug_ReloadVSH(iClient, iArgc)
+public Action Debug_ReloadVSH(int iClient, int iArgc)
 {
     g_bReloadVSHOnRoundEnd = true;
     switch (VSHRoundState)
@@ -7198,7 +7198,6 @@ public Action:Debug_ReloadVSH(iClient, iArgc)
     return Plugin_Handled;
 }
 
-
 /*
     chdata.inc
 
@@ -7206,7 +7205,7 @@ public Action:Debug_ReloadVSH(iClient, iArgc)
 */
 
 // True if they weren't in the condition and were set to it.
-stock bool:InsertCond(iClient, TFCond:iCond, Float:flDuration = TFCondDuration_Infinite)
+stock bool InsertCond(int iClient, TFCond iCond, float flDuration = TFCondDuration_Infinite)
 {
     if (!TF2_IsPlayerInCondition(iClient, iCond))
     {
@@ -7217,7 +7216,7 @@ stock bool:InsertCond(iClient, TFCond:iCond, Float:flDuration = TFCondDuration_I
 }
 
 // True if the condition was removed.
-stock bool:RemoveCond(iClient, TFCond:iCond)
+stock bool RemoveCond(int iClient, TFCond iCond)
 {
     if (TF2_IsPlayerInCondition(iClient, iCond))
     {
@@ -7228,7 +7227,7 @@ stock bool:RemoveCond(iClient, TFCond:iCond)
 }
 
 // true if removed, false if not found / etc
-stock bool:RemoveDemoShield(iClient)
+stock bool RemoveDemoShield(int iClient)
 {
     new iEnt = MaxClients + 1;
     while ((iEnt = FindEntityByClassname2(iEnt, "tf_wearable_demoshield")) != -1)
@@ -7243,121 +7242,60 @@ stock bool:RemoveDemoShield(iClient)
 }
 
 // Returns true if at least one was removed
-stock bool:RemovePlayerBack(client, indices[], len)
+stock bool RemovePlayerBack(int client, int[] indices, int len)
 {
     if (len <= 0)
-    {
         return false;
-    }
-
-    new bool:bReturn = false;
-
-    new edict = MaxClients + 1;
-
-    while ((edict = FindEntityByClassname2(edict, "tf_wearable")) != -1)
+    bool bReturn = false;
+    int back = -1, iTry = 0;
+    while (iTry < 100 && (back = FindPlayerBack(client, indices, len)) != -1 && IsValidEntity(back)) //Eventually we should hit -1 for back. iTry is to prevent infinite loop(shouldn't happen).
     {
-        decl String:netclass[32];
-
-        if (GetEntityNetClass(edict, netclass, sizeof(netclass)) && StrEqual(netclass, "CTFWearable"))
-        {
-            new idx = GetEntProp(edict, Prop_Send, "m_iItemDefinitionIndex");
-
-            if (GetEntPropEnt(edict, Prop_Send, "m_hOwnerEntity") == client && !GetEntProp(edict, Prop_Send, "m_bDisguiseWearable"))
-            {
-                for (new i = 0; i < len; i++)
-                {
-                    if (idx == indices[i])
-                    {
-                        TF2_RemoveWearable(client, edict);
-                        bReturn = true;
-                    }
-                }
-            }
-        }
+        TF2_RemoveWearable(client, back);
+        iTry++;
+        bReturn = true;
     }
-
-    edict = MaxClients + 1;
-
-    while ((edict = FindEntityByClassname2(edict, "tf_powerup_bottle")) != -1)
-    {
-        decl String:netclass[32];
-
-        if (GetEntityNetClass(edict, netclass, sizeof(netclass)) && StrEqual(netclass, "CTFPowerupBottle"))
-        {
-            new idx = GetEntProp(edict, Prop_Send, "m_iItemDefinitionIndex");
-
-            if (GetEntPropEnt(edict, Prop_Send, "m_hOwnerEntity") == client && !GetEntProp(edict, Prop_Send, "m_bDisguiseWearable"))
-            {
-                for (new i = 0; i < len; i++)
-                {
-                    if (idx == indices[i])
-                    {
-                        TF2_RemoveWearable(client, edict);
-                        bReturn = true;
-                        //AcceptEntityInput(edict, "Kill");
-                    }
-                }
-            }
-        }
-    }
-
     return bReturn;
 }
 
 // Returns entity index as soon as any one is found, -1 if none found
-stock FindPlayerBack(client, indices[], len)
+stock int FindPlayerBack(int client, int[] indices, int len)
 {
     if (len <= 0)
-    {
         return -1;
-    }
-
-    new edict = MaxClients + 1;
-
+    int edict = MaxClients + 1;
     while ((edict = FindEntityByClassname2(edict, "tf_wearable")) != -1)
     {
-        decl String:netclass[32];
-
+        char netclass[32];
         if (GetEntityNetClass(edict, netclass, sizeof(netclass)) && StrEqual(netclass, "CTFWearable"))
         {
-            new idx = GetEntProp(edict, Prop_Send, "m_iItemDefinitionIndex");
-
+            int idx = GetEntProp(edict, Prop_Send, "m_iItemDefinitionIndex");
             if (GetEntPropEnt(edict, Prop_Send, "m_hOwnerEntity") == client && !GetEntProp(edict, Prop_Send, "m_bDisguiseWearable"))
             {
-                for (new i = 0; i < len; i++)
+                for (int i = 0; i < len; i++)
                 {
                     if (idx == indices[i])
-                    {
                         return edict;
-                    }
                 }
             }
         }
     }
-
     edict = MaxClients + 1;
-
     while ((edict = FindEntityByClassname2(edict, "tf_powerup_bottle")) != -1)
     {
-        decl String:netclass[32];
-
+        char netclass[32];
         if (GetEntityNetClass(edict, netclass, sizeof(netclass)) && StrEqual(netclass, "CTFPowerupBottle"))
         {
-            new idx = GetEntProp(edict, Prop_Send, "m_iItemDefinitionIndex");
-
+            int idx = GetEntProp(edict, Prop_Send, "m_iItemDefinitionIndex");
             if (GetEntPropEnt(edict, Prop_Send, "m_hOwnerEntity") == client && !GetEntProp(edict, Prop_Send, "m_bDisguiseWearable"))
             {
-                for (new i = 0; i < len; i++)
+                for (int i = 0; i < len; i++)
                 {
                     if (idx == indices[i])
-                    {
                         return edict;
-                    }
                 }
             }
         }
     }
-
     return -1;
 }
 
@@ -7371,30 +7309,30 @@ enum m_flNext2
     m_flNextEndPriority = 0
 }
 
-static Float:g_flNext[m_flNext];
-static Float:g_flNext2[m_flNext][TF_MAX_PLAYERS];
+static float g_flNext[m_flNext];
+static float g_flNext2[m_flNext][TF_MAX_PLAYERS];
 
-stock bool:IsNextTime(iIndex, Float:flAdditional = 0.0)
+stock bool IsNextTime(m_flNext iIndex, float flAdditional = 0.0)
 {
     return (GetEngineTime() >= g_flNext[iIndex]+flAdditional);
 }
 
-stock IncNextTime(iIndex, Float:flSeconds)
+stock void IncNextTime(m_flNext iIndex, float flSeconds)
 {
     g_flNext[iIndex] = GetEngineTime() + flSeconds;
 }
 
-stock SetNextTime(iIndex, Float:flTime)
+stock void SetNextTime(m_flNext iIndex, float flTime)
 {
     g_flNext[iIndex] = flTime;
 }
 
-stock GetNextTime(iIndex)
+stock float GetNextTime(m_flNext iIndex)
 {
     return g_flNext[iIndex];
 }
 
-stock Float:GetTimeTilNextTime(iIndex, bool:bNonNegative = true)
+stock float GetTimeTilNextTime(m_flNext iIndex, bool bNonNegative = true)
 {
     return bNonNegative ? fmax(g_flNext[iIndex] - GetEngineTime(), 0.0) : (g_flNext[iIndex] - GetEngineTime());
 }
@@ -7402,7 +7340,7 @@ stock Float:GetTimeTilNextTime(iIndex, bool:bNonNegative = true)
 /*
     If next time occurs, we also add time on for when it is next allowed.
 */
-stock bool:IfDoNextTime(iIndex, Float:flThenAdd)
+stock bool IfDoNextTime(m_flNext iIndex, float flThenAdd)
 {
     if (IsNextTime(iIndex))
     {
@@ -7414,22 +7352,22 @@ stock bool:IfDoNextTime(iIndex, Float:flThenAdd)
 
 // Start of plural NextTime versions
 
-stock bool:IsNextTime2(iClient, iIndex, Float:flAdditional = 0.0)
+stock bool IsNextTime2(int iClient, m_flNext iIndex, float flAdditional = 0.0)
 {
     return (GetEngineTime() >= g_flNext2[iIndex][iClient]+flAdditional);
 }
 
-stock IncNextTime2(iClient, iIndex, Float:flSeconds)
+stock void IncNextTime2(int iClient, m_flNext iIndex, float flSeconds)
 {
     g_flNext2[iIndex][iClient] = GetEngineTime() + flSeconds;
 }
 
-stock SetNextTime2(iClient, iIndex, Float:flTime)
+stock void SetNextTime2(int iClient, m_flNext iIndex, float flTime)
 {
     g_flNext2[iIndex][iClient] = flTime;
 }
 
-stock GetNextTime2(iClient, iIndex)
+stock float GetNextTime2(int iClient, m_flNext iIndex)
 {
     return g_flNext2[iIndex][iClient];
 }
@@ -7437,7 +7375,7 @@ stock GetNextTime2(iClient, iIndex)
 /*
     If next time occurs, we also add time on for when it is next allowed.
 */
-stock bool:IfDoNextTime2(iClient, iIndex, Float:flThenAdd)
+stock bool IfDoNextTime2(int iClient, m_flNext iIndex, float flThenAdd)
 {
     if (IsNextTime2(iClient, iIndex))
     {
@@ -7456,7 +7394,7 @@ stock bool:IfDoNextTime2(iClient, iIndex, Float:flThenAdd)
     By: Chdata
 
 */
-static s_iLastPriority[TF_MAX_PLAYERS] = {MIN_INT,...};
+static int s_iLastPriority[TF_MAX_PLAYERS] = {MIN_INT,...};
 //static Handle:s_hPCTTimer[TF_MAX_PLAYERS] = {null,...};
 
 /*
