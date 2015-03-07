@@ -1842,16 +1842,16 @@ public Action event_round_end(Event event, const char[] name, bool dontBroadcast
         if (Damage[top[0]] > 9000)
             CreateTimer(1.0, Timer_NineThousand, _, TIMER_FLAG_NO_MAPCHANGE);
         char scores[3][80];
-		for (int i = 0; i < sizeof(top); i++)
-		{
-			if (IsClientInGame(top[i]) && (GetEntityTeamNum(top[i]) >= TFTeam_Spectator))
-				GetClientName(top[i], scores[i], 80);
-			else
-			{
-				top[i] = 0;
-				strcopy(scores[i], 80, "---");
-			}
-		}
+        for (int i = 0; i < sizeof(top); i++)
+        {
+            if (IsClientInGame(top[i]) && (GetEntityTeamNum(top[i]) >= TFTeam_Spectator))
+                GetClientName(top[i], scores[i], 80);
+            else
+            {
+                top[i] = 0;
+                strcopy(scores[i], 80, "---");
+            }
+        }
         SetHudTextParams(-1.0, 0.3, 10.0, 255, 255, 255, 255);
         PriorityCenterTextAll(_, ""); //Should clear center text
         for (int i = 1; i <= MaxClients; i++)
@@ -2948,7 +2948,7 @@ public Action Timer_NoHonorBound(Handle timer, any userid)
         int index = ((IsValidEntity(weapon) && weapon > MaxClients) ? GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex") : -1), active = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
         char classname[64];
         if (IsValidEdict(active))
-			GetEdictClassname(active, classname, sizeof(classname));
+            GetEdictClassname(active, classname, sizeof(classname));
         if (index == 357 && active == weapon && strcmp(classname, "tf_weapon_katana", false) == 0)
         {
             SetEntProp(weapon, Prop_Send, "m_bIsBloody", 1);
@@ -2968,7 +2968,7 @@ public Action event_destroy(Event event, const char[] name, bool dontBroadcast)
             if (Special == VSHSpecial_Hale)
             {
                 if (customkill != TF_CUSTOM_BOOTS_STOMP)
-					event.SetString("weapon", "fists");
+                    event.SetString("weapon", "fists");
                 if (!GetRandomInt(0, 4))
                 {
                     char s[PLATFORM_MAX_PATH];
@@ -3031,7 +3031,7 @@ public Action event_uberdeployed(Event event, const char[] name, bool dontBroadc
                     uberTarget[client] = target;
                 }
                 else
-					uberTarget[client] = -1;
+                    uberTarget[client] = -1;
                 SetEntPropFloat(medigun, Prop_Send, "m_flChargeLevel", 1.51);
                 CreateTimer(0.4, Timer_Lazor, EntIndexToEntRef(medigun), TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
             }
@@ -3059,7 +3059,7 @@ public Action Timer_Lazor(Handle hTimer, any medigunid)
                     uberTarget[client] = target;
                 }
                 else
-					uberTarget[client] = -1;
+                    uberTarget[client] = -1;
             }
         }
         if (charge <= 0.05)
@@ -3085,7 +3085,7 @@ public Action Timer_Lazor2(Handle hTimer, any medigunid)
 public Action Command_GetHPCmd(int client, int args)
 {
     if (!client)
-		return Plugin_Handled;
+        return Plugin_Handled;
     Command_GetHP(client);
     return Plugin_Handled;
 }
@@ -3281,7 +3281,7 @@ public Action Command_Points(int client, int args)
 void StopHaleMusic(int client)
 {
     if (!IsValidClient(client))
-		return;
+        return;
 //  StopSound(client, SNDCHAN_AUTO, HaleTempTheme);
     StopSound(client, SNDCHAN_AUTO, HHHTheme);
     StopSound(client, SNDCHAN_AUTO, CBSTheme);
@@ -3294,7 +3294,7 @@ public Action Command_StopMusic(int client, int args)
     for (int i = 1; i <= MaxClients; i++)
     {
         if (!IsClientInGame(i))
-			continue;
+            continue;
         StopHaleMusic(i);
     }
     CReplyToCommand(client, "{olive}[VSH]{default} Stopped boss music.");
@@ -3304,14 +3304,14 @@ public Action Command_StopMusic(int client, int args)
 public Action Command_Point_Disable(int client, int args)
 {
     if (g_bEnabled)
-		SetControlPoint(false);
+        SetControlPoint(false);
     return Plugin_Handled;
 }
 
 public Action Command_Point_Enable(int client, int args)
 {
     if (g_bEnabled)
-		SetControlPoint(true);
+        SetControlPoint(true);
     return Plugin_Handled;
 }
 
@@ -3404,9 +3404,9 @@ public void OnClientDisconnect(int client)
             if (IsClientInGame(client))
             {
                 if (IsPlayerAlive(client))
-					CreateTimer(0.0, CheckAlivePlayers);
+                    CreateTimer(0.0, CheckAlivePlayers);
                 if (client == FindNextHaleEx())
-					CreateTimer(1.0, Timer_SkipHalePanel, _, TIMER_FLAG_NO_MAPCHANGE);
+                    CreateTimer(1.0, Timer_SkipHalePanel, _, TIMER_FLAG_NO_MAPCHANGE);
             }
             if (client == NextHale)
                 NextHale = -1;
@@ -3416,10 +3416,10 @@ public void OnClientDisconnect(int client)
 
 public Action Timer_SetDisconQueuePoints(Handle timer, Handle pack)
 {
-	DataPack dPack = view_as<DataPack>(pack);
+    DataPack dPack = view_as<DataPack>(pack);
     dPack.Reset();
     char authid[32];
-    pack.ReadString(authid, sizeof(authid));
+    dPack.ReadString(authid, sizeof(authid));
     SetAuthIdQueuePoints(authid, 0);
 }
 
@@ -3434,9 +3434,9 @@ public Action event_player_spawn(Event event, const char[] name, bool dontBroadc
 {
     int client = GetClientOfUserId(event.GetInt("userid"));
     if (!client || !IsClientInGame(client))
-		return Plugin_Continue; // IsValidClient(client, false)   - You can probably assume the player is valid at this point though.. TODO
+        return Plugin_Continue; // IsValidClient(client, false)   - You can probably assume the player is valid at this point though.. TODO
     if (!g_bEnabled)
-		return Plugin_Continue;
+        return Plugin_Continue;
     SetVariantString("");
     AcceptEntityInput(client, "SetCustomModel");
     if (client == Hale && VSHRoundState < VSHRState_End && VSHRoundState != VSHRState_Disabled)
@@ -3504,44 +3504,46 @@ public Action ClientTimer(Handle hTimer)
             SetHudTextParams(-1.0, 0.88, 0.35, 90, 255, 90, 255, 0, 0.35, 0.0, 0.1);
             if (!IsPlayerAlive(client))
             {
-                new obstarget = GetEntPropEnt(client, Prop_Send, "m_hObserverTarget");
+                int obstarget = GetEntPropEnt(client, Prop_Send, "m_hObserverTarget");
                 if (obstarget != client && obstarget != Hale && IsValidClient(obstarget))
                 {
-                    if (!(GetClientButtons(client) & IN_SCORE)) ShowSyncHudText(client, rageHUD, "%t", "vsh_damage_others", Damage[client], obstarget, Damage[obstarget]);
+                    if (!(GetClientButtons(client) & IN_SCORE))
+                        ShowSyncHudText(client, rageHUD, "%t", "vsh_damage_others", Damage[client], obstarget, Damage[obstarget]);
                 }
                 else
                 {
-                    if (!(GetClientButtons(client) & IN_SCORE)) ShowSyncHudText(client, rageHUD, "%t: %d", "vsh_damage_own", Damage[client]);
+                    if (!(GetClientButtons(client) & IN_SCORE))
+                        ShowSyncHudText(client, rageHUD, "%t: %d", "vsh_damage_own", Damage[client]);
                 }
                 continue;
             }
-            if (!(GetClientButtons(client) & IN_SCORE)) ShowSyncHudText(client, rageHUD, "%t: %d", "vsh_damage_own", Damage[client]);
-            new TFClassType:class = TF2_GetPlayerClass(client);
-            new weapon = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
-            if (weapon <= MaxClients || !IsValidEntity(weapon) || !GetEdictClassname(weapon, wepclassname, sizeof(wepclassname))) strcopy(wepclassname, sizeof(wepclassname), "");
-            new bool:validwep = (strncmp(wepclassname, "tf_wea", 6, false) == 0);
-            new index = (validwep ? GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex") : -1);
+            if (!(GetClientButtons(client) & IN_SCORE))
+                ShowSyncHudText(client, rageHUD, "%t: %d", "vsh_damage_own", Damage[client]);
+            TFClassType class = TF2_GetPlayerClass(client);
+            int weapon = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
+            if (weapon <= MaxClients || !IsValidEntity(weapon) || !GetEdictClassname(weapon, wepclassname, sizeof(wepclassname)))
+                strcopy(wepclassname, sizeof(wepclassname), "");
+            bool validwep = (strncmp(wepclassname, "tf_wea", 6, false) == 0);
+            int index = (validwep ? GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex") : -1);
             if (TF2_IsPlayerInCondition(client, TFCond_Cloaked))
             {
                 if (GetClientCloakIndex(client) == 59)
                 {
-                    if (TF2_IsPlayerInCondition(client, TFCond_DeadRingered)) TF2_RemoveCondition(client, TFCond_DeadRingered);
+                    if (TF2_IsPlayerInCondition(client, TFCond_DeadRingered))
+                        TF2_RemoveCondition(client, TFCond_DeadRingered);
                 }
-                else TF2_AddCondition(client, TFCond_DeadRingered, 0.3);
+                else
+                    TF2_AddCondition(client, TFCond_DeadRingered, 0.3);
             }
-
-            new bool:bHudAdjust = false;
-
+            bool bHudAdjust = false;
             // Chdata's Deadringer Notifier
             if (TF2_GetPlayerClass(client) == TFClass_Spy)
             {
                 if (GetClientCloakIndex(client) == 59)
                 {
                     bHudAdjust = true;
-                    new drstatus = TF2_IsPlayerInCondition(client, TFCond_Cloaked) ? 2 : GetEntProp(client, Prop_Send, "m_bFeignDeathReady") ? 1 : 0;
-
-                    decl String:s[32];
-
+                    int drstatus = TF2_IsPlayerInCondition(client, TFCond_Cloaked) ? 2 : GetEntProp(client, Prop_Send, "m_bFeignDeathReady") ? 1 : 0;
+                    char s[32];
                     switch (drstatus)
                     {
                         case 1:
@@ -3560,46 +3562,32 @@ public Action ClientTimer(Handle hTimer)
                             Format(s, sizeof(s), "Status: Inactive");
                         }
                     }
-
                     if (!(GetClientButtons(client) & IN_SCORE))
-                    {
                         ShowSyncHudText(client, jumpHUD, "%s", s);
-                    }
                 }
             }
-
             if (class == TFClass_Medic)
             {
-                new medigun = GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary);
-
-                decl String:mediclassname[64];
-
+                int medigun = GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary);
+                char mediclassname[64];
                 if (IsValidEdict(medigun) && GetEdictClassname(medigun, mediclassname, sizeof(mediclassname)) && strcmp(mediclassname, "tf_weapon_medigun", false) == 0)
                 {
                     bHudAdjust = true;
                     SetHudTextParams(-1.0, 0.83, 0.35, 255, 255, 255, 255, 0, 0.2, 0.0, 0.1);
-
-                    new charge = RoundToFloor(GetEntPropFloat(medigun, Prop_Send, "m_flChargeLevel") * 100);
-
+                    int charge = RoundToFloor(GetEntPropFloat(medigun, Prop_Send, "m_flChargeLevel") * 100);
                     if (!(GetClientButtons(client) & IN_SCORE))
-                    {
                         ShowSyncHudText(client, jumpHUD, "%T: %i", "vsh_uber-charge", client, charge);
-                    }
-
                     if (charge == 100 && !(VSHFlags[client] & VSHFLAG_UBERREADY))
                     {
                         FakeClientCommandEx(client, "voicemenu 1 7");
                         VSHFlags[client] |= VSHFLAG_UBERREADY;
                     }
                 }
-
                 if (weapon == GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary))
                 {
-                    new healtarget = GetHealingTarget(client);
+                    int healtarget = GetHealingTarget(client);
                     if (IsValidClient(healtarget) && TF2_GetPlayerClass(healtarget) == TFClass_Scout)
-                    {
                         TF2_AddCondition(client, TFCond_SpeedBuffAlly, 0.3);
-                    }
                 }
             }
 
@@ -4047,7 +4035,7 @@ public Action:HaleTimer(Handle:hTimer)
         }
     }
     return Plugin_Continue;
-}
+} //50% port mark
 
 public Action:HHHTeleTimer(Handle:timer)
 {
