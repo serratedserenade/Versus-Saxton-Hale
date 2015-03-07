@@ -1841,28 +1841,17 @@ public Action event_round_end(Event event, const char[] name, bool dontBroadcast
         }
         if (Damage[top[0]] > 9000)
             CreateTimer(1.0, Timer_NineThousand, _, TIMER_FLAG_NO_MAPCHANGE);
-        char s1[80];
-        if (IsClientInGame(top[0]) && (view_as<int>(GetEntityTeamNum(top[0])) >= 1))
-            GetClientName(top[0], s, 80);
-        else
-        {
-            Format(s, 80, "---");
-            top[0]=0;
-        }
-        if (IsClientInGame(top[1]) && (view_as<int>(GetEntityTeamNum(top[1])) >= 1))
-            GetClientName(top[1], s1, 80);
-        else
-        {
-            Format(s1, 80, "---");
-            top[1]=0;
-        }
-        if (IsClientInGame(top[2]) && (view_as<int>(GetEntityTeamNum(top[2])) >= 1))
-            GetClientName(top[2], s2, 80);
-        else
-        {
-            Format(s2, 80, "---");
-            top[2]=0;
-        }
+        char scores[3][80];
+		for (int i = 0; i < sizeof(top); i++)
+		{
+			if (IsClientInGame(top[i]) && (GetEntityTeamNum(top[i]) >= TFTeam_Spectator))
+				GetClientName(top[i], scores[i], 80);
+			else
+			{
+				top[i] = 0;
+				strcopy(scores[i], 80, "---");
+			}
+		}
         SetHudTextParams(-1.0, 0.3, 10.0, 255, 255, 255, 255);
         PriorityCenterTextAll(_, ""); //Should clear center text
         for (int i = 1; i <= MaxClients; i++)
@@ -1873,9 +1862,9 @@ public Action event_round_end(Event event, const char[] name, bool dontBroadcast
 //              if (numHaleKills < 2 && false) ShowHudText(i, -1, "%t\n1)%i - %s\n2)%i - %s\n3)%i - %s\n\n%t %i\n%t %i", "vsh_top_3", Damage[top[0]], s, Damage[top[1]], s1, Damage[top[2]], s2, "vsh_damage_fx", Damage[i], "vsh_scores", RoundFloat(Damage[i] / 600.0));
 //              else
                 ShowSyncHudText(i, infoHUD, "%t\n1)%i - %s\n2)%i - %s\n3)%i - %s\n\n%t %i\n%t %i", "vsh_top_3",
-                    Damage[top[0]], s,
-                    Damage[top[1]], s1,
-                    Damage[top[2]], s2,
+                    Damage[top[0]], scores[0],
+                    Damage[top[1]], scores[1],
+                    Damage[top[2]], scores[2],
                     "vsh_damage_fx",Damage[i],
                     "vsh_scores", RoundFloat(Damage[i] / 600.0)
                 );
@@ -2392,7 +2381,7 @@ public Action MakeModelTimer(Handle hTimer)
         case VSHSpecial_Vagineer:
         {
             SetVariantString(VagineerModel);
-//          SetEntProp(Hale, Prop_Send, "m_nSkin", view_as<int>(GetEntityTeamNum(Hale)-TFTeam_Red));
+//          SetEntProp(Hale, Prop_Send, "m_nSkin", GetEntityTeamNum(Hale)-2);
         }
         case VSHSpecial_HHH:
             SetVariantString(HHHModel);
