@@ -7668,21 +7668,22 @@ stock SwitchToOtherWeapon(client)
     else SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary));
 }
 
-stock FindTeleOwner(client)
+stock int FindTeleOwner(int client)
 {
-    if (!IsValidClient(client)) return -1;
-    if (!IsPlayerAlive(client)) return -1;
-    new tele = GetEntPropEnt(client, Prop_Send, "m_hGroundEntity");
-    decl String:classname[32];
+    if (!IsValidClient(client) || !IsPlayerAlive(client))
+        return -1;
+    int tele = GetEntPropEnt(client, Prop_Send, "m_hGroundEntity");
+    char classname[32];
     if (IsValidEntity(tele) && GetEdictClassname(tele, classname, sizeof(classname)) && strcmp(classname, "obj_teleporter", false) == 0)
     {
-        new owner = GetEntPropEnt(tele, Prop_Send, "m_hBuilder");
-        if (IsValidClient(owner)) return owner; // IsValidClient(owner, false)
+        int owner = GetEntPropEnt(tele, Prop_Send, "m_hBuilder");
+        if (IsValidClient(owner))
+            return owner; // IsValidClient(owner, false)
     }
     return -1;
 }
 
-stock TF2_IsPlayerCritBuffed(client)
+stock bool TF2_IsPlayerCritBuffed(int client)
 {
     return (TF2_IsPlayerInCondition(client, TFCond_Kritzkrieged)
             || TF2_IsPlayerInCondition(client, TFCond_HalloweenCritCandy)
@@ -7696,32 +7697,31 @@ stock TF2_IsPlayerCritBuffed(client)
             );
 }
 
-stock SetNextAttack(weapon, Float:duration = 0.0)
+stock void SetNextAttack(int weapon, float duration = 0.0)
 {
-    if (weapon <= MaxClients) return;
-    if (!IsValidEntity(weapon)) return;
-    new Float:next = GetGameTime() + duration;
+    if (weapon <= MaxClients || !IsValidEntity(weapon))
+        return;
+    float next = GetGameTime() + duration;
     SetEntPropFloat(weapon, Prop_Send, "m_flNextPrimaryAttack", next);
     SetEntPropFloat(weapon, Prop_Send, "m_flNextSecondaryAttack", next);
 }
 
-#if defined _tf2items_included
-stock SpawnWeapon(client, String:name[], index, level, qual, String:att[])
+stock int SpawnWeapon(client, String:name[], index, level, qual, String:att[]) //TF2Items is required.
 {
-    new Handle:hWeapon = TF2Items_CreateItem(OVERRIDE_ALL|FORCE_GENERATION);
+    Handle hWeapon = TF2Items_CreateItem(OVERRIDE_ALL|FORCE_GENERATION);
     if (hWeapon == null)
         return -1;
     TF2Items_SetClassname(hWeapon, name);
     TF2Items_SetItemIndex(hWeapon, index);
     TF2Items_SetLevel(hWeapon, level);
     TF2Items_SetQuality(hWeapon, qual);
-    new String:atts[32][32];
-    new count = ExplodeString(att, " ; ", atts, 32, 32);
+    char atts[32][32];
+    int count = ExplodeString(att, " ; ", atts, 32, 32);
     if (count > 1)
     {
         TF2Items_SetNumAttributes(hWeapon, count/2);
-        new i2 = 0;
-        for (new i = 0; i < count; i += 2)
+        int i2 = 0;
+        for (int i = 0; i < count; i += 2)
         {
             TF2Items_SetAttribute(hWeapon, i2, StringToInt(atts[i]), StringToFloat(atts[i+1]));
             i2++;
@@ -7729,50 +7729,54 @@ stock SpawnWeapon(client, String:name[], index, level, qual, String:att[])
     }
     else
         TF2Items_SetNumAttributes(hWeapon, 0);
-
-    new entity = TF2Items_GiveNamedItem(client, hWeapon);
-    CloseHandle(hWeapon);
+    int entity = TF2Items_GiveNamedItem(client, hWeapon);
+    delete hWeapon;
     EquipPlayerWeapon(client, entity);
     return entity;
 }
-#endif
 
-
-stock SetAmmo(client, wepslot, newAmmo)
+stock void SetAmmo(int client, int wepslot, int newAmmo)
 {
-    new weapon = GetPlayerWeaponSlot(client, wepslot);
-    if (!IsValidEntity(weapon)) return;
-    new type = GetEntProp(weapon, Prop_Send, "m_iPrimaryAmmoType");
-    if (type < 0 || type > 31) return;
+    int weapon = GetPlayerWeaponSlot(client, wepslot);
+    if (!IsValidEntity(weapon))
+        return;
+    int type = GetEntProp(weapon, Prop_Send, "m_iPrimaryAmmoType");
+    if (type < 0 || type > 31)
+        return;
     SetEntProp(client, Prop_Send, "m_iAmmo", newAmmo, _, type);
 }
 
-stock GetAmmo(client, wepslot)
+stock int GetAmmo(int client, int wepslot)
 {
-    if (!IsValidClient(client)) return 0;
-    new weapon = GetPlayerWeaponSlot(client, wepslot);
-    if (!IsValidEntity(weapon)) return 0;
-    new type = GetEntProp(weapon, Prop_Send, "m_iPrimaryAmmoType");
-    if (type < 0 || type > 31) return 0;
+    if (!IsValidClient(client))
+        return 0;
+    int weapon = GetPlayerWeaponSlot(client, wepslot);
+    if (!IsValidEntity(weapon))
+        return 0;
+    int type = GetEntProp(weapon, Prop_Send, "m_iPrimaryAmmoType");
+    if (type < 0 || type > 31)
+        return 0;
     return GetEntProp(client, Prop_Send, "m_iAmmo", _, type);
 }
 
-stock TF2_GetMetal(client)
+stock int TF2_GetMetal(int client)
 {
-    if (!IsValidClient(client) || !IsPlayerAlive(client)) return 0;
+    if (!IsValidClient(client) || !IsPlayerAlive(client))
+        return 0;
     return GetEntProp(client, Prop_Send, "m_iAmmo", _, 3);
 }
 
-stock TF2_SetMetal(client, metal)
+stock void TF2_SetMetal(int client, int metal)
 {
-    if (!IsValidClient(client) || !IsPlayerAlive(client)) return;
+    if (!IsValidClient(client) || !IsPlayerAlive(client))
+        return;
     SetEntProp(client, Prop_Send, "m_iAmmo", metal, _, 3);
 }
 
-stock GetHealingTarget(client)
+stock int GetHealingTarget(int client)
 {
-    new String:s[64];
-    new medigun = GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary);
+    char s[64];
+    int medigun = GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary);
     if (medigun <= MaxClients || !IsValidEdict(medigun))
         return -1;
     GetEdictClassname(medigun, s, sizeof(s));
@@ -7796,10 +7800,11 @@ stock GetHealingTarget(client)
     return true;
 }*/
 
-stock FindEntityByClassname2(startEnt, const String:classname[])
+stock int FindEntityByClassname2(int startEnt, const char[] classname)
 {
     /* If startEnt isn't valid shifting it back to the nearest valid one */
-    while (startEnt > -1 && !IsValidEntity(startEnt)) startEnt--;
+    while (startEnt > -1 && !IsValidEntity(startEnt))
+        startEnt--;
     return FindEntityByClassname(startEnt, classname);
 }
 
@@ -7831,17 +7836,17 @@ stock void ChangeTeam(int iClient, TFTeam iTeam) // iTeam should never be less t
     }
 }
 
-stock any:min(any:a,any:b) { return (a < b) ? a : b; }
+stock any min(any a,any b) { return (a < b) ? a : b; }
 
 /*
     Player health adder
     By: Chdata
 */
-stock AddPlayerHealth(iClient, iAdd, iOverheal = 0, bStaticMax = false)
+stock void AddPlayerHealth(int iClient, int iAdd, int iOverheal = 0, bool bStaticMax = false)
 {
-    new iHealth = GetClientHealth(iClient);
-    new iNewHealth = iHealth + iAdd;
-    new iMax = bStaticMax ? iOverheal : GetEntProp(iClient, Prop_Data, "m_iMaxHealth") + iOverheal;
+    int iHealth = GetClientHealth(iClient);
+    int iNewHealth = iHealth + iAdd;
+    int iMax = bStaticMax ? iOverheal : GetEntProp(iClient, Prop_Data, "m_iMaxHealth") + iOverheal;
     if (iHealth < iMax)
     {
         iNewHealth = min(iNewHealth, iMax);
@@ -7849,44 +7854,40 @@ stock AddPlayerHealth(iClient, iAdd, iOverheal = 0, bStaticMax = false)
     }
 }
 
-stock PrepareSound(const String:szSoundPath[])
+stock PrepareSound(const char[] szSoundPath)
 {
     PrecacheSound(szSoundPath, true);
-    decl String:s[PLATFORM_MAX_PATH];
+    char s[PLATFORM_MAX_PATH];
     Format(s, sizeof(s), "sound/%s", szSoundPath);
     AddFileToDownloadsTable(s);
 }
 
-stock DownloadSoundList(const String:szFileList[][], iSize)
+stock DownloadSoundList(const char[][] szFileList, int iSize)
 {
     for (new i = 0; i < iSize; i++)
-    {
         PrepareSound(szFileList[i]);
-    }
 }
 
-stock PrecacheSoundList(const String:szFileList[][], iSize)
+stock void PrecacheSoundList(const char[][] szFileList, int iSize)
 {
     for (new i = 0; i < iSize; i++)
-    {
         PrecacheSound(szFileList[i], true);
-    }
 }
 
 // Adds both a .vmt and .vtf to downloads - must exclude extension
-stock PrepareMaterial(const String:szMaterialPath[])
+stock void PrepareMaterial(const char[] szMaterialPath)
 {
-    decl String:s[PLATFORM_MAX_PATH];
+    char s[PLATFORM_MAX_PATH];
     Format(s, sizeof(s), "%s%s", szMaterialPath, ".vtf");
     AddFileToDownloadsTable(s);
     Format(s, sizeof(s), "%s%s", szMaterialPath, ".vmt");
     AddFileToDownloadsTable(s);
 }
 
-stock DownloadMaterialList(const String:szFileList[][], iSize)
+stock void DownloadMaterialList(const char[][] szFileList, int iSize)
 {
-    decl String:s[PLATFORM_MAX_PATH];
-    for (new i = 0; i < iSize; i++)
+    char s[PLATFORM_MAX_PATH];
+    for (int i = 0; i < iSize; i++)
     {
         strcopy(s, sizeof(s), szFileList[i]);
         AddFileToDownloadsTable(s); // if (FileExists(s, true))
