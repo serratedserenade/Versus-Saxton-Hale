@@ -6721,26 +6721,28 @@ public Action HelpPanel2(int client)
     return Plugin_Continue;
 }
 
-public Action:ClasshelpinfoCmd(client, args)
+public Action ClasshelpinfoCmd(int client, int args)
 {
-    if (!client) return Plugin_Handled;
+    if (!client)
+        return Plugin_Handled;
     ClasshelpinfoSetting(client);
     return Plugin_Handled;
 }
 
-public Action:ClasshelpinfoSetting(client)
+public Action ClasshelpinfoSetting(int client)
 {
     if (!g_bAreEnoughPlayersPlaying)
         return Plugin_Handled;
-    new Handle:panel = CreatePanel();
-    SetPanelTitle(panel, "Turn the VS Saxton Hale class info...");
-    DrawPanelItem(panel, "On");
-    DrawPanelItem(panel, "Off");
-    SendPanelToClient(panel, client, ClasshelpinfoTogglePanelH, 9001);
-    CloseHandle(panel);
+    Panel panel = new Panel();
+    panel.SetTitle("Turn the VS Saxton Hale class info...");
+    panel.DrawItem("On");
+    panel.DrawItem("Off");
+    panel.Send(client, ClasshelpinfoTogglePanelH, 9001);
+    delete panel;
     return Plugin_Handled;
 }
-public ClasshelpinfoTogglePanelH(Handle:menu, MenuAction:action, param1, param2)
+
+public int ClasshelpinfoTogglePanelH(Menu menu, MenuAction action, int param1, int param2)
 {
     if (IsValidClient(param1))
     {
@@ -6753,7 +6755,9 @@ public ClasshelpinfoTogglePanelH(Handle:menu, MenuAction:action, param1, param2)
             CPrintToChat(param1, "{olive}[VSH]{default} %t", "vsh_classinfo", param2 == 2 ? "off" : "on");
         }
     }
+    return 0;
 }
+
 /*public HelpPanelH1(Handle:menu, MenuAction:action, param1, param2)
 {
     if (action == MenuAction_Select)
@@ -6776,25 +6780,29 @@ public Action:HelpPanel1(client, Args)
     CloseHandle(panel);
     return Plugin_Continue;
 }*/
-public Action:MusicTogglePanelCmd(client, args)
+
+public Action MusicTogglePanelCmd(int client, int args)
 {
-    if (!client) return Plugin_Handled;
+    if (!client)
+        return Plugin_Handled;
     MusicTogglePanel(client);
     return Plugin_Handled;
 }
-public Action:MusicTogglePanel(client)
+
+public Action MusicTogglePanel(int client)
 {
     if (!g_bAreEnoughPlayersPlaying || !client)
         return Plugin_Handled;
-    new Handle:panel = CreatePanel();
-    SetPanelTitle(panel, "Turn the VS Saxton Hale music...");
-    DrawPanelItem(panel, "On");
-    DrawPanelItem(panel, "Off");
-    SendPanelToClient(panel, client, MusicTogglePanelH, 9001);
-    CloseHandle(panel);
+    Panel panel = new Panel();
+    panel.SetTitle("Turn the VS Saxton Hale music...");
+    panel.DrawItem("On");
+    panel.DrawItem("Off");
+    panel.Send(client, MusicTogglePanelH, 9001);
+    delete panel;
     return Plugin_Handled;
 }
-public MusicTogglePanelH(Handle:menu, MenuAction:action, param1, param2)
+
+public int MusicTogglePanelH(Menu menu, MenuAction action, int param1, int param2)
 {
     if (IsValidClient(param1))
     {
@@ -6810,27 +6818,31 @@ public MusicTogglePanelH(Handle:menu, MenuAction:action, param1, param2)
             CPrintToChat(param1, "{olive}[VSH]{default} %t", "vsh_music", param2 == 2 ? "off" : "on");
         }
     }
+    return 0;
 }
-public Action:VoiceTogglePanelCmd(client, args)
+
+public Action VoiceTogglePanelCmd(int client, int args)
 {
-    if (!client) return Plugin_Handled;
+    if (!client)
+        return Plugin_Handled;
     VoiceTogglePanel(client);
     return Plugin_Handled;
 }
-public Action:VoiceTogglePanel(client)
+
+public Action VoiceTogglePanel(int client)
 {
     if (!g_bAreEnoughPlayersPlaying || !client)
         return Plugin_Handled;
-    new Handle:panel = CreatePanel();
-    SetPanelTitle(panel, "Turn the VS Saxton Hale voices...");
-    DrawPanelItem(panel, "On");
-    DrawPanelItem(panel, "Off");
-    SendPanelToClient(panel, client, VoiceTogglePanelH, 9001);
-    CloseHandle(panel);
+    Panel panel = new Panel();
+    panel.SetTitle("Turn the VS Saxton Hale voices...");
+    panel.DrawItem("On");
+    panel.DrawItem("Off");
+    panel.Send(client, VoiceTogglePanelH, 9001);
+    delete panel;
     return Plugin_Handled;
 }
 
-public VoiceTogglePanelH(Handle:menu, MenuAction:action, param1, param2)
+public int VoiceTogglePanelH(Menu menu, MenuAction action, int param1, int param2)
 {
     if (IsValidClient(param1))
     {
@@ -6841,9 +6853,11 @@ public VoiceTogglePanelH(Handle:menu, MenuAction:action, param1, param2)
             else
                 SetClientSoundOptions(param1, SOUNDEXCEPT_VOICE, true);
             CPrintToChat(param1, "{olive}[VSH]{default} %t", "vsh_voice", param2 == 2 ? "off" : "on");
-            if (param2 == 2) CPrintToChat(param1, "%t", "vsh_voice2");
+            if (param2 == 2)
+                CPrintToChat(param1, "%t", "vsh_voice2");
         }
     }
+    return 0;
 }
 
 public Action:HookSound(clients[64], &numClients, String:sample[PLATFORM_MAX_PATH], &entity, &channel, &Float:volume, &level, &pitch, &flags)
