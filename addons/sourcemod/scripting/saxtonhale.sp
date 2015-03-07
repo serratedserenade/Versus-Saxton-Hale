@@ -370,14 +370,14 @@ new HaleRage;
 new NextHale;
 new Float:g_flStabbed;
 new Float:g_flMarketed;
-new Float:HPTime;
-new Float:KSpreeTimer;
+//new Float:HPTime;
+//new Float:KSpreeTimer;
 new Float:WeighDownTimer;
 new KSpreeCount = 1;
 new Float:UberRageCount;
 new Float:GlowTimer;
 new bool:bEnableSuperDuperJump;
-new bool:bTenSecStart[2] = {false, false};
+//new bool:bTenSecStart[2] = {false, false};
 new bool:bSpawnTeleOnTriggerHurt = false;
 new HHHClimbCount;
 new bool:bNoTaunt = false;
@@ -943,8 +943,8 @@ public OnConfigsExecuted()
 }
 public OnMapStart()
 {
-    HPTime = 0.0;
-    KSpreeTimer = 0.0;
+    //HPTime = 0.0;
+    //KSpreeTimer = 0.0;
     TeamRoundCounter = 0;
     MusicTimer = INVALID_HANDLE;
     doorchecktimer = INVALID_HANDLE;
@@ -1704,10 +1704,15 @@ public Action:event_round_start(Handle:event, const String:name[], bool:dontBroa
     {
         Hale = tHale;
     }
-    bTenSecStart[0] = true;
-    bTenSecStart[1] = true;
-    CreateTimer(29.1, tTenSecStart, 0);
-    CreateTimer(60.0, tTenSecStart, 1);
+
+    SetNextTime(e_flNextAllowBossSuicide, 29.1);
+    SetNextTime(e_flNextAllowOtherSpawnTele, 60.0);
+
+    // bTenSecStart[0] = true;
+    // bTenSecStart[1] = true;
+    // CreateTimer(29.1, tTenSecStart, 0);
+    // CreateTimer(60.0, tTenSecStart, 1);
+
     CreateTimer(9.1, StartHaleTimer, _, TIMER_FLAG_NO_MAPCHANGE);
     CreateTimer(3.5, StartResponceTimer, _, TIMER_FLAG_NO_MAPCHANGE);
     CreateTimer(9.6, MessageTimer, true, TIMER_FLAG_NO_MAPCHANGE);
@@ -2171,10 +2176,10 @@ public Action:StartResponceTimer(Handle:hTimer)
     }
     return Plugin_Continue;
 }
-public Action:tTenSecStart(Handle:hTimer, any:ofs)
-{
-    bTenSecStart[ofs] = false;
-}
+// public Action:tTenSecStart(Handle:hTimer, any:ofs)
+// {
+//     bTenSecStart[ofs] = false;
+// }
 public Action:StartHaleTimer(Handle:hTimer)
 {
     CreateTimer(0.1, GottamTimer);
@@ -3335,7 +3340,7 @@ public Action:Command_GetHP(client)
         HaleHealthLast = HaleHealth;
         return Plugin_Continue;
     }
-    if (GetGameTime() >= HPTime)
+    if (IsNextTime(e_flNextHealthQuery)) //  GetGameTime() >= HPTime
     {
         healthcheckused++;
         switch (Special)
@@ -3367,12 +3372,12 @@ public Action:Command_GetHP(client)
             }
         }
         HaleHealthLast = HaleHealth;
-        HPTime = GetGameTime() + (healthcheckused < 3 ? 20.0 : 80.0);
+        SetNextTime(e_flNextHealthQuery, healthcheckused < 3 ? 20.0 : 80.0);
     }
     else if (RedAlivePlayers == 1)
         CPrintToChat(client, "{olive}[VSH]{default} %t", "vsh_already_see");
     else
-        CPrintToChat(client, "{olive}[VSH]{default} %t", "vsh_wait_hp", RoundFloat(HPTime-GetGameTime()), HaleHealthLast);
+        CPrintToChat(client, "{olive}[VSH]{default} %t", "vsh_wait_hp", RoundFloat(GetTimeTilNextTime(e_flNextHealthQuery)), HaleHealthLast);
     return Plugin_Continue;
 }
 public Action:Command_MakeNextSpecial(client, args)
@@ -4142,7 +4147,7 @@ public Action:HaleTimer(Handle:hTimer)
                         CreateTimer(bEnableSuperDuperJump ? 4.0:2.0, HHHTeleTimer, _, TIMER_FLAG_NO_MAPCHANGE);
                     }
 
-                    SetEntPropFloat(Hale, Prop_Send, "m_flNextAttack", GetGameTime() + (bEnableSuperDuperJump ? 4.0 : 2.0));
+                    SetEntPropFloat(Hale, Prop_Send, "e_flNextAttack", GetGameTime() + (bEnableSuperDuperJump ? 4.0 : 2.0));
                     SetEntProp(Hale, Prop_Send, "m_bGlowEnabled", 0);
                     GlowTimer = 0.0;
 
@@ -4371,7 +4376,7 @@ public Action:DoTaunt(client, const String:command[], argc)
     if (!g_bEnabled || (client != Hale))
         return Plugin_Continue;
 
-    if (bNoTaunt) // Prevent double-tap rages
+    if (!IfDoNextTime(e_flNextBossTaunt, 1.5)) // Prevent double-tap rages
     {
         return Plugin_Handled;
     }
@@ -4467,22 +4472,22 @@ public Action:DoTaunt(client, const String:command[], argc)
         VSHFlags[Hale] &= ~VSHFLAG_BOTRAGE;
     }
 
-    bNoTaunt = true;
-    CreateTimer(1.5, Timer_NoTaunting, _, TIMER_FLAG_NO_MAPCHANGE);
+    // bNoTaunt = true;
+    // CreateTimer(1.5, Timer_NoTaunting, _, TIMER_FLAG_NO_MAPCHANGE);
 
     return Plugin_Continue;
 }
 
-public Action:Timer_NoTaunting(Handle:timer)
-{
-    bNoTaunt = false;
-}
+// public Action:Timer_NoTaunting(Handle:timer)
+// {
+//     bNoTaunt = false;
+// }
 
 public Action:DoSuicide(client, const String:command[], argc)
 {
     if (g_bEnabled && (VSHRoundState == VSHRState_Waiting || VSHRoundState == VSHRState_Active))
     {
-        if (client == Hale && bTenSecStart[0])
+        if (client == Hale && !IsNextTime(m_flNextAllowBossSuicide))
         {
             CPrintToChat(client, "Do not suicide as Hale. Use !resetq instead.");
             return Plugin_Handled;
@@ -4494,7 +4499,7 @@ public Action:DoSuicide(client, const String:command[], argc)
 }
 public Action:DoSuicide2(client, const String:command[], argc)
 {
-    if (g_bEnabled && client == Hale && bTenSecStart[0])
+    if (g_bEnabled && client == Hale && !IsNextTime(m_flNextAllowBossSuicide))
     {
         CPrintToChat(client, "You can't change teams this early.");
         return Plugin_Handled;
@@ -4790,10 +4795,15 @@ public Action:event_player_death(Handle:event, const String:name[], bool:dontBro
                 }
             }
         }
-        if (GetGameTime() <= KSpreeTimer)
-            KSpreeCount++;
-        else
+        if (IsNextTime(e_flNextBossKillSpreeEnd, 5.0)) //GetGameTime() <= KSpreeTimer)
+        {
             KSpreeCount = 1;
+        }
+        else
+        {
+            KSpreeCount++;
+        }
+
         if (KSpreeCount == 3 && RedAlivePlayers != 1)
         {
             switch (Special)
@@ -4838,7 +4848,10 @@ public Action:event_player_death(Handle:event, const String:name[], bool:dontBro
             KSpreeCount = 0;
         }
         else
-            KSpreeTimer = GetGameTime() + 5.0;
+        {
+            SetNextTime(e_flNextBossKillSpreeEnd, 5.0);
+            //KSpreeTimer = GetGameTime() + 5.0;
+        }
     }
     if ((TF2_GetPlayerClass(client) == TFClass_Engineer) && !(deathflags & TF_DEATHFLAG_DEADRINGER))
     {
@@ -5618,14 +5631,14 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                     // Teleport the boss back to one of the spawns.
                     // And during the first 30 seconds, he can only teleport to his own spawn.
                     //TeleportToSpawn(Hale, (bTenSecStart[1]) ? HaleTeam : 0);
-                    TeleportToMultiMapSpawn(Hale, (bTenSecStart[1]) ? HaleTeam : 0);
+                    TeleportToMultiMapSpawn(Hale, (!IsNextTime(m_flNextAllowOtherSpawnTele)) ? HaleTeam : 0);
                 }
                 else if (damage >= 250.0)
                 {
                     if (Special == VSHSpecial_HHH)
                     {
-                        //TeleportToSpawn(Hale, (bTenSecStart[1]) ? HaleTeam : 0);
-                        TeleportToMultiMapSpawn(Hale, (bTenSecStart[1]) ? HaleTeam : 0);
+                        //TeleportToSpawn(Hale, (!IsNextTime(m_flNextAllowOtherSpawnTele)) ? HaleTeam : 0);
+                        TeleportToMultiMapSpawn(Hale, (!IsNextTime(m_flNextAllowOtherSpawnTele)) ? HaleTeam : 0);
                     }
                     else if (HaleCharge >= 0)
                     {
@@ -7646,32 +7659,31 @@ stock FindPlayerBack(client, indices[], len)
     return -1;
 }
 
-enum m_flNext
+enum e_flNext
 {
-    m_flNextUnusedFeature = 0
+    e_flNextBossTaunt = 0,
+    e_flNextAllowBossSuicide,
+    e_flNextAllowOtherSpawnTele,
+    e_flNextBossKillSpreeEnd,
+    e_flNextHealthQuery
 }
 
-enum m_flNext2
+enum e_flNext2
 {
-    m_flNextEndPriority = 0
+    e_flNextEndPriority = 0
 }
 
-static Float:g_flNext[m_flNext];
-static Float:g_flNext2[m_flNext][TF_MAX_PLAYERS];
+static Float:g_flNext[e_flNext];
+static Float:g_flNext2[e_flNext][TF_MAX_PLAYERS];
 
 stock bool:IsNextTime(iIndex, Float:flAdditional = 0.0)
 {
     return (GetEngineTime() >= g_flNext[iIndex]+flAdditional);
 }
 
-stock IncNextTime(iIndex, Float:flSeconds)
+stock SetNextTime(iIndex, Float:flTime, bool:bAbsolute = false)
 {
-    g_flNext[iIndex] = GetEngineTime() + flSeconds;
-}
-
-stock SetNextTime(iIndex, Float:flTime)
-{
-    g_flNext[iIndex] = flTime;
+    g_flNext[iIndex] = bAbsolute ? flTime : GetEngineTime() + flSeconds;
 }
 
 stock GetNextTime(iIndex)
@@ -7691,7 +7703,7 @@ stock bool:IfDoNextTime(iIndex, Float:flThenAdd)
 {
     if (IsNextTime(iIndex))
     {
-        IncNextTime(iIndex, flThenAdd);
+        SetNextTime(iIndex, flThenAdd);
         return true;
     }
     return false;
@@ -7704,14 +7716,9 @@ stock bool:IsNextTime2(iClient, iIndex, Float:flAdditional = 0.0)
     return (GetEngineTime() >= g_flNext2[iIndex][iClient]+flAdditional);
 }
 
-stock IncNextTime2(iClient, iIndex, Float:flSeconds)
+stock SetNextTime2(iClient, iIndex, Float:flTime, bool:bAbsolute = false)
 {
-    g_flNext2[iIndex][iClient] = GetEngineTime() + flSeconds;
-}
-
-stock SetNextTime2(iClient, iIndex, Float:flTime)
-{
-    g_flNext2[iIndex][iClient] = flTime;
+    g_flNext2[iIndex][iClient] = bAbsolute ? flTime : GetEngineTime() + flSeconds;
 }
 
 stock GetNextTime2(iClient, iIndex)
@@ -7726,7 +7733,7 @@ stock bool:IfDoNextTime2(iClient, iIndex, Float:flThenAdd)
 {
     if (IsNextTime2(iClient, iIndex))
     {
-        IncNextTime2(iClient, iIndex, flThenAdd);
+        SetNextTime2(iClient, iIndex, flThenAdd);
         return true;
     }
     return false;
@@ -7761,7 +7768,7 @@ stock PriorityCenterText(iClient, iPriority = MIN_INT, const String:szFormat[], 
 
     if (s_iLastPriority[iClient] > iPriority)
     {
-        if (IsNextTime2(iClient, m_flNextEndPriority))
+        if (IsNextTime2(iClient, e_flNextEndPriority))
         {
             s_iLastPriority[iClient] = MIN_INT;
         }
@@ -7773,7 +7780,7 @@ stock PriorityCenterText(iClient, iPriority = MIN_INT, const String:szFormat[], 
 
     if (iPriority > s_iLastPriority[iClient])
     {
-        IncNextTime2(iClient, m_flNextEndPriority, 5.0);
+        IncNextTime2(iClient, e_flNextEndPriority, 5.0);
         s_iLastPriority[iClient] = iPriority;
     }
 
@@ -7819,7 +7826,7 @@ stock PriorityCenterTextAllEx(iPriority = -2147483647, const String:szFormat[], 
 
     if (s_iLastPriority[0] > iPriority)
     {
-        if (IsNextTime2(0, m_flNextEndPriority))
+        if (IsNextTime2(0, e_flNextEndPriority))
         {
             s_iLastPriority[0] = MIN_INT;
 
@@ -7836,7 +7843,7 @@ stock PriorityCenterTextAllEx(iPriority = -2147483647, const String:szFormat[], 
 
     if (iPriority > s_iLastPriority[0])
     {
-        IncNextTime2(0, m_flNextEndPriority, 5.0);
+        IncNextTime2(0, e_flNextEndPriority, 5.0);
 
         s_iLastPriority[0] = iPriority;
 
