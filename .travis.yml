@@ -8,26 +8,20 @@ matrix:
 before_install:
     - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test > /dev/null
     - sudo apt-get update -qq > /dev/null
-    - sudo apt-get install gcc-multilib lynx lib32stdc++6 mercurial -y  > /dev/null
+    - sudo apt-get install gcc-multilib lynx lib32stdc++6 -y  > /dev/null
 install:
     - SMPATTERN="http:.*sourcemod-.*-git.*-linux.*"
     - SMURL="http://www.sourcemod.net/smdrop/$SMVERSION/"
     - SMPACKAGE=`lynx -dump "$SMURL" | egrep -o "$SMPATTERN" | tail -1`
     - wget $SMPACKAGE
     - tar -xzf $(basename "$SMPACKAGE")
-    - mkdir depends
-    - cd depends
-    - git clone https://code.limetech.org/diffusion/ST/steamtools.git steamtools
-    - mv steamtools/plugin/steamtools.inc ../addons/sourcemod/scripting/include/
-    - rm -rf ./*
-    - hg clone http://hg.limetech.org/projects/tf2items/tf2items_source/ tf2items
-    - mv tf2items/pawn/tf2items.inc ../addons/sourcemod/scripting/include/
-    - cd ../ && rm -rf depends
     - cd addons/sourcemod
 before_script:
-    - cd ./scripting/
+    - cd ./scripting/include/
     - wget "https://forums.alliedmods.net/attachment.php?attachmentid=141740" -O morecolors.inc
-    - mv morecolors.inc include/
+    - wget "http://hg.limetech.org/projects/tf2items/tf2items_source/raw-file/tip/pawn/tf2items.inc" -O tf2items.inc
+    - wget "http://hg.limetech.org/projects/steamtools/raw-file/tip/plugin/steamtools.inc" -O steamtools.inc
+    - cd ../
     - chmod +x spcomp
     - mkdir compiled
 script: ./compile.sh saxtonhale.sp
