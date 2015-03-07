@@ -6983,10 +6983,9 @@ stock int AttachProjectileModel(int entity, char[] strModel, char[] strAnim = ""
     return -1;
 }
 
-public Native_IsVSHMap(Handle:plugin, numParams)
+/*public Native_IsVSHMap(Handle:plugin, numParams)
 {
-    return IsSaxtonHaleMap();
-/*  new result = IsSaxtonHaleMap();
+    new result = IsSaxtonHaleMap();
     new result2 = result;
 
     new Action:act = Plugin_Continue;
@@ -6995,9 +6994,9 @@ public Native_IsVSHMap(Handle:plugin, numParams)
     Call_Finish(act);
     if (act == Plugin_Changed)
         result = result2;
-    return result;*/
+    return result;
 }
-/*
+
 public Native_IsEnabled(Handle:plugin, numParams)
 {
     new result = g_bEnabled;
@@ -7117,37 +7116,49 @@ public Native_GetDamage(Handle:plugin, numParams)
     return result;
 }*/
 
-public Native_IsEnabled(Handle:plugin, numParams)
+public int Native_IsVSHMap(Handle plugin, int numParams)
 {
-    return g_bEnabled;
+    return view_as<int>(IsSaxtonHaleMap());
 }
-public Native_GetHale(Handle:plugin, numParams)
+
+public int Native_IsEnabled(Handle plugin, int numParams)
+{
+    return view_as<int>(g_bEnabled);
+}
+
+public int Native_GetHale(Handle plugin, int numParams)
 {
     if (IsValidClient(Hale))
         return GetClientUserId(Hale);
     return -1;
 }
-public Native_GetTeam(Handle:plugin, numParams)
+
+public int Native_GetTeam(Handle plugin, int numParams)
 {
-    return HaleTeam;
+    return view_as<int>(HaleTeam);
 }
-public Native_GetSpecial(Handle:plugin, numParams)
+
+public int Native_GetSpecial(Handle plugin, int numParams)
 {
-    return Special;
+    return view_as<int>(Special);
 }
-public Native_GetHealth(Handle:plugin, numParams)
+
+public int Native_GetHealth(Handle plugin, int numParams)
 {
     return HaleHealth;
 }
-public Native_GetHealthMax(Handle:plugin, numParams)
+
+public int Native_GetHealthMax(Handle plugin, int numParams)
 {
     return HaleHealthMax;
 }
-public Native_GetRoundState(Handle:plugin, numParams)
+
+public int Native_GetRoundState(Handle plugin, int numParams)
 {
-    return VSHRoundState;
+    return view_as<int>(VSHRoundState);
 }
-public Native_GetDamage(Handle:plugin, numParams)
+
+public int Native_GetDamage(Handle plugin, int numParams)
 {
     new client = GetNativeCell(1);
     if (!IsValidClient(client))
