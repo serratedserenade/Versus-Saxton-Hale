@@ -6914,16 +6914,19 @@ public Action HookSound(int clients[64],
     return Plugin_Continue;
 }
 
-public void OnEntityCreated(int entity, const char[] classname)
+public int OnEntityCreated(int entity, const char[] classname)
 {
     if (g_bEnabled && VSHRoundState == VSHRState_Active && strcmp(classname, "tf_projectile_pipe", false) == 0)
         SDKHook(entity, SDKHook_SpawnPost, OnEggBombSpawned);
+    return 0; //Temp
 }
-public OnEggBombSpawned(int entity)
+
+public int OnEggBombSpawned(int entity)
 {
     int owner = GetEntPropEnt(entity, Prop_Send, "m_hOwnerEntity");
     if (IsValidClient(owner) && owner == Hale && Special == VSHSpecial_Bunny)
         RequestFrame(Timer_SetEggBomb, EntIndexToEntRef(entity));
+    return 0; //Temp
 }
 
 public void Timer_SetEggBomb(any ref)
