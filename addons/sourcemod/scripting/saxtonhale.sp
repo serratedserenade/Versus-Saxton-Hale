@@ -3750,7 +3750,7 @@ public Action HaleTimer(Handle hTimer)
         TF2_RemoveCondition(Hale, TFCond_MarkedForDeath);
     if (TF2_IsPlayerInCondition(Hale, TFCond_Disguised))
         TF2_RemoveCondition(Hale, TFCond_Disguised);
-    if (TF2_IsPlayerInCondition(Hale, TFCond:42) && TF2_IsPlayerInCondition(Hale, TFCond_Dazed))
+    if (TF2_IsPlayerInCondition(Hale, view_as<TFCond>(42)) && TF2_IsPlayerInCondition(Hale, TFCond_Dazed))
         TF2_RemoveCondition(Hale, TFCond_Dazed);
     float speed = HaleSpeed + 0.7 * (100 - HaleHealth * 100 / HaleHealthMax);
     SetEntPropFloat(Hale, Prop_Send, "m_flMaxspeed", speed);
@@ -3850,13 +3850,11 @@ public Action HaleTimer(Handle hTimer)
             Call_StartForward(OnHaleJump);
             Call_PushCellRef(super);
             Call_Finish(act);
-            switch (act)
+            if (act != Plugin_Continue)
             {
-                case Plugin_Continue:
-                    break;
-                case Plugin_Changed:
+                if (act == Plugin_Changed)
                     bEnableSuperDuperJump = super;
-                default:
+                else
                     return Plugin_Continue;
             }
             float pos[3];
