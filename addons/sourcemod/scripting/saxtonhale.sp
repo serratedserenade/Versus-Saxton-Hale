@@ -518,7 +518,8 @@ static const char haleversiondates[][] =
     "18 Aug 2014",
     "04 Oct 2014",
     "29 Oct 2014", //  An update I never bothered to throw outdate
-    "25 Dec 2014"  //  Merry Xmas
+    "25 Dec 2014",  //  Merry Xmas
+    "9 Mar 2015"
 };
 static const int maxversion = (sizeof(haleversiontitles) - 1);
 Handle OnHaleJump, OnHaleRage, OnHaleWeighdown, OnMusic, OnHaleNext;
