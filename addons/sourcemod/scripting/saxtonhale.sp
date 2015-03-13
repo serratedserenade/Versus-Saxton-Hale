@@ -3679,7 +3679,7 @@ public Action:event_player_spawn(Handle:event, const String:name[], bool:dontBro
         if (!(VSHFlags[client] & VSHFLAG_HASONGIVED))
         {
             VSHFlags[client] |= VSHFLAG_HASONGIVED;
-			new array[] = { 57, 133, 231, 405, 444, 608, 642 };
+            new array[] = { 57, 133, 231, 405, 444, 608, 642 };
             RemovePlayerBack(client, array, sizeof(array));
             RemoveDemoShield(client);
             TF2_RemoveAllWeapons(client);
