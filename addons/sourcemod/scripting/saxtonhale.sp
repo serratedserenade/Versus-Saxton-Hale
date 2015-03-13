@@ -171,12 +171,12 @@ enum e_flNext2
 
 // SFX
 #define CBSTheme                "saxton_hale/the_millionaires_holiday.mp3"
-#define CBS0                    "vo/sniper_specialweapon08.wav"
-#define CBS1                "vo/taunts/sniper_taunts02.wav"
+#define CBS0                    "vo/sniper_specialweapon08.mp3"
+#define CBS1                "vo/taunts/sniper_taunts02.mp3"
 #define CBS2                    "vo/sniper_award"
-#define CBS3                "vo/sniper_battlecry03.wav"
+#define CBS3                "vo/sniper_battlecry03.mp3"
 #define CBS4                    "vo/sniper_domination"
-#define CBSJump1                "vo/sniper_specialcompleted02.wav"
+#define CBSJump1                "vo/sniper_specialcompleted02.mp3"
 
 // Unused
 //#define ShivModel               "models/weapons/c_models/c_wood_machete/c_wood_machete.mdl"
@@ -191,8 +191,8 @@ enum e_flNext2
 
 // SFX
 #define HHHLaught               "vo/halloween_boss/knight_laugh"
-#define HHHRage                 "vo/halloween_boss/knight_attack01.wav"
-#define HHHRage2                "vo/halloween_boss/knight_alert.wav"
+#define HHHRage                 "vo/halloween_boss/knight_attack01.mp3"
+#define HHHRage2                "vo/halloween_boss/knight_alert.mp3"
 #define HHHAttack               "vo/halloween_boss/knight_attack"
 
 #define HHHTheme                "saxton_hale/hhh_theme.mp3"
@@ -258,83 +258,83 @@ static const char BunnyMaterials[][] = {
 
 // SFX
 static const char BunnyWin[][] = {
-    "vo/demoman_gibberish01.wav",
-    "vo/demoman_gibberish12.wav",
-    "vo/demoman_cheers02.wav",
-    "vo/demoman_cheers03.wav",
-    "vo/demoman_cheers06.wav",
-    "vo/demoman_cheers07.wav",
-    "vo/demoman_cheers08.wav",
-    "vo/taunts/demoman_taunts12.wav"
+    "vo/demoman_gibberish01.mp3",
+    "vo/demoman_gibberish12.mp3",
+    "vo/demoman_cheers02.mp3",
+    "vo/demoman_cheers03.mp3",
+    "vo/demoman_cheers06.mp3",
+    "vo/demoman_cheers07.mp3",
+    "vo/demoman_cheers08.mp3",
+    "vo/taunts/demoman_taunts12.mp3"
 };
 
 static const char BunnyJump[][] = {
-    "vo/demoman_gibberish07.wav",
-    "vo/demoman_gibberish08.wav",
-    "vo/demoman_laughshort01.wav",
-    "vo/demoman_positivevocalization04.wav"
+    "vo/demoman_gibberish07.mp3",
+    "vo/demoman_gibberish08.mp3",
+    "vo/demoman_laughshort01.mp3",
+    "vo/demoman_positivevocalization04.mp3"
 };
 
 static const char BunnyRage[][] = {
-    "vo/demoman_positivevocalization03.wav",
-    "vo/demoman_dominationscout05.wav",
-    "vo/demoman_cheers02.wav"
+    "vo/demoman_positivevocalization03.mp3",
+    "vo/demoman_dominationscout05.mp3",
+    "vo/demoman_cheers02.mp3"
 };
 
 static const char BunnyFail[][] = {
-    "vo/demoman_gibberish04.wav",
-    "vo/demoman_gibberish10.wav",
-    "vo/demoman_jeers03.wav",
-    "vo/demoman_jeers06.wav",
-    "vo/demoman_jeers07.wav",
-    "vo/demoman_jeers08.wav"
+    "vo/demoman_gibberish04.mp3",
+    "vo/demoman_gibberish10.mp3",
+    "vo/demoman_jeers03.mp3",
+    "vo/demoman_jeers06.mp3",
+    "vo/demoman_jeers07.mp3",
+    "vo/demoman_jeers08.mp3"
 };
 
 static const char BunnyKill[][] = {
-    "vo/demoman_gibberish09.wav",
-    "vo/demoman_cheers02.wav",
-    "vo/demoman_cheers07.wav",
-    "vo/demoman_positivevocalization03.wav"
+    "vo/demoman_gibberish09.mp3",
+    "vo/demoman_cheers02.mp3",
+    "vo/demoman_cheers07.mp3",
+    "vo/demoman_positivevocalization03.mp3"
 };
 
 static const char BunnySpree[][] = {
-    "vo/demoman_gibberish05.wav",
-    "vo/demoman_gibberish06.wav",
-    "vo/demoman_gibberish09.wav",
-    "vo/demoman_gibberish11.wav",
-    "vo/demoman_gibberish13.wav",
-    "vo/demoman_autodejectedtie01.wav"
+    "vo/demoman_gibberish05.mp3",
+    "vo/demoman_gibberish06.mp3",
+    "vo/demoman_gibberish09.mp3",
+    "vo/demoman_gibberish11.mp3",
+    "vo/demoman_gibberish13.mp3",
+    "vo/demoman_autodejectedtie01.mp3"
 };
 
 static const char BunnyLast[][] = {
-    "vo/taunts/demoman_taunts05.wav",
-    "vo/taunts/demoman_taunts04.wav",
-    "vo/demoman_specialcompleted07.wav"
+    "vo/taunts/demoman_taunts05.mp3",
+    "vo/taunts/demoman_taunts04.mp3",
+    "vo/demoman_specialcompleted07.mp3"
 };
 
 static const char BunnyPain[][] = {
-    "vo/demoman_sf12_badmagic01.wav",
-    "vo/demoman_sf12_badmagic07.wav",
-    "vo/demoman_sf12_badmagic10.wav"
+    "vo/demoman_sf12_badmagic01.mp3",
+    "vo/demoman_sf12_badmagic07.mp3",
+    "vo/demoman_sf12_badmagic10.mp3"
 };
 
 static const char BunnyStart[][] = {
-    "vo/demoman_gibberish03.wav",
-    "vo/demoman_gibberish11.wav"
+    "vo/demoman_gibberish03.mp3",
+    "vo/demoman_gibberish11.mp3"
 };
 
 static const char BunnyRandomVoice[][] = {
-    "vo/demoman_positivevocalization03.wav",
-    "vo/demoman_jeers08.wav",
-    "vo/demoman_gibberish03.wav",
-    "vo/demoman_cheers07.wav",
-    "vo/demoman_sf12_badmagic01.wav",
-    "vo/burp02.wav",
-    "vo/burp03.wav",
-    "vo/burp04.wav",
-    "vo/burp05.wav",
-    "vo/burp06.wav",
-    "vo/burp07.wav"
+    "vo/demoman_positivevocalization03.mp3",
+    "vo/demoman_jeers08.mp3",
+    "vo/demoman_gibberish03.mp3",
+    "vo/demoman_cheers07.mp3",
+    "vo/demoman_sf12_badmagic01.mp3",
+    "vo/burp02.mp3",
+    "vo/burp03.mp3",
+    "vo/burp04.mp3",
+    "vo/burp05.mp3",
+    "vo/burp06.mp3",
+    "vo/burp07.mp3"
 };
 
 // Unused
@@ -929,9 +929,9 @@ void AddToDownload()
     /*
         Files to precache that are originally part of TF2 or HL2 / etc and don't need to be downloaded
     */
-    PrecacheSound("vo/announcer_am_capincite01.wav", true);
-    PrecacheSound("vo/announcer_am_capincite03.wav", true);
-    PrecacheSound("vo/announcer_am_capenabled02.wav", true);
+    PrecacheSound("vo/announcer_am_capincite01.mp3", true);
+    PrecacheSound("vo/announcer_am_capincite03.mp3", true);
+    PrecacheSound("vo/announcer_am_capenabled02.mp3", true);
     //PrecacheSound("weapons/barret_arm_zap.wav", true);
     PrecacheSound("player/doubledonk.wav", true);
     PrecacheParticleSystem("ghost_appearation");
@@ -970,11 +970,11 @@ void AddToDownload()
     char s[PLATFORM_MAX_PATH];
     for (i = 1; i <= 4; i++)
     {
-        Format(s, PLATFORM_MAX_PATH, "%s0%i.wav", HaleLastB, i);
+        Format(s, PLATFORM_MAX_PATH, "%s0%i.mp3", HaleLastB, i);
         PrecacheSound(s, true);
-        /*Format(s, PLATFORM_MAX_PATH, "%s0%i.wav", HHHLaught, i);
+        /*Format(s, PLATFORM_MAX_PATH, "%s0%i.mp3", HHHLaught, i);
         PrecacheSound(s, true);
-        Format(s, PLATFORM_MAX_PATH, "%s0%i.wav", HHHAttack, i);
+        Format(s, PLATFORM_MAX_PATH, "%s0%i.mp3", HHHAttack, i);
         PrecacheSound(s, true);*/
     }
     PrepareSound(HaleKillMedic);
@@ -1052,13 +1052,13 @@ void AddToDownload()
     {
         if (i <= 9)
         {
-            Format(s, PLATFORM_MAX_PATH, "%s%02i.wav", CBS2, i);
+            Format(s, PLATFORM_MAX_PATH, "%s%02i.mp3", CBS2, i);
             PrecacheSound(s, true);
         }
-        Format(s, PLATFORM_MAX_PATH, "%s%02i.wav", CBS4, i);
+        Format(s, PLATFORM_MAX_PATH, "%s%02i.mp3", CBS4, i);
         PrecacheSound(s, true);
     }
-    PrecacheSound("vo/sniper_dominationspy04.wav", true);
+    PrecacheSound("vo/sniper_dominationspy04.mp3", true);
     // Download
     PrepareModel(CBSModel);
     PrepareSound(CBSTheme);
@@ -1068,26 +1068,26 @@ void AddToDownload()
     PrecacheSound(HHHRage2, true);
     for (i = 1; i <= 4; i++)
     {
-        Format(s, PLATFORM_MAX_PATH, "%s0%i.wav", HHHLaught, i);
+        Format(s, PLATFORM_MAX_PATH, "%s0%i.mp3", HHHLaught, i);
         PrecacheSound(s, true);
-        Format(s, PLATFORM_MAX_PATH, "%s0%i.wav", HHHAttack, i);
+        Format(s, PLATFORM_MAX_PATH, "%s0%i.mp3", HHHAttack, i);
         PrecacheSound(s, true);
     }
     PrecacheSound("ui/halloween_boss_summoned_fx.wav", true);
     PrecacheSound("ui/halloween_boss_defeated_fx.wav", true);
-    PrecacheSound("vo/halloween_boss/knight_pain01.wav", true);
-    PrecacheSound("vo/halloween_boss/knight_pain02.wav", true);
-    PrecacheSound("vo/halloween_boss/knight_pain03.wav", true);
-    PrecacheSound("vo/halloween_boss/knight_death01.wav", true);
-    PrecacheSound("vo/halloween_boss/knight_death02.wav", true);
+    PrecacheSound("vo/halloween_boss/knight_pain01.mp3", true);
+    PrecacheSound("vo/halloween_boss/knight_pain02.mp3", true);
+    PrecacheSound("vo/halloween_boss/knight_pain03.mp3", true);
+    PrecacheSound("vo/halloween_boss/knight_death01.mp3", true);
+    PrecacheSound("vo/halloween_boss/knight_death02.mp3", true);
     PrecacheSound("misc/halloween/spell_teleport.wav", true);
     // Download
     PrepareModel(HHHModel);
     PrepareSound(HHHTheme);
     // Vagineer
     // Precache
-    PrecacheSound("vo/engineer_no01.wav", true);
-    PrecacheSound("vo/engineer_jeers02.wav", true);
+    PrecacheSound("vo/engineer_no01.mp3", true);
+    PrecacheSound("vo/engineer_jeers02.mp3", true);
     // Download
     PrepareModel(VagineerModel);
     PrepareSound(VagineerLastA);
@@ -4376,7 +4376,7 @@ public Action event_player_death(Event event, const char[] name, bool dontBroadc
         {
             case VSHSpecial_HHH:
             {
-                Format(s, PLATFORM_MAX_PATH, "vo/halloween_boss/knight_death0%d.wav", GetRandomInt(1, 2));
+                Format(s, PLATFORM_MAX_PATH, "vo/halloween_boss/knight_death0%d.mp3", GetRandomInt(1, 2));
                 EmitSoundToAll(s, _, SNDCHAN_VOICE, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, _, NULL_VECTOR, NULL_VECTOR, false, 0.0);
                 EmitSoundToAll("ui/halloween_boss_defeated_fx.wav", _, _, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, _, NULL_VECTOR, NULL_VECTOR, false, 0.0);
 //              CreateTimer(0.1, Timer_ChangeRagdoll, any:GetEventInt(event, "userid"));
@@ -4478,7 +4478,7 @@ public Action event_player_death(Event event, const char[] name, bool dontBroadc
             }
             case VSHSpecial_HHH:
             {
-                Format(s, PLATFORM_MAX_PATH, "%s0%i.wav", HHHAttack, GetRandomInt(1, 4));
+                Format(s, PLATFORM_MAX_PATH, "%s0%i.mp3", HHHAttack, GetRandomInt(1, 4));
                 EmitSoundToAll(s, _, SNDCHAN_VOICE, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, attacker, NULL_VECTOR, NULL_VECTOR, false, 0.0);
                 EmitSoundToAll(s, _, SNDCHAN_ITEM, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, attacker, NULL_VECTOR, NULL_VECTOR, false, 0.0);
             }
@@ -4497,7 +4497,7 @@ public Action event_player_death(Event event, const char[] name, bool dontBroadc
                     {
                         case TFClass_Spy:
                         {
-                            strcopy(s, PLATFORM_MAX_PATH, "vo/sniper_dominationspy04.wav");
+                            strcopy(s, PLATFORM_MAX_PATH, "vo/sniper_dominationspy04.mp3");
                             EmitSoundToAll(s, _, SNDCHAN_VOICE, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, attacker, NULL_VECTOR, NULL_VECTOR, false, 0.0);
                             EmitSoundToAll(s, _, SNDCHAN_ITEM, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, attacker, NULL_VECTOR, NULL_VECTOR, false, 0.0);
                         }
@@ -4553,7 +4553,7 @@ public Action event_player_death(Event event, const char[] name, bool dontBroadc
                         Format(s, PLATFORM_MAX_PATH, "%s%i.wav", VagineerKSpreeNew, GetRandomInt(1, 5));
                 }
                 case VSHSpecial_HHH:
-                    Format(s, PLATFORM_MAX_PATH, "%s0%i.wav", HHHLaught, GetRandomInt(1, 4));
+                    Format(s, PLATFORM_MAX_PATH, "%s0%i.mp3", HHHLaught, GetRandomInt(1, 4));
                 case VSHSpecial_CBS:
                 {
                     if (!GetRandomInt(0, 3))
@@ -4561,7 +4561,7 @@ public Action event_player_death(Event event, const char[] name, bool dontBroadc
                     else if (!GetRandomInt(0, 3))
                         Format(s, PLATFORM_MAX_PATH, CBS1);
                     else
-                        Format(s, PLATFORM_MAX_PATH, "%s%02i.wav", CBS2, GetRandomInt(1, 9));
+                        Format(s, PLATFORM_MAX_PATH, "%s%02i.mp3", CBS2, GetRandomInt(1, 9));
                     EmitSoundToAllExcept(SOUNDEXCEPT_VOICE, s, _, _, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, _, NULL_VECTOR, NULL_VECTOR, false, 0.0);
                 }
                 case VSHSpecial_Bunny:
@@ -4768,7 +4768,7 @@ public Action CheckAlivePlayers(Handle hTimer)
                 if (!GetRandomInt(0, 2))
                     Format(s, PLATFORM_MAX_PATH, "%s", CBS0);
                 else
-                    Format(s, PLATFORM_MAX_PATH, "%s%02i.wav", CBS4, GetRandomInt(1, 25));
+                    Format(s, PLATFORM_MAX_PATH, "%s%02i.mp3", CBS4, GetRandomInt(1, 25));
                 EmitSoundToAll(s, _, SNDCHAN_VOICE, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, _, pos, NULL_VECTOR, false, 0.0);
             }
             else if (Special == VSHSpecial_Bunny)
@@ -4798,11 +4798,11 @@ public Action CheckAlivePlayers(Handle hTimer)
     {
         PrintHintTextToAll("%t", "vsh_point_enable", RedAlivePlayers);
         if (RedAlivePlayers == AliveToEnable)
-            EmitSoundToAll("vo/announcer_am_capenabled02.wav");
+            EmitSoundToAll("vo/announcer_am_capenabled02.mp3");
         else if (RedAlivePlayers < AliveToEnable)
         {
             char s[PLATFORM_MAX_PATH];
-            Format(s, PLATFORM_MAX_PATH, "vo/announcer_am_capincite0%i.wav", GetRandomInt(0, 1) ? 1 : 3);
+            Format(s, PLATFORM_MAX_PATH, "vo/announcer_am_capincite0%i.mp3", GetRandomInt(0, 1) ? 1 : 3);
             EmitSoundToAll(s);
         }
         SetControlPoint(true);
@@ -5230,12 +5230,12 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
                         }
                         case VSHSpecial_Vagineer:
                         {
-                            EmitSoundToAll("vo/engineer_positivevocalization01.wav", _, SNDCHAN_VOICE, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, Hale, NULL_VECTOR, NULL_VECTOR, false, 0.0);
-                            EmitSoundToAllExcept(SOUNDEXCEPT_VOICE, "vo/engineer_positivevocalization01.wav", _, SNDCHAN_ITEM, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, Hale, NULL_VECTOR, NULL_VECTOR, false, 0.0);
+                            EmitSoundToAll("vo/engineer_positivevocalization01.mp3", _, SNDCHAN_VOICE, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, Hale, NULL_VECTOR, NULL_VECTOR, false, 0.0);
+                            EmitSoundToAllExcept(SOUNDEXCEPT_VOICE, "vo/engineer_positivevocalization01.mp3", _, SNDCHAN_ITEM, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, Hale, NULL_VECTOR, NULL_VECTOR, false, 0.0);
                         }
                         case VSHSpecial_HHH:
                         {
-                            Format(s, PLATFORM_MAX_PATH, "vo/halloween_boss/knight_pain0%d.wav", GetRandomInt(1, 3));
+                            Format(s, PLATFORM_MAX_PATH, "vo/halloween_boss/knight_pain0%d.mp3", GetRandomInt(1, 3));
                             EmitSoundToAll(s, _, SNDCHAN_VOICE, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, Hale, NULL_VECTOR, NULL_VECTOR, false, 0.0);
                             EmitSoundToAllExcept(SOUNDEXCEPT_VOICE, s, _, SNDCHAN_ITEM, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, Hale, NULL_VECTOR, NULL_VECTOR, false, 0.0);
                         }
@@ -6875,7 +6875,7 @@ public Action HookSound(int clients[64],
         return Plugin_Continue;
     if (StrContains(sample, "saxton_hale", false) != -1)
         return Plugin_Continue;
-    if (strcmp(sample, "vo/engineer_LaughLong01.wav", false) == 0)
+    if (strcmp(sample, "vo/engineer_LaughLong01.mp3", false) == 0)
     {
         strcopy(sample, PLATFORM_MAX_PATH, VagineerKSpree);
         return Plugin_Changed;
@@ -6884,7 +6884,7 @@ public Action HookSound(int clients[64],
     {
         if (GetRandomInt(0, 100) <= 10)
         {
-            Format(sample, PLATFORM_MAX_PATH, "%s0%i.wav", HHHLaught, GetRandomInt(1, 4));
+            Format(sample, PLATFORM_MAX_PATH, "%s0%i.mp3", HHHLaught, GetRandomInt(1, 4));
             return Plugin_Changed;
         }
     }
@@ -6895,9 +6895,9 @@ public Action HookSound(int clients[64],
             if (StrContains(sample, "engineer_moveup", false) != -1)
                 Format(sample, PLATFORM_MAX_PATH, "%s%i.wav", VagineerJump, GetRandomInt(1, 2));
             else if (StrContains(sample, "engineer_no", false) != -1 || GetRandomInt(0, 9) > 6)
-                strcopy(sample, PLATFORM_MAX_PATH, "vo/engineer_no01.wav");
+                strcopy(sample, PLATFORM_MAX_PATH, "vo/engineer_no01.mp3");
             else
-                strcopy(sample, PLATFORM_MAX_PATH, "vo/engineer_jeers02.wav");
+                strcopy(sample, PLATFORM_MAX_PATH, "vo/engineer_jeers02.mp3");
             return Plugin_Changed;
         }
         if (Special == VSHSpecial_Bunny)
