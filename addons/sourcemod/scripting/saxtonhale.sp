@@ -3390,7 +3390,7 @@ public Action:Command_GetHP(client)
     else if (RedAlivePlayers == 1)
         CPrintToChat(client, "{olive}[VSH]{default} %t", "vsh_already_see");
     else
-        CPrintToChat(client, "{olive}[VSH]{default} %t", "vsh_wait_hp", RoundFloat(GetTimeTilNextTime(e_flNextHealthQuery)), HaleHealthLast);
+        CPrintToChat(client, "{olive}[VSH]{default} %t", "vsh_wait_hp", GetSecsTilNextTime(e_flNextHealthQuery), HaleHealthLast);
     return Plugin_Continue;
 }
 public Action:Command_MakeNextSpecial(client, args)
@@ -7703,6 +7703,11 @@ stock Float:GetTimeTilNextTime(iIndex, bool:bNonNegative = true)
     return bNonNegative ? fmax(g_flNext[iIndex] - GetEngineTime(), 0.0) : (g_flNext[iIndex] - GetEngineTime());
 }
 
+stock GetSecsTilNextTime(iIndex, bool:bNonNegative = true)
+{
+    return RoundToFloor(GetTimeTilNextTime(iIndex, bNonNegative));
+}
+
 /*
     If next time occurs, we also add time on for when it is next allowed.
 */
@@ -7728,9 +7733,14 @@ stock SetNextTime2(iClient, iIndex, Float:flSeconds, bool:bAbsolute = false)
     g_flNext2[iIndex][iClient] = bAbsolute ? flSeconds : GetEngineTime() + flSeconds;
 }
 
-stock GetNextTime2(iClient, iIndex)
+stock Float:GetTimeTilNextTime2(iClient, iIndex, bool:bNonNegative = true)
 {
-    return g_flNext2[iIndex][iClient];
+    return bNonNegative ? fmax(g_flNext2[iIndex][iClient] - GetEngineTime(), 0.0) : (g_flNext2[iIndex][iClient] - GetEngineTime());
+}
+
+stock GetSecsTilNextTime2(iClient, iIndex, bool:bNonNegative = true)
+{
+    return RoundToFloor(GetTimeTilNextTime2(iClient, iIndex, bNonNegative));
 }
 
 /*
