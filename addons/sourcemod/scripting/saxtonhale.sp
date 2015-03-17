@@ -1839,7 +1839,7 @@ SearchForItemPacks()
         foundHealth = true;
     }
     ent = -1;
-    while ((ent = FindEntityByClassname2(ent, "item_healthkit_large")) != -1)
+    while ((ent = FindEntityByClassname2(ent, "item_healthkit_full")) != -1)
     {
         SetEntProp(ent, Prop_Send, "m_iTeamNum", g_bEnabled?OtherTeam:0, 4);
         foundHealth = true;
