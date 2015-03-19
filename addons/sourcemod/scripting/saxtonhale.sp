@@ -36,7 +36,7 @@
 
 #define CBS_MAX_ARROWS 9
 
-#define EASTER_BUNNY_ON
+#define EASTER_BUNNY_ON         // Add a "//" before this line [or delete it] to remove the easter bunny
 
 #define HALEHHH_TELEPORTCHARGETIME 2
 #define HALE_JUMPCHARGETIME 1
@@ -2002,12 +2002,14 @@ public Action:event_round_end(Handle:event, const String:name[], bool:dontBroadc
                 EmitSoundToAll(s, _, SNDCHAN_VOICE, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, Hale, _, NULL_VECTOR, false, 0.0);
                 EmitSoundToAllExcept(SOUNDEXCEPT_VOICE, s, _, _, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, Hale, _, NULL_VECTOR, false, 0.0);
             }
+#if defined EASTER_BUNNY_ON
             case VSHSpecial_Bunny:
             {
                 strcopy(s, PLATFORM_MAX_PATH, BunnyWin[GetRandomInt(0, sizeof(BunnyWin)-1)]);
                 EmitSoundToAll(s, _, SNDCHAN_VOICE, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, Hale, _, NULL_VECTOR, false, 0.0);
                 EmitSoundToAllExcept(SOUNDEXCEPT_VOICE, s, _, _, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, Hale, _, NULL_VECTOR, false, 0.0);  
             }
+#endif
         }
     }
     for (new i = 1 ; i <= MaxClients; i++)
@@ -2159,10 +2161,12 @@ public Action:StartResponceTimer(Handle:hTimer)
     decl Float:pos[3];
     switch (Special)
     {
+#if defined EASTER_BUNNY_ON
         case VSHSpecial_Bunny:
         {
             strcopy(s, PLATFORM_MAX_PATH, BunnyStart[GetRandomInt(0, sizeof(BunnyStart)-1)]);
         }
+#endif
         case VSHSpecial_Vagineer:
         {
             if (!GetRandomInt(0, 1))
@@ -2613,10 +2617,12 @@ public Action:MakeModelTimer(Handle:hTimer)
     new body = 0;
     switch (Special)
     {
+#if defined EASTER_BUNNY_ON
         case VSHSpecial_Bunny:
         {
             SetVariantString(BunnyModel);
         }
+#endif
         case VSHSpecial_Vagineer:
         {
             SetVariantString(VagineerModel);
@@ -4219,8 +4225,10 @@ public Action:HaleTimer(Handle:hTimer)
                         Format(s, PLATFORM_MAX_PATH, "%s%i.wav", VagineerJump, GetRandomInt(1, 2));
                     case VSHSpecial_CBS:
                         strcopy(s, PLATFORM_MAX_PATH, CBSJump1);
+#if defined EASTER_BUNNY_ON
                     case VSHSpecial_Bunny:
                         strcopy(s, PLATFORM_MAX_PATH, BunnyJump[GetRandomInt(0, sizeof(BunnyJump)-1)]);
+#endif
                     case VSHSpecial_Hale:
                     {
                         Format(s, PLATFORM_MAX_PATH, "%s%i.wav", GetRandomInt(0, 1) ? HaleJump : HaleJump132, GetRandomInt(1, 2));
@@ -4437,6 +4445,7 @@ public Action:DoTaunt(client, const String:command[], argc)
                 Format(s, PLATFORM_MAX_PATH, "%s", HHHRage2);
                 CreateTimer(0.6, UseRage, dist);
             }
+#if defined EASTER_BUNNY_ON
             case VSHSpecial_Bunny:
             {
                 strcopy(s, PLATFORM_MAX_PATH, BunnyRage[GetRandomInt(1, sizeof(BunnyRage)-1)]);
@@ -4452,6 +4461,7 @@ public Action:DoTaunt(client, const String:command[], argc)
                 //add charging?
                 CreateTimer(0.6, UseRage, dist);
             }
+#endif
             case VSHSpecial_CBS:
             {
                 if (GetRandomInt(0, 1))
@@ -4656,7 +4666,9 @@ public Action:event_player_death(Handle:event, const String:name[], bool:dontBro
     new attacker = GetClientOfUserId(GetEventInt(event, "attacker"));
     new deathflags = GetEventInt(event, "death_flags");
     new customkill = GetEventInt(event, "customkill");
+#if defined EASTER_BUNNY_ON
     if (attacker == Hale && Special == VSHSpecial_Bunny && VSHRoundState == VSHRState_Active)  SpawnManyAmmoPacks(client, EggModel, 1, 5, 120.0);
+#endif
     if (attacker == Hale && VSHRoundState == VSHRState_Active && (deathflags & TF_DEATHFLAG_DEADRINGER))
     {
         numHaleKills++;
@@ -4696,6 +4708,7 @@ public Action:event_player_death(Handle:event, const String:name[], bool:dontBro
                 EmitSoundToAllExcept(SOUNDEXCEPT_VOICE, s, _, SNDCHAN_ITEM, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, client, NULL_VECTOR, NULL_VECTOR, false, 0.0);
 //              CreateTimer(0.1, Timer_ChangeRagdoll, any:GetEventInt(event, "userid"));
             }
+#if defined EASTER_BUNNY_ON
             case VSHSpecial_Bunny:
             {
                 strcopy(s, PLATFORM_MAX_PATH, BunnyFail[GetRandomInt(0, sizeof(BunnyFail)-1)]);
@@ -4704,6 +4717,7 @@ public Action:event_player_death(Handle:event, const String:name[], bool:dontBro
 //              CreateTimer(0.1, Timer_ChangeRagdoll, any:GetEventInt(event, "userid"));
                 SpawnManyAmmoPacks(client, EggModel, 1);
             }
+#endif
         }
         if (HaleHealth < 0)
             HaleHealth = 0;
@@ -4769,12 +4783,14 @@ public Action:event_player_death(Handle:event, const String:name[], bool:dontBro
                 EmitSoundToAll(s, _, SNDCHAN_VOICE, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, attacker, NULL_VECTOR, NULL_VECTOR, false, 0.0);
                 EmitSoundToAll(s, _, SNDCHAN_ITEM, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, attacker, NULL_VECTOR, NULL_VECTOR, false, 0.0);
             }
+#if defined EASTER_BUNNY_ON
             case VSHSpecial_Bunny:
             {
                 strcopy(s, PLATFORM_MAX_PATH, BunnyKill[GetRandomInt(0, sizeof(BunnyKill)-1)]);
                 EmitSoundToAll(s, _, SNDCHAN_VOICE, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, attacker, NULL_VECTOR, NULL_VECTOR, false, 0.0);
                 EmitSoundToAll(s, _, SNDCHAN_ITEM, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, attacker, NULL_VECTOR, NULL_VECTOR, false, 0.0);
             }
+#endif
             case VSHSpecial_CBS:
             {
                 if (!GetRandomInt(0, 3) && RedAlivePlayers != 1)
@@ -4851,10 +4867,12 @@ public Action:event_player_death(Handle:event, const String:name[], bool:dontBro
                         Format(s, PLATFORM_MAX_PATH, "%s%02i.mp3", CBS2, GetRandomInt(1, 9));
                     EmitSoundToAllExcept(SOUNDEXCEPT_VOICE, s, _, _, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, _, NULL_VECTOR, NULL_VECTOR, false, 0.0);
                 }
+#if defined EASTER_BUNNY_ON
                 case VSHSpecial_Bunny:
                 {
                     strcopy(s, PLATFORM_MAX_PATH, BunnySpree[GetRandomInt(0, sizeof(BunnySpree)-1)]);
                 }
+#endif
             }
             EmitSoundToAllExcept(SOUNDEXCEPT_VOICE, s, _, SNDCHAN_VOICE, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, Hale, NULL_VECTOR, NULL_VECTOR, false, 0.0);
             EmitSoundToAllExcept(SOUNDEXCEPT_VOICE, s, _, SNDCHAN_ITEM, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, Hale, NULL_VECTOR, NULL_VECTOR, false, 0.0);
@@ -5056,8 +5074,10 @@ public Action:CheckAlivePlayers(Handle:hTimer)
                 }
                 EmitSoundToAll(s, _, SNDCHAN_VOICE, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, _, pos, NULL_VECTOR, false, 0.0);
             }
+#if defined EASTER_BUNNY_ON
             else if (Special == VSHSpecial_Bunny)
                 strcopy(s, PLATFORM_MAX_PATH, BunnyLast[GetRandomInt(0, sizeof(BunnyLast)-1)]);
+#endif
             else if (Special == VSHSpecial_Vagineer)
                 strcopy(s, PLATFORM_MAX_PATH, VagineerLastA);
             else
@@ -5588,12 +5608,14 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                             EmitSoundToAll(s, _, SNDCHAN_VOICE, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, Hale, NULL_VECTOR, NULL_VECTOR, false, 0.0);
                             EmitSoundToAllExcept(SOUNDEXCEPT_VOICE, s, _, SNDCHAN_ITEM, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, Hale, NULL_VECTOR, NULL_VECTOR, false, 0.0);
                         }
+#if defined EASTER_BUNNY_ON
                         case VSHSpecial_Bunny:
                         {
                             strcopy(s, PLATFORM_MAX_PATH, BunnyPain[GetRandomInt(0, sizeof(BunnyPain)-1)]);
                             EmitSoundToAll(s, _, SNDCHAN_VOICE, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, Hale, NULL_VECTOR, NULL_VECTOR, false, 0.0);
                             EmitSoundToAllExcept(SOUNDEXCEPT_VOICE, s, _, SNDCHAN_ITEM, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, Hale, NULL_VECTOR, NULL_VECTOR, false, 0.0);
                         }
+#endif
                     }
                     if (g_flStabbed < 4.0)
                         g_flStabbed++;
@@ -7225,6 +7247,7 @@ public Action:HookSound(clients[64], &numClients, String:sample[PLATFORM_MAX_PAT
                 strcopy(sample, PLATFORM_MAX_PATH, "vo/engineer_jeers02.mp3");
             return Plugin_Changed;
         }
+#if defined EASTER_BUNNY_ON
         if (Special == VSHSpecial_Bunny)
         {
             if (StrContains(sample, "gibberish", false) == -1 && StrContains(sample, "burp", false) == -1 && !GetRandomInt(0, 2))
@@ -7235,11 +7258,13 @@ public Action:HookSound(clients[64], &numClients, String:sample[PLATFORM_MAX_PAT
             }
             return Plugin_Continue;
         }
+#endif
         return Plugin_Handled;
     }
     return Plugin_Continue;
 }
 
+#if defined EASTER_BUNNY_ON
 public OnEntityCreated(entity, const String:classname[])
 {
     if (g_bEnabled && VSHRoundState == VSHRState_Active && strcmp(classname, "tf_projectile_pipe", false) == 0)
@@ -7262,6 +7287,7 @@ public Timer_SetEggBomb(any:ref)
         SetEntityRenderColor(entity, 255, 255, 255, 0);
     }
 }
+#endif
 
 //#define EF_BONEMERGE            (1 << 0)
 //#define EF_BONEMERGE_FASTCULL   (1 << 7)
