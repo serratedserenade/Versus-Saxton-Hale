@@ -5,7 +5,7 @@ The precursor to [FF2](https://github.com/50DKP/FF2-Official).
 
 [Visit the forum thread!](https://forums.alliedmods.net/showthread.php?t=244209)
 
-[![Build Status](https://travis-ci.org/WildCard65/Versus-Saxton-Hale.svg?branch=1.7Port)](https://travis-ci.org/WildCard65/Versus-Saxton-Hale)
+[![Build Status](https://travis-ci.org/WildCard65/Versus-Saxton-Hale.svg?branch=develop)](https://travis-ci.org/WildCard65/Versus-Saxton-Hale)
 
 ###For first/fresh installs
 Copy the `addons` folder to the server's `tf/` folder.  
