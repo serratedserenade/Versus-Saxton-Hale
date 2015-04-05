@@ -24,7 +24,7 @@ install:
     - tar -xzf $(cat sourcemod)
 before_script:
     - cd addons/sourcemod/scripting/
-    - wget "https://forums.alliedmods.net/attachment.php?attachmentid=141740" -O include/morecolors.inc
+    - wget "https://www.doctormckay.com/download/scripting/include/morecolors.inc" -O include/morecolors.inc
     - wget "http://hg.limetech.org/projects/tf2items/tf2items_source/raw-file/tip/pawn/tf2items.inc" -O include/tf2items.inc
     - wget "https://code.limetech.org/diffusion/ST/browse/master/plugin/steamtools.inc?view=raw" -O include/steamtools.inc
     - chmod +x spcomp

@@ -18,6 +18,7 @@
 #undef REQUIRE_PLUGIN
 #tryinclude <tf2attributes>
 #define REQUIRE_PLUGIN
+#include <morecolors>
 #if SOURCEMOD_V_MINOR > 7
   #pragma newdecls required
   #define SMEIGHT
@@ -29,7 +30,6 @@
 #if !defined SMEIGHT
   #pragma newdecls required
 #endif
-#include <morecolors>
 #include <sourcemod>
 #include <nextmap>
 #include <saxtonhale>
