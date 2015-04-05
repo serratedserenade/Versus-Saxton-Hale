@@ -4660,7 +4660,7 @@ public Action Timer_Damage(Handle hTimer, any id)
 {
     int client = GetClientOfUserId(id);
     if (IsValidClient(client)) // IsValidClient(client, false)
-        CPrintToChat(client, "{olive}[VSH] %t. %t %i{default}", "vsh_damage", Damage[client], "vsh_scores", RoundFloat(Damage[client] / 600.0));
+        CPrintToChat(client, "{olive}[VSH] {default}%t. %t %i", "vsh_damage", Damage[client], "vsh_scores", RoundFloat(Damage[client] / 600.0));
     return Plugin_Continue;
 }
 
