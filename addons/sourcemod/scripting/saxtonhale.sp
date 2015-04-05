@@ -4068,11 +4068,10 @@ public Action Destroy(int client, const char[] command, int argc)
     return Plugin_Continue;
 }
 
-public int TF2_OnConditionRemoved(int client, TFCond condition)
+public void TF2_OnConditionRemoved(int client, TFCond condition)
 {
     if (TF2_GetPlayerClass(client) == TFClass_Scout && condition == TFCond_CritHype)
         TF2_AddCondition(client, TFCond_SpeedBuffAlly, 0.01);   //recalc their speed
-    return -1; //Temp till tf2.inc is transitionalled.
 }
 
 /*
