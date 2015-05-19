@@ -6939,11 +6939,10 @@ public Action HookSound(int clients[64],
 }
 
 #if defined EASTER_BUNNY_ON
-public int OnEntityCreated(int entity, const char[] classname)
+public void OnEntityCreated(int entity, const char[] classname)
 {
     if (g_bEnabled && VSHRoundState == VSHRState_Active && strcmp(classname, "tf_projectile_pipe", false) == 0)
         SDKHook(entity, SDKHook_SpawnPost, OnEggBombSpawned);
-    return 0; //Temp
 }
 
 public int OnEggBombSpawned(int entity)
