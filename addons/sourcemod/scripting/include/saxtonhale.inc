@@ -203,7 +203,7 @@ public SharedPlugin __pl_SaxtonHale =
 };
 
 #if !defined REQUIRE_PLUGIN
-public __pl_SaxtonHale_SetNTVOptional()
+public void __pl_SaxtonHale_SetNTVOptional()
 {
     MarkNativeAsOptional("VSH_IsSaxtonHaleModeMap");
     MarkNativeAsOptional("VSH_IsSaxtonHaleModeEnabled");
