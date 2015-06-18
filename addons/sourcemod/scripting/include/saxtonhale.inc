@@ -222,5 +222,5 @@ public void __pl_SaxtonHale_SetNTVOptional()
     MarkNativeAsOptional("VSH.BossHealth.get");
     MarkNativeAsOptional("VSH.BossHealthMax.get");
     MarkNativeAsOptional("VSH.RoundState.get");
-};
+}
 #endif
