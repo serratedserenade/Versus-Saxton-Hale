@@ -2608,7 +2608,7 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
         }
         case 356: // Kunai
         {
-            Handle hItemOverride = PrepareItemHandle(hItem, _, _, "125 ; -60");
+			Handle hItemOverride = PrepareItemHandle(hItem, _, _, "125 ; -55");
 
             if (hItemOverride != null)
             {
