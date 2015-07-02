@@ -5236,8 +5236,11 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
                     }*/
                     if (wepindex == 356) // Kunai
                         AddPlayerHealth(attacker, 180, 270, true);
-                    if (wepindex == 461) // Big Earner gives full cloak on backstab
+                    if (wepindex == 461) // Big Earner gives full cloak on backstab and speed boost for 3 seconds
+                    {
                         SetEntPropFloat(attacker, Prop_Send, "m_flCloakMeter", 100.0);
+                        TF2_AddCondition(attacker, TFCond_SpeedBuffAlly, 3.0);
+                    }
                     char s[PLATFORM_MAX_PATH];
                     switch (Special)
                     {
