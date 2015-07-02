@@ -2628,9 +2628,9 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
                 return Plugin_Changed;
             }
         }
-        case 220: // Shortstop (Removed shortstop reload penalty I guess? Makes it act like scattergun...)
+		case 220: // Shortstop (Removed shortstop reload penalty)
         {
-            Handle hItemOverride = PrepareItemHandle(hItem, _, _, "328 ; 1", true);
+			Handle hItemOverride = PrepareItemHandle(hItem, _, _, "241 ; 1");
             if (hItemOverride != null)
             {
                 hItem = hItemOverride;
