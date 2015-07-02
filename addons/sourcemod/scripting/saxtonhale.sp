@@ -3535,7 +3535,7 @@ public Action ClientTimer(Handle hTimer)
                 strcopy(wepclassname, sizeof(wepclassname), "");
             bool validwep = (strncmp(wepclassname, "tf_wea", 6, false) == 0);
             int index = (validwep ? GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex") : -1);
-            if (TF2_IsPlayerInCondition(client, TFCond_Cloaked))
+			/*if (TF2_IsPlayerInCondition(client, TFCond_Cloaked))
             {
                 if (GetClientCloakIndex(client) == 59)
                 {
@@ -3544,7 +3544,7 @@ public Action ClientTimer(Handle hTimer)
                 }
                 else
                     TF2_AddCondition(client, TFCond_DeadRingered, 0.3);
-            }
+			}*/
             bool bHudAdjust = false;
             // Chdata's Deadringer Notifier
             if (TF2_GetPlayerClass(client) == TFClass_Spy)
@@ -4922,14 +4922,14 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
             {
                 if (damagetype & DMG_CRIT)
                     damagetype &= ~DMG_CRIT;
-                damage = 620.0;
+				damage = 124.0;
                 //return Plugin_Changed;
             }
-            else if (TF2_IsPlayerInCondition(client, TFCond_Cloaked) && TF2_IsPlayerInCondition(client, TFCond_DeadRingered))
+			else if (TF2_IsPlayerInCondition(client, TFCond_Cloaked) && !TF2_IsPlayerInCondition(client, TFCond_DeadRingered))
             {
                 if (damagetype & DMG_CRIT)
                     damagetype &= ~DMG_CRIT;
-                damage = 850.0;
+				damage = 106.25;
                 //return Plugin_Changed;
             }
             return Plugin_Changed; //Better to return here.
