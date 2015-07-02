@@ -424,4 +424,22 @@
 		"#format" "{1:s},{2:s}"
 		"en"	"What's new in v{olive}{1}{default} ({olive}{2}{default})? Type {olive}/halenew{default}"
 	}
+	"vsh_you_got_stomped_hale"
+	{
+		"#format" "{1:N}"
+		"en"	"{1} just goomba stomped you."
+	}
+	"vsh_you_got_stomped"
+	{
+		"en"	"Hale just goomba stomped you. Watch your head!"
+	}
+	"vsh_you_stomped_hale"
+	{
+		"#format" "{1:N}"
+		"en"	"You just stomped on {1}."
+	}
+	"vsh_you_stomped"
+	{
+		"en"	"You just stomped on the hale."
+	}
 }
