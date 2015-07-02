@@ -4093,7 +4093,7 @@ public void TF2_OnConditionRemoved(int client, TFCond condition)
 
 public Action RTD_CanRollDice(int client)
 {
-    if (g_fEnabled && client == Hale && !g_bHaleRTD)
+    if (g_bEnabled && client == Hale && !g_bHaleRTD)
         return Plugin_Handled;
     return Plugin_Continue;
 }
@@ -4124,7 +4124,7 @@ public Action OnStomp(int attacker, int victim, float &damageMultiplier, float &
     else if(victim == Hale)
     {
         damageMultiplier = g_fGoombaDamage;
-        JumpPower = g_fReboundPower;
+        JumpPower = g_fGoombaRebound;
         PrintHintText(victim, "%t", "vsh_you_got_stomped_hale", attacker);
         PrintHintText(attacker, "%t", "vsh_you_stomped");
         return Plugin_Changed;
