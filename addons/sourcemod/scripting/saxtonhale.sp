@@ -4916,7 +4916,7 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
             TF2_AddCondition(client, TFCond_SpeedBuffAlly, 1.0);
             return Plugin_Continue;
         }
-            if ((TF2_GetPlayerClass(client) == TFClass_Spy) && (damagetype & DMG_CLUB)) //Only Melee hits get altered damage
+        if ((TF2_GetPlayerClass(client) == TFClass_Spy) && (damagetype & DMG_CLUB)) //Only Melee hits get altered damage
         {
             if (GetEntProp(client, Prop_Send, "m_bFeignDeathReady") && !TF2_IsPlayerInCondition(client, TFCond_Cloaked))
             {
