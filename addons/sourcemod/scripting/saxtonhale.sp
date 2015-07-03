@@ -368,7 +368,7 @@ Handle PointCookie, MusicCookie, VoiceCookie, ClasshelpinfoCookie, doorchecktime
 //new Handle:cvarCircuitStun;
 //new Handle:cvarForceSpecToHale;
 int PointDelay = 6, RageDMG = 3500, bSpecials = true, AliveToEnable = 5, PointType = 0, TeamRoundCounter, botqueuepoints = 0, tf_arena_use_queue, mp_teams_unbalance_limit;
-int tf_arena_first_blood, mp_forcecamera, defaulttakedamagetype;
+int tf_arena_first_blood, tf_dropped_weapon_lifetime, mp_forcecamera, defaulttakedamagetype;
 bool haleCrits = false, bDemoShieldCrits = false, bAlwaysShowHealth = true, newRageSentry = true, checkdoors = false, PointReady;
 //new Float:circuitStun = 0.0;
 char currentmap[99];
