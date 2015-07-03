@@ -38,8 +38,6 @@
 
 #define CBS_MAX_ARROWS 9
 
-#define EASTER_BUNNY_ON         // Add a "//" before this line [or delete it] to remove the easter bunny
-
 #define HALEHHH_TELEPORTCHARGETIME 2
 #define HALE_JUMPCHARGETIME 1
 
