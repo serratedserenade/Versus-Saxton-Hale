@@ -675,6 +675,7 @@ public void OnPluginStart()
     FindConVar("tf_bot_count").AddChangeHook(HideCvarNotify);
     FindConVar("tf_arena_use_queue").AddChangeHook(HideCvarNotify);
     FindConVar("tf_arena_first_blood").AddChangeHook(HideCvarNotify);
+    FindConVar("tf_dropped_weapon_lifetime").AddChangeHook(HideCvarNotify);
     FindConVar("mp_friendlyfire").AddChangeHook(HideCvarNotify);
 
     HookEvent("teamplay_round_start", event_round_start);
@@ -844,12 +845,14 @@ public void OnConfigsExecuted()
         tf_arena_use_queue = FindConVar("tf_arena_use_queue").IntValue;
         mp_teams_unbalance_limit = FindConVar("mp_teams_unbalance_limit").IntValue;
         tf_arena_first_blood = FindConVar("tf_arena_first_blood").IntValue;
+        tf_dropped_weapon_lifetime = FindConVar("tf_dropped_weapon_lifetime").IntValue;
         mp_forcecamera = FindConVar("mp_forcecamera").IntValue;
         tf_scout_hype_pep_max = FindConVar("tf_scout_hype_pep_max").FloatValue;
         FindConVar("tf_arena_use_queue").IntValue = 0;
         FindConVar("mp_teams_unbalance_limit").IntValue = TF2_GetRoundWinCount() ? 0 : 1; // s_bLateLoad ? 0 :
         //SetConVarInt(FindConVar("mp_teams_unbalance_limit"), GetConVarBool(cvarFirstRound)?0:1);
         FindConVar("tf_arena_first_blood").IntValue = 0;
+        FindConVar("tf_dropped_weapon_lifetime").IntValue = 0;
         FindConVar("mp_forcecamera").IntValue = 0;
         FindConVar("tf_scout_hype_pep_max").FloatValue = 100.0;
         FindConVar("tf_damage_disablespread").IntValue = 1;
@@ -904,6 +907,7 @@ public void OnMapEnd()
         FindConVar("tf_arena_use_queue").IntValue = tf_arena_use_queue;
         FindConVar("mp_teams_unbalance_limit").IntValue = mp_teams_unbalance_limit;
         FindConVar("tf_arena_first_blood").IntValue = tf_arena_first_blood;
+        FindConVar("tf_dropped_weapon_lifetime").IntValue = tf_dropped_weapon_lifetime;
         FindConVar("mp_forcecamera").IntValue = mp_forcecamera;
         FindConVar("tf_scout_hype_pep_max").FloatValue = tf_scout_hype_pep_max;
 #if defined _steamtools_included
