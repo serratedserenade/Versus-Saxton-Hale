@@ -56,8 +56,6 @@
 #define MIN_INT                 -2147483648    //  PriorityCenterText
 #define MAX_DIGITS              12             //  10 + \0 for IntToString. And negative signs.
 
-//#define OVERRIDE_MEDIGUNS_ON
-
 // TF2 Weapon Loadout Slots
 enum
 {
