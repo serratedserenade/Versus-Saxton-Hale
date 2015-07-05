@@ -2649,9 +2649,9 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
                 return Plugin_Changed;
             }
         }
-        case 220: // Shortstop (Removed shortstop reload penalty)
+        case 220: // Shortstop (Removed shortstop reload penalty, and provides bonuses without being active)
         {
-            Handle hItemOverride = PrepareItemHandle(hItem, _, _, "241 ; 1");
+            Handle hItemOverride = PrepareItemHandle(hItem, _, _, "128 ; 0 ; 241 ; 1");
             if (hItemOverride != null)
             {
                 hItem = hItemOverride;
