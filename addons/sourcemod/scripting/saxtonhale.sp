@@ -2727,7 +2727,7 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
             return Plugin_Changed;
         }
     }
-    #if defined OVERRIDE_MEDIGUNS_ON
+#if defined OVERRIDE_MEDIGUNS_ON
     //Medic mediguns
     if (TF2_GetPlayerClass(client) == TFClass_Medic && (strncmp(classname, "tf_weapon_medigun", 17, false) == 0))
     {
@@ -2739,7 +2739,7 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
             return Plugin_Changed;
         }
     }
-    #endif
+#endif
     return Plugin_Continue;
 }
 
@@ -2948,12 +2948,10 @@ public Action MakeNoHale(Handle hTimer, any clientid)
     if (TF2_GetPlayerClass(client) == TFClass_Medic)
     {
         weapon = GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary);
-        #if defined OVERRIDE_MEDIGUNS_ON
+#if defined OVERRIDE_MEDIGUNS_ON
         if (GetEntPropFloat(weapon, Prop_Send, "m_flChargeLevel") < 0.41)
             SetEntPropFloat(weapon, Prop_Send, "m_flChargeLevel", 0.41);
-        #endif
-
-        #if !defined OVERRIDE_MEDIGUNS_ON
+#else
         int mediquality = (weapon > MaxClients && IsValidEdict(weapon) ? GetEntProp(weapon, Prop_Send, "m_iEntityQuality") : -1);
         if (mediquality != 10)
         {
@@ -2966,7 +2964,7 @@ public Action MakeNoHale(Handle hTimer, any clientid)
             }
             SetEntPropFloat(weapon, Prop_Send, "m_flChargeLevel", 0.41);
         }
-        #endif
+#endif
     }
     return Plugin_Continue;
 }
