@@ -21,4 +21,4 @@ if [ $MEDIGUN_OVERRIDE_BUILD == 1 ]; then
 	ARGS="$ARGS OVERRIDE_MEDIGUNS_ON="
 fi
 ARGS="$ARGS saxtonhale.sp"
-,/spcomp $ARGS
+./spcomp $ARGS
