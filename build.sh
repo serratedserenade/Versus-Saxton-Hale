@@ -14,6 +14,7 @@ if [ $BUILD_WITH_GOOMBA == 1 ]; then
 fi
 chmod +x spcomp
 mkdir compiled
+ARGS="TRAVIS_OVERRIDE="
 if [ $EASTER_BUNNY_BUILD == 1 ]; then
 	ARGS="$ARGS EASTER_BUNNY_ON="
 fi

@@ -36,6 +36,12 @@
 #include <nextmap>
 #include <saxtonhale>
 
+//This is here to allow travis to compile with + without the defines within this.
+#if !defined TRAVIS_OVERRIDE
+  #define EASTER_BUNNY_ON
+  #define OVERRIDE_MEDIGUNS_ON
+#endif
+
 #define CBS_MAX_ARROWS 9
 
 #define HALEHHH_TELEPORTCHARGETIME 2
