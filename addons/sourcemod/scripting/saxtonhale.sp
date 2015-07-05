@@ -17,6 +17,8 @@
 #define REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
 #tryinclude <tf2attributes>
+#tryinclude <goomba>
+#tryinclude <rtd>
 #define REQUIRE_PLUGIN
 #include <morecolors>
 #if SOURCEMOD_V_MINOR > 7
@@ -360,16 +362,16 @@ static bool g_bReloadVSHOnRoundEnd = false;
 #define VSHFLAG_CLASSHELPED (1 << 4)
 #define VSHFLAG_HASONGIVED  (1 << 5)
 int VSHFlags[TF_MAX_PLAYERS], Hale = -1, HaleHealthMax, HaleHealth, HaleHealthLast, HaleCharge = 0, HaleRage, NextHale, KSpreeCount = 1, HHHClimbCount;
-float g_flStabbed, g_flMarketed, WeighDownTimer, UberRageCount, GlowTimer, HaleSpeed = 340.0, RageDist = 800.0, Announce = 120.0, tf_scout_hype_pep_max;
+float g_flStabbed, g_flMarketed, WeighDownTimer, UberRageCount, GlowTimer, HaleSpeed = 340.0, RageDist = 800.0, Announce = 120.0, tf_scout_hype_pep_max, g_fGoombaDamage = 0.05, g_fGoombaRebound = 300.0;
 bool bEnableSuperDuperJump, bSpawnTeleOnTriggerHurt = false, g_bEnabled = false, g_bAreEnoughPlayersPlaying = false;
 ConVar cvarVersion, cvarHaleSpeed, cvarPointDelay, cvarRageDMG, cvarRageDist, cvarAnnounce, cvarSpecials, cvarEnabled, cvarAliveToEnable, cvarPointType, cvarCrits, cvarRageSentry;
-ConVar cvarFirstRound, cvarDemoShieldCrits, cvarDisplayHaleHP, cvarEnableEurekaEffect, cvarForceHaleTeam;
+ConVar cvarFirstRound, cvarDemoShieldCrits, cvarDisplayHaleHP, cvarEnableEurekaEffect, cvarForceHaleTeam, cvarGoombaDamage, cvarGoombaRebound, cvarBossRTD;
 Handle PointCookie, MusicCookie, VoiceCookie, ClasshelpinfoCookie, doorchecktimer, jumpHUD, rageHUD, healthHUD, infoHUD, MusicTimer;
 //new Handle:cvarCircuitStun;
 //new Handle:cvarForceSpecToHale;
 int PointDelay = 6, RageDMG = 3500, bSpecials = true, AliveToEnable = 5, PointType = 0, TeamRoundCounter, botqueuepoints = 0, tf_arena_use_queue, mp_teams_unbalance_limit;
 int tf_arena_first_blood, tf_dropped_weapon_lifetime, mp_forcecamera, defaulttakedamagetype;
-bool haleCrits = false, bDemoShieldCrits = false, bAlwaysShowHealth = true, newRageSentry = true, checkdoors = false, PointReady;
+bool haleCrits = false, bDemoShieldCrits = false, bAlwaysShowHealth = true, newRageSentry = true, checkdoors = false, PointReady, g_bHaleRTD = false;
 //new Float:circuitStun = 0.0;
 char currentmap[99];
 
@@ -519,7 +521,7 @@ static const char haleversiondates[][] =
     "04 Oct 2014",
     "29 Oct 2014", //  An update I never bothered to throw outdate
     "25 Dec 2014",  //  Merry Xmas
-    "9 Mar 2015"
+    "9 Mar 2015",
 };
 static const int maxversion = (sizeof(haleversiontitles) - 1);
 Handle OnHaleJump, OnHaleRage, OnHaleWeighdown, OnMusic, OnHaleNext;
@@ -669,6 +671,9 @@ public void OnPluginStart()
     //cvarForceSpecToHale = CreateConVar("hale_spec_force_boss", "0", "1- if a spectator is up next, will force them to Hale + spectators will gain queue points, else spectators are ignored by plugin", FCVAR_PLUGIN, true, 0.0, true, 1.0);
     cvarEnableEurekaEffect = CreateConVar("hale_enable_eureka", "0", "1- allow Eureka Effect, else disallow", FCVAR_PLUGIN, true, 0.0, true, 1.0);
     cvarForceHaleTeam = CreateConVar("hale_force_team", "0", "0- Use plugin logic, 1- random team, 2- red, 3- blue", FCVAR_PLUGIN, true, 0.0, true, 3.0);
+    cvarGoombaDamage = CreateConVar("hale_goomba_damage", "0.05", "How much the Goomba damage should be multipled by when goomba stomping the boss (requires Goomba Stomp)", _, true, 0.01, true, 1.0);
+    cvarGoombaRebound = CreateConVar("hale_goomba_jump", "300.0", "How high players should rebound after goomba stomping the boss (requires Goomba Stomp)", _, true, 0.0);
+    cvarBossRTD = CreateConVar("hale_boss_rtd", "0", "Can the boss use rtd? 0 to disallow boss, 1 to allow boss (requires RTD)", _, true, 0.0, true, 1.0);
 
     // bFriendlyFire = GetConVarBool(FindConVar("mp_friendlyfire"));
     // HookConVarChange(FindConVar("mp_friendlyfire"), HideCvarNotify);
@@ -702,6 +707,9 @@ public void OnPluginStart()
     cvarDemoShieldCrits.AddChangeHook(CvarChange);
     cvarDisplayHaleHP.AddChangeHook(CvarChange);
     cvarRageSentry.AddChangeHook(CvarChange);
+    cvarGoombaDamage.AddChangeHook(CvarChange);
+    cvarGoombaRebound.AddChangeHook(CvarChange);
+    cvarBossRTD.AddChangeHook(CvarChange);
     //HookConVarChange(cvarCircuitStun, CvarChange);
     g_bReloadVSHOnRoundEnd = false;
     RegAdminCmd("sm_hale_reload", Debug_ReloadVSH, ADMFLAG_ROOT, "Reloads the VSH plugin safely and silently.");
@@ -839,6 +847,9 @@ public void OnConfigsExecuted()
     bDemoShieldCrits = cvarDemoShieldCrits.BoolValue;
     bAlwaysShowHealth = cvarDisplayHaleHP.BoolValue;
     newRageSentry = cvarRageSentry.BoolValue;
+    g_fGoombaDamage = cvarGoombaDamage.FloatValue;
+    g_fGoombaRebound = cvarGoombaRebound.FloatValue;
+    g_bHaleRTD = cvarBossRTD.BoolValue;
     //circuitStun = GetConVarFloat(cvarCircuitStun);
     if (IsSaxtonHaleMap() && cvarEnabled.BoolValue)
     {
@@ -1173,6 +1184,12 @@ public void CvarChange(ConVar convar, const char[] oldValue, const char[] newVal
         bAlwaysShowHealth = cvarDisplayHaleHP.BoolValue;
     else if (convar == cvarRageSentry)
         newRageSentry = convar.BoolValue;
+    else if (convar == cvarGoombaDamage)
+        g_fGoombaDamage = cvarGoombaDamage.FloatValue;
+    else if (convar == cvarGoombaRebound)
+        g_fGoombaRebound = cvarGoombaRebound.FloatValue;
+    else if (convar == cvarBossRTD)
+        g_bHaleRTD = cvarBossRTD.BoolValue;
     //else if (convar == cvarCircuitStun)
     //  circuitStun = GetConVarFloat(convar);
     else if (convar == cvarEnabled)
@@ -4078,6 +4095,47 @@ public void TF2_OnConditionRemoved(int client, TFCond condition)
         TF2_AddCondition(client, TFCond_SpeedBuffAlly, 0.01);   //recalc their speed
 }
 
+public Action RTD_CanRollDice(int client)
+{
+    if (g_bEnabled && client == Hale && !g_bHaleRTD)
+        return Plugin_Handled;
+    return Plugin_Continue;
+}
+
+public Action OnStomp(int attacker, int victim, float &damageMultiplier, float &damageBonus, float &JumpPower)
+{
+    if (!g_bEnabled || !IsValidClient(attacker) || !IsValidClient(victim) || attacker == victim)
+        return Plugin_Continue;
+    if(attacker == Hale)
+    {
+        float vPos[3];
+        GetEntPropVector(attacker, Prop_Send, "m_vecOrigin", vPos);
+        if (RemoveDemoShield(victim)) // If the demo had a shield to break
+        {
+            EmitSoundToClient(victim, "player/spy_shield_break.wav", _, _, _, _, 0.7, 100, _, vPos, _, false);
+            EmitSoundToClient(attacker, "player/spy_shield_break.wav", _, _, _, _, 0.7, 100, _, vPos, _, false);
+            TF2_AddCondition(victim, TFCond_Bonked, 0.1);
+            TF2_AddCondition(victim, TFCond_SpeedBuffAlly, 1.0);
+            damageMultiplier = 0.0;
+            return Plugin_Handled;
+        }
+        damageMultiplier = 900.0;
+        JumpPower = 0.0;
+        PrintHintText(victim, "%t", "vsh_you_got_stomped");
+        PrintHintText(attacker, "%t", "vsh_you_stomped_hale", victim);
+        return Plugin_Changed;
+    }
+    else if(victim == Hale)
+    {
+        damageMultiplier = g_fGoombaDamage;
+        JumpPower = g_fGoombaRebound;
+        PrintHintText(victim, "%t", "vsh_you_got_stomped_hale", attacker);
+        PrintHintText(attacker, "%t", "vsh_you_stomped");
+        return Plugin_Changed;
+    }
+    return Plugin_Continue;
+}
+
 /*
  Call medic to rage update by Chdata
 
@@ -5993,6 +6051,7 @@ void FindVersionData(Panel panel, int versionindex)
         case 70: //1.53
         {
             panel.DrawText("1) Ported VSH over to 1.7 syntax.(WildCard65)");
+            panel.DrawText("2) Integrated RTD and Goomba overrides.(WildCard65)");
         }
         case 69: //1.52
         {
