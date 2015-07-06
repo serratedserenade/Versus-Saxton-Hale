@@ -5,7 +5,9 @@ tar -xzf $(cat sourcemod)
 cd addons/sourcemod/scripting
 wget "http://www.doctormckay.com/download/scripting/include/morecolors.inc" -O include/morecolors.inc --no-check-certificate
 wget "http://hg.limetech.org/projects/tf2items/tf2items_source/raw-file/tip/pawn/tf2items.inc" -O include/tf2items.inc
-wget "https://code.limetech.org/diffusion/ST/browse/master/plugin/steamtools.inc?view=raw" -O include/steamtools.inc
+if [ $BUILD_WITH_STEAMTOOLS == 1]; then
+	wget "https://code.limetech.org/diffusion/ST/browse/master/plugin/steamtools.inc?view=raw" -O include/steamtools.inc
+fi
 if [ $BUILD_WITH_RTD == 1 ]; then
 	wget "https://forums.alliedmods.net/attachment.php?attachmentid=115795" -O include/rtd.inc
 fi
