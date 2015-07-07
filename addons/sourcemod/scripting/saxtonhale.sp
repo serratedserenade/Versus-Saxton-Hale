@@ -2654,9 +2654,9 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
                 return Plugin_Changed;
             }
         }
-        case 220: // Shortstop (Removed shortstop reload penalty I guess? Makes it act like scattergun...)
+        case 220: // Shortstop (Removed shortstop reload penalty, and provides bonuses without being active)
         {
-            Handle hItemOverride = PrepareItemHandle(hItem, _, _, "328 ; 1", true);
+            Handle hItemOverride = PrepareItemHandle(hItem, _, _, "128 ; 0 ; 241 ; 1");
             if (hItemOverride != null)
             {
                 hItem = hItemOverride;
@@ -2732,7 +2732,7 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
             return Plugin_Changed;
         }
     }
-    #if defined OVERRIDE_MEDIGUNS_ON
+#if defined OVERRIDE_MEDIGUNS_ON
     //Medic mediguns
     if (TF2_GetPlayerClass(client) == TFClass_Medic && (strncmp(classname, "tf_weapon_medigun", 17, false) == 0))
     {
@@ -2744,7 +2744,7 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
             return Plugin_Changed;
         }
     }
-    #endif
+#endif
     return Plugin_Continue;
 }
 
@@ -2953,12 +2953,10 @@ public Action MakeNoHale(Handle hTimer, any clientid)
     if (TF2_GetPlayerClass(client) == TFClass_Medic)
     {
         weapon = GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary);
-        #if defined OVERRIDE_MEDIGUNS_ON
+#if defined OVERRIDE_MEDIGUNS_ON
         if (GetEntPropFloat(weapon, Prop_Send, "m_flChargeLevel") < 0.41)
             SetEntPropFloat(weapon, Prop_Send, "m_flChargeLevel", 0.41);
-        #endif
-
-        #if !defined OVERRIDE_MEDIGUNS_ON
+#else
         int mediquality = (weapon > MaxClients && IsValidEdict(weapon) ? GetEntProp(weapon, Prop_Send, "m_iEntityQuality") : -1);
         if (mediquality != 10)
         {
@@ -2971,7 +2969,7 @@ public Action MakeNoHale(Handle hTimer, any clientid)
             }
             SetEntPropFloat(weapon, Prop_Send, "m_flChargeLevel", 0.41);
         }
-        #endif
+#endif
     }
     return Plugin_Continue;
 }
@@ -4983,20 +4981,20 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
             TF2_AddCondition(client, TFCond_SpeedBuffAlly, 1.0);
             return Plugin_Continue;
         }
-        if (TF2_GetPlayerClass(client) == TFClass_Spy)  //eggs probably do melee damage to spies, then? That's not ideal, but eh.
+        if ((TF2_GetPlayerClass(client) == TFClass_Spy) && (damagetype & DMG_CLUB)) //Only Melee hits get altered damage
         {
             if (GetEntProp(client, Prop_Send, "m_bFeignDeathReady") && !TF2_IsPlayerInCondition(client, TFCond_Cloaked))
             {
                 if (damagetype & DMG_CRIT)
                     damagetype &= ~DMG_CRIT;
-                damage = 620.0;
+                damage = 124.0;
                 //return Plugin_Changed;
             }
             else if (TF2_IsPlayerInCondition(client, TFCond_Cloaked) && TF2_IsPlayerInCondition(client, TFCond_DeadRingered))
             {
                 if (damagetype & DMG_CRIT)
                     damagetype &= ~DMG_CRIT;
-                damage = 850.0;
+                damage = 130.0;
                 //return Plugin_Changed;
             }
             return Plugin_Changed; //Better to return here.
@@ -5303,8 +5301,11 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
                     }*/
                     if (wepindex == 356) // Kunai
                         AddPlayerHealth(attacker, 180, 270, true);
-                    if (wepindex == 461) // Big Earner gives full cloak on backstab
+                    if (wepindex == 461) // Big Earner gives full cloak on backstab and speed boost for 3 seconds
+                    {
                         SetEntPropFloat(attacker, Prop_Send, "m_flCloakMeter", 100.0);
+                        TF2_AddCondition(attacker, TFCond_SpeedBuffAlly, 3.0);
+                    }
                     char s[PLATFORM_MAX_PATH];
                     switch (Special)
                     {
