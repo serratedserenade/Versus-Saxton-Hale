@@ -368,11 +368,13 @@ float g_flStabbed, g_flMarketed, WeighDownTimer, UberRageCount, GlowTimer, HaleS
 bool bEnableSuperDuperJump, bSpawnTeleOnTriggerHurt = false, g_bEnabled = false, g_bAreEnoughPlayersPlaying = false;
 ConVar cvarVersion, cvarHaleSpeed, cvarPointDelay, cvarRageDMG, cvarRageDist, cvarAnnounce, cvarSpecials, cvarEnabled, cvarAliveToEnable, cvarPointType, cvarCrits, cvarRageSentry;
 ConVar cvarFirstRound, cvarDemoShieldCrits, cvarDisplayHaleHP, cvarEnableEurekaEffect, cvarForceHaleTeam, cvarGoombaDamage, cvarGoombaRebound, cvarBossRTD;
+//Stock TF2 convars
+ConVar cvarTFUseQueue, cvarMPUnbalanceLimit, cvarTFFirstBlood, cvarMPForceCamera, cvarTFScoutHypeMax;
 Handle PointCookie, MusicCookie, VoiceCookie, ClasshelpinfoCookie, doorchecktimer, jumpHUD, rageHUD, healthHUD, infoHUD, MusicTimer;
 //new Handle:cvarCircuitStun;
 //new Handle:cvarForceSpecToHale;
 int PointDelay = 6, RageDMG = 3500, bSpecials = true, AliveToEnable = 5, PointType = 0, TeamRoundCounter, botqueuepoints = 0, tf_arena_use_queue, mp_teams_unbalance_limit;
-int tf_arena_first_blood, tf_dropped_weapon_lifetime, mp_forcecamera, defaulttakedamagetype;
+int tf_arena_first_blood, mp_forcecamera, defaulttakedamagetype;
 bool haleCrits = false, bDemoShieldCrits = false, bAlwaysShowHealth = true, newRageSentry = true, checkdoors = false, PointReady, g_bHaleRTD = false;
 //new Float:circuitStun = 0.0;
 char currentmap[99];
@@ -679,10 +681,14 @@ public void OnPluginStart()
 
     // bFriendlyFire = GetConVarBool(FindConVar("mp_friendlyfire"));
     // HookConVarChange(FindConVar("mp_friendlyfire"), HideCvarNotify);
+    cvarTFUseQueue = FindConVar("tf_arena_use_queue");
+    cvarMPUnbalanceLimit = FindConVar("mp_teams_unbalance_limit");
+    cvarTFFirstBlood = FindConVar("tf_arena_first_blood");
+    cvarMPForceCamera = FindConVar("mp_forcecamera");
+    cvarTFScoutHypeMax = FindConVar("tf_scout_hype_pep_max");
     FindConVar("tf_bot_count").AddChangeHook(HideCvarNotify);
-    FindConVar("tf_arena_use_queue").AddChangeHook(HideCvarNotify);
-    FindConVar("tf_arena_first_blood").AddChangeHook(HideCvarNotify);
-    FindConVar("tf_dropped_weapon_lifetime").AddChangeHook(HideCvarNotify);
+    cvarTFUseQueue.AddChangeHook(HideCvarNotify);
+    cvarTFFirstBlood.AddChangeHook(HideCvarNotify);
     FindConVar("mp_friendlyfire").AddChangeHook(HideCvarNotify);
 
     HookEvent("teamplay_round_start", event_round_start);
@@ -855,19 +861,17 @@ public void OnConfigsExecuted()
     //circuitStun = GetConVarFloat(cvarCircuitStun);
     if (IsSaxtonHaleMap() && cvarEnabled.BoolValue)
     {
-        tf_arena_use_queue = FindConVar("tf_arena_use_queue").IntValue;
-        mp_teams_unbalance_limit = FindConVar("mp_teams_unbalance_limit").IntValue;
-        tf_arena_first_blood = FindConVar("tf_arena_first_blood").IntValue;
-        tf_dropped_weapon_lifetime = FindConVar("tf_dropped_weapon_lifetime").IntValue;
-        mp_forcecamera = FindConVar("mp_forcecamera").IntValue;
-        tf_scout_hype_pep_max = FindConVar("tf_scout_hype_pep_max").FloatValue;
-        FindConVar("tf_arena_use_queue").IntValue = 0;
-        FindConVar("mp_teams_unbalance_limit").IntValue = TF2_GetRoundWinCount() ? 0 : 1; // s_bLateLoad ? 0 :
+        tf_arena_use_queue = cvarTFUseQueue.IntValue;
+        mp_teams_unbalance_limit = cvarMPUnbalanceLimit.IntValue;
+        tf_arena_first_blood = cvarTFFirstBlood.IntValue;
+        mp_forcecamera = cvarMPForceCamera.IntValue;
+        tf_scout_hype_pep_max = cvarTFScoutHypeMax.FloatValue;
+        cvarTFUseQueue.IntValue = 0;
+        cvarMPUnbalanceLimit.IntValue = TF2_GetRoundWinCount() ? 0 : 1; // s_bLateLoad ? 0 :
         //SetConVarInt(FindConVar("mp_teams_unbalance_limit"), GetConVarBool(cvarFirstRound)?0:1);
-        FindConVar("tf_arena_first_blood").IntValue = 0;
-        FindConVar("tf_dropped_weapon_lifetime").IntValue = 0;
-        FindConVar("mp_forcecamera").IntValue = 0;
-        FindConVar("tf_scout_hype_pep_max").FloatValue = 100.0;
+        cvarTFFirstBlood.IntValue = 0;
+        cvarMPForceCamera.IntValue = 0;
+        cvarTFScoutHypeMax.FloatValue = 100.0;
         FindConVar("tf_damage_disablespread").IntValue = 1;
 #if defined _steamtools_included
         if (steamtools)
@@ -920,7 +924,6 @@ public void OnMapEnd()
         FindConVar("tf_arena_use_queue").IntValue = tf_arena_use_queue;
         FindConVar("mp_teams_unbalance_limit").IntValue = mp_teams_unbalance_limit;
         FindConVar("tf_arena_first_blood").IntValue = tf_arena_first_blood;
-        FindConVar("tf_dropped_weapon_lifetime").IntValue = tf_dropped_weapon_lifetime;
         FindConVar("mp_forcecamera").IntValue = mp_forcecamera;
         FindConVar("tf_scout_hype_pep_max").FloatValue = tf_scout_hype_pep_max;
 #if defined _steamtools_included
@@ -2651,9 +2654,9 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
                 return Plugin_Changed;
             }
         }
-        case 220: // Shortstop (Removed shortstop reload penalty, and provides bonuses without being active)
+        case 220: // Shortstop (Removed shortstop reload penalty I guess? Makes it act like scattergun...)
         {
-            Handle hItemOverride = PrepareItemHandle(hItem, _, _, "128 ; 0 ; 241 ; 1");
+            Handle hItemOverride = PrepareItemHandle(hItem, _, _, "328 ; 1", true);
             if (hItemOverride != null)
             {
                 hItem = hItemOverride;
@@ -2729,7 +2732,7 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
             return Plugin_Changed;
         }
     }
-#if defined OVERRIDE_MEDIGUNS_ON
+    #if defined OVERRIDE_MEDIGUNS_ON
     //Medic mediguns
     if (TF2_GetPlayerClass(client) == TFClass_Medic && (strncmp(classname, "tf_weapon_medigun", 17, false) == 0))
     {
@@ -2741,7 +2744,7 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
             return Plugin_Changed;
         }
     }
-#endif
+    #endif
     return Plugin_Continue;
 }
 
@@ -2950,10 +2953,12 @@ public Action MakeNoHale(Handle hTimer, any clientid)
     if (TF2_GetPlayerClass(client) == TFClass_Medic)
     {
         weapon = GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary);
-#if defined OVERRIDE_MEDIGUNS_ON
+        #if defined OVERRIDE_MEDIGUNS_ON
         if (GetEntPropFloat(weapon, Prop_Send, "m_flChargeLevel") < 0.41)
             SetEntPropFloat(weapon, Prop_Send, "m_flChargeLevel", 0.41);
-#else
+        #endif
+
+        #if !defined OVERRIDE_MEDIGUNS_ON
         int mediquality = (weapon > MaxClients && IsValidEdict(weapon) ? GetEntProp(weapon, Prop_Send, "m_iEntityQuality") : -1);
         if (mediquality != 10)
         {
@@ -2966,7 +2971,7 @@ public Action MakeNoHale(Handle hTimer, any clientid)
             }
             SetEntPropFloat(weapon, Prop_Send, "m_flChargeLevel", 0.41);
         }
-#endif
+        #endif
     }
     return Plugin_Continue;
 }
@@ -4978,20 +4983,20 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
             TF2_AddCondition(client, TFCond_SpeedBuffAlly, 1.0);
             return Plugin_Continue;
         }
-        if ((TF2_GetPlayerClass(client) == TFClass_Spy) && (damagetype & DMG_CLUB)) //Only Melee hits get altered damage
+        if (TF2_GetPlayerClass(client) == TFClass_Spy)  //eggs probably do melee damage to spies, then? That's not ideal, but eh.
         {
             if (GetEntProp(client, Prop_Send, "m_bFeignDeathReady") && !TF2_IsPlayerInCondition(client, TFCond_Cloaked))
             {
                 if (damagetype & DMG_CRIT)
                     damagetype &= ~DMG_CRIT;
-                damage = 124.0;
+                damage = 620.0;
                 //return Plugin_Changed;
             }
             else if (TF2_IsPlayerInCondition(client, TFCond_Cloaked) && TF2_IsPlayerInCondition(client, TFCond_DeadRingered))
             {
                 if (damagetype & DMG_CRIT)
                     damagetype &= ~DMG_CRIT;
-                damage = 130.0;
+                damage = 850.0;
                 //return Plugin_Changed;
             }
             return Plugin_Changed; //Better to return here.
@@ -5298,11 +5303,8 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
                     }*/
                     if (wepindex == 356) // Kunai
                         AddPlayerHealth(attacker, 180, 270, true);
-                    if (wepindex == 461) // Big Earner gives full cloak on backstab and speed boost for 3 seconds
-                    {
+                    if (wepindex == 461) // Big Earner gives full cloak on backstab
                         SetEntPropFloat(attacker, Prop_Send, "m_flCloakMeter", 100.0);
-                        TF2_AddCondition(attacker, TFCond_SpeedBuffAlly, 3.0);
-                    }
                     char s[PLATFORM_MAX_PATH];
                     switch (Special)
                     {
