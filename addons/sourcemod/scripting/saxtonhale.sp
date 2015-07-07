@@ -872,6 +872,11 @@ public void OnConfigsExecuted()
         cvarTFFirstBlood.IntValue = 0;
         cvarMPForceCamera.IntValue = 0;
         cvarTFScoutHypeMax.FloatValue = 100.0;
+        cvarTFUseQueue.AddChangeHook(ForceOverride);
+        cvarMPUnbalanceLimit.AddChangeHook(ForceOverride);
+        cvarTFFirstBlood.AddChangeHook(ForceOverride);
+        cvarMPForceCamera.AddChangeHook(ForceOverride);
+        cvarTFScoutHypeMax.AddChangeHook(ForceOverride);
         FindConVar("tf_damage_disablespread").IntValue = 1;
 #if defined _steamtools_included
         if (steamtools)
@@ -1158,6 +1163,16 @@ public void HideCvarNotify(ConVar convar, const char[] oldValue, const char[] ne
 {
     FindConVar("sv_tags").Flags &= ~FCVAR_NOTIFY;
     convar.Flags &= ~FCVAR_NOTIFY;
+}
+
+public void ForceOverride(ConVar convar, const char[] oldValue, const char[] newValue)
+{
+	if (convar == cvarTFUseQueue || convar == cvarTFFirstBlood || convar == cvarMPForceCamera)
+		convar.IntValue = 0;
+	else if (convar == cvarMPUnbalanceLimit)
+		convar.IntValue = TF2_GetRoundWinCount() ? 0 : 1;
+	else if (convar == cvarTFScoutHypeMax)
+		convar.FloatValue = 100.0;
 }
 
 public void CvarChange(ConVar convar, const char[] oldValue, const char[] newValue)
