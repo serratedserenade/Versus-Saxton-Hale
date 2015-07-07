@@ -36,9 +36,13 @@
 #include <nextmap>
 #include <saxtonhale>
 
-#define CBS_MAX_ARROWS 9
+//This is here to allow travis to compile with + without the defines within this.
+#if !defined TRAVIS_OVERRIDE
+  #define EASTER_BUNNY_ON
+  #define OVERRIDE_MEDIGUNS_ON
+#endif
 
-#define EASTER_BUNNY_ON         // Add a "//" before this line [or delete it] to remove the easter bunny
+#define CBS_MAX_ARROWS 9
 
 #define HALEHHH_TELEPORTCHARGETIME 2
 #define HALE_JUMPCHARGETIME 1
@@ -57,8 +61,6 @@
 #define MAX_INT                 2147483647     //  PriorityCenterText
 #define MIN_INT                 -2147483648    //  PriorityCenterText
 #define MAX_DIGITS              12             //  10 + \0 for IntToString. And negative signs.
-
-//#define OVERRIDE_MEDIGUNS_ON
 
 // TF2 Weapon Loadout Slots
 enum
