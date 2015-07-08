@@ -365,16 +365,17 @@ static bool g_bReloadVSHOnRoundEnd = false;
 #define VSHFLAG_HASONGIVED  (1 << 5)
 int VSHFlags[TF_MAX_PLAYERS], Hale = -1, HaleHealthMax, HaleHealth, HaleHealthLast, HaleCharge = 0, HaleRage, NextHale, KSpreeCount = 1, HHHClimbCount;
 float g_flStabbed, g_flMarketed, WeighDownTimer, UberRageCount, GlowTimer, HaleSpeed = 340.0, RageDist = 800.0, Announce = 120.0, g_fGoombaDamage = 0.05, g_fGoombaRebound = 300.0; //tf_scout_hype_pep_max
+float tf_feign_death_activate_damage_scale, tf_feign_death_damage_scale, tf_stealth_damage_reduction;
 bool bEnableSuperDuperJump, bSpawnTeleOnTriggerHurt = false, g_bEnabled = false, g_bAreEnoughPlayersPlaying = false;
 ConVar cvarVersion, cvarHaleSpeed, cvarPointDelay, cvarRageDMG, cvarRageDist, cvarAnnounce, cvarSpecials, cvarEnabled, cvarAliveToEnable, cvarPointType, cvarCrits, cvarRageSentry;
 ConVar cvarFirstRound, cvarDemoShieldCrits, cvarDisplayHaleHP, cvarEnableEurekaEffect, cvarForceHaleTeam, cvarGoombaDamage, cvarGoombaRebound, cvarBossRTD;
 //Stock TF2 convars
-ConVar cvarTFUseQueue, cvarMPUnbalanceLimit, cvarTFFirstBlood, cvarMPForceCamera; //cvarTFScoutHypeMax;
+ConVar cvarTFUseQueue, cvarMPUnbalanceLimit, cvarTFFirstBlood, cvarMPForceCamera, cvarTFWeaponLifeTime, cvarTFFeignActivateDamageScale, cvarTFFeignDamageScale, cvarTFFeignDeathDuration, cvarTFStealthDamageReduction; //cvarTFScoutHypeMax;
 Handle PointCookie, MusicCookie, VoiceCookie, ClasshelpinfoCookie, doorchecktimer, jumpHUD, rageHUD, healthHUD, infoHUD, MusicTimer;
 //new Handle:cvarCircuitStun;
 //new Handle:cvarForceSpecToHale;
-int tf_arena_first_blood, mp_forcecamera, defaulttakedamagetype, mp_teams_unbalance_limit;
 int PointDelay = 6, RageDMG = 3500, bSpecials = true, AliveToEnable = 5, PointType = 0, TeamRoundCounter, botqueuepoints = 0, tf_arena_use_queue, tf_dropped_weapon_lifetime;
+int tf_arena_first_blood, mp_forcecamera, defaulttakedamagetype, mp_teams_unbalance_limit, tf_feign_death_duration;
 bool haleCrits = false, bDemoShieldCrits = false, bAlwaysShowHealth = true, newRageSentry = true, checkdoors = false, PointReady, g_bHaleRTD = false;
 //new Float:circuitStun = 0.0;
 char currentmap[99];
@@ -686,6 +687,10 @@ public void OnPluginStart()
     cvarTFFirstBlood = FindConVar("tf_arena_first_blood");
     cvarMPForceCamera = FindConVar("mp_forcecamera");
     cvarTFWeaponLifeTime = FindConVar("tf_dropped_weapon_lifetime");
+    cvarTFFeignActivateDamageScale = FindConVar("tf_feign_death_activate_damage_scale");
+	cvarTFFeignDamageScale = FindConVar("tf_feign_death_damage_scale");
+	cvarTFFeignDeathDuration = FindConVar("tf_feign_death_duration");
+	cvarTFStealthDamageReduction = FindConVar("tf_stealth_damage_reduction");
     //cvarTFScoutHypeMax = FindConVar("tf_scout_hype_pep_max");
     FindConVar("tf_bot_count").AddChangeHook(HideCvarNotify);
     cvarTFUseQueue.AddChangeHook(HideCvarNotify);
@@ -867,6 +872,10 @@ public void OnConfigsExecuted()
         tf_arena_first_blood = cvarTFFirstBlood.IntValue;
         mp_forcecamera = cvarMPForceCamera.IntValue;
         tf_dropped_weapon_lifetime = cvarTFWeaponLifeTime.IntValue;
+		tf_feign_death_activate_damage_scale = cvarTFFeignActivateDamageScale.FloatValue;
+		tf_feign_death_damage_scale = cvarTFFeignDamageScale.FloatValue;
+		tf_feign_death_duration = cvarTFFeignDeathDuration.IntValue;
+		tf_stealth_damage_reduction = cvarTFStealthDamageReduction.FloatValue;
         //tf_scout_hype_pep_max = cvarTFScoutHypeMax.FloatValue;
         cvarTFUseQueue.SetInt(0);
         cvarMPUnbalanceLimit.SetInt(TF2_GetRoundWinCount() ? 0 : 1); // s_bLateLoad ? 0 :
@@ -927,6 +936,10 @@ public void OnMapEnd()
         cvarTFFirstBlood.SetInt(tf_arena_first_blood);
         cvarMPForceCamera.SetInt(mp_forcecamera);
         cvarTFWeaponLifeTime.SetInt(tf_dropped_weapon_lifetime);
+		cvarTFFeignActivateDamageScale.SetFloat(tf_feign_death_activate_damage_scale);
+		cvarTFFeignDamageScale.SetFloat(tf_feign_death_damage_scale);
+		cvarTFFeignDeathDuration.SetInt(tf_feign_death_duration);
+		cvarTFStealthDamageReduction.SetFloat(tf_stealth_damage_reduction);
         //cvarTFScoutHypeMax.SetFloat(tf_scout_hype_pep_max);
 #if defined _steamtools_included
         if (steamtools)
@@ -1535,11 +1548,19 @@ public Action event_round_start(Event event, const char[] name, bool dontBroadca
         SearchForItemPacks();
         cvarMPUnbalanceLimit.SetInt(1);
         cvarTFWeaponLifeTime.SetInt(tf_dropped_weapon_lifetime);
+		cvarTFFeignActivateDamageScale.SetFloat(tf_feign_death_activate_damage_scale);
+		cvarTFFeignDamageScale.SetFloat(tf_feign_death_damage_scale);
+		cvarTFFeignDeathDuration.SetInt(tf_feign_death_duration);
+		cvarTFStealthDamageReduction.SetFloat(tf_stealth_damage_reduction);
         CreateTimer(71.0, Timer_EnableCap, _, TIMER_FLAG_NO_MAPCHANGE);
         return Plugin_Continue;
     }
     cvarMPUnbalanceLimit.SetInt(TF2_GetRoundWinCount() ? 0 : 1); // s_bLateLoad ? 0 :
     cvarTFWeaponLifeTime.SetInt(TF2_GetRoundWinCount() ? 0 : tf_dropped_weapon_lifetime);
+	cvarTFFeignActivateDamageScale.SetFloat(TF2_GetRoundWinCount() ? 0.1 : tf_feign_death_activate_damage_scale);
+	cvarTFFeignDamageScale.SetFloat(TF2_GetRoundWinCount() ? 0.1 : tf_feign_death_damage_scale);
+	cvarTFFeignDeathDuration.SetInt(TF2_GetRoundWinCount() ? 7 : tf_feign_death_duration);
+	cvarTFStealthDamageReduction.SetFloat(TF2_GetRoundWinCount() ? 0.1 : tf_stealth_damage_reduction);
     if (FixUnbalancedTeams())
         return Plugin_Continue;
     for (int i = 1; i <= MaxClients; i++)
@@ -3563,7 +3584,7 @@ public Action ClientTimer(Handle hTimer)
                 strcopy(wepclassname, sizeof(wepclassname), "");
             bool validwep = (strncmp(wepclassname, "tf_wea", 6, false) == 0);
             int index = (validwep ? GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex") : -1);
-            if (TF2_IsPlayerInCondition(client, TFCond_Cloaked))
+            /*if (TF2_IsPlayerInCondition(client, TFCond_Cloaked))
             {
                 if (GetClientCloakIndex(client) == 59)
                 {
@@ -3572,7 +3593,7 @@ public Action ClientTimer(Handle hTimer)
                 }
                 else
                     TF2_AddCondition(client, TFCond_DeadRingered, 0.3);
-            }
+            }*/
             bool bHudAdjust = false;
             // Chdata's Deadringer Notifier
             if (TF2_GetPlayerClass(client) == TFClass_Spy)
@@ -4100,6 +4121,27 @@ public void TF2_OnConditionRemoved(int client, TFCond condition)
 {
     if (TF2_GetPlayerClass(client) == TFClass_Scout && condition == TFCond_CritHype)
         TF2_AddCondition(client, TFCond_SpeedBuffAlly, 0.01);   //recalc their speed
+}
+
+public void TF2_OnConditionAdded(int client, TFCond condition)
+{
+	if (g_bEnabled && client != Hale)
+    {
+		if (TF2_GetPlayerClass(client) == TFClass_Spy && condition == TFCond_DeadRingered)
+		{
+			RequestFrame(Frame_RemoveFeignSpeedBuff, client);
+		}
+	}
+}
+
+public void Frame_RemoveFeignSpeedBuff(int client)
+{
+	if (IsClientInGame(client))
+	{
+		TF2_RemoveCondition(client, TFCond_SpeedBuffAlly);
+		SetVariantString("ParticleEffectStop");
+		AcceptEntityInput(client, "DispatchEffect");
+	}
 }
 
 public Action RTD_CanRollDice(int client)
@@ -4985,20 +5027,23 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
             TF2_AddCondition(client, TFCond_SpeedBuffAlly, 1.0);
             return Plugin_Continue;
         }
-        if ((TF2_GetPlayerClass(client) == TFClass_Spy) && (damagetype & DMG_CLUB)) //Only Melee hits get altered damage
+        if ((TF2_GetPlayerClass(client) == TFClass_Spy) && ((damagetype & DMG_CLUB) || Special == VSHSpecial_CBS)) //Only Melee hits and CBS arrows get altered damage
         {
             if (GetEntProp(client, Prop_Send, "m_bFeignDeathReady") && !TF2_IsPlayerInCondition(client, TFCond_Cloaked))
             {
                 if (damagetype & DMG_CRIT)
                     damagetype &= ~DMG_CRIT;
-                damage = 124.0;
+                damage = 620.0;
                 //return Plugin_Changed;
             }
-            else if (TF2_IsPlayerInCondition(client, TFCond_Cloaked) && TF2_IsPlayerInCondition(client, TFCond_DeadRingered))
+            else if (TF2_IsPlayerInCondition(client, TFCond_Cloaked))
             {
                 if (damagetype & DMG_CRIT)
                     damagetype &= ~DMG_CRIT;
-                damage = 130.0;
+                if (TF2_IsPlayerInCondition(client, TFCond_DeadRingered))
+					damage = 620.0;
+				else if (!TF2_IsPlayerInCondition(client, TFCond_DeadRingered))
+					damage = 850.0;
                 //return Plugin_Changed;
             }
             return Plugin_Changed; //Better to return here.
