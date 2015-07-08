@@ -5162,7 +5162,7 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
                             }
                         }
                     }
-                    case 14, 201, 230, 402, 526, 664, 752, 792, 801, 851, 881, 890, 899, 908, 957, 966, 1098:
+                    /*case 14, 201, 230, 402, 526, 664, 752, 792, 801, 851, 881, 890, 899, 908, 957, 966, 1098:
                     {
                         switch (wepindex)   //cleaner to read than if wepindex == || wepindex == || etc
                         {
@@ -5206,7 +5206,7 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
                             if (HaleRage < 0)
                                 HaleRage = 0;
                         }
-                    }
+                    }*/
                     case 355:
                     {
                         float rage = 0.05*RageDMG;
@@ -5292,6 +5292,50 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
                         RemoveCond(attacker, TFCond_Dazed);
                     }
                 }
+				char wepclassname[32];
+				GetEdictClassname(weapon, wepclassname, sizeof(wepclassname));
+				if (strncmp(wepclassname, "tf_weapon_sni", 13, false) == 0)
+				{
+					if (strncmp(wepclassname, "tf_weapon_sniperrifle", 21, false) == 0)
+					{
+                        if (VSHRoundState != VSHRState_End)
+                        {
+                            float chargelevel = (IsValidEntity(weapon) && weapon > MaxClients ? GetEntPropFloat(weapon, Prop_Send, "m_flChargedDamage") : 0.0), time = (GlowTimer > 10 ? 1.0 : 2.0);
+                            time += (GlowTimer > 10 ? (GlowTimer > 20 ? 1 : 2) : 4)*(chargelevel/100);
+                            SetEntProp(client, Prop_Send, "m_bGlowEnabled", 1);
+                            GlowTimer += RoundToCeil(time);
+                            if (GlowTimer > 30.0)
+                                GlowTimer = 30.0;
+                        }
+					}
+                    if (wepindex == 752 && VSHRoundState != VSHRState_End)
+                    {
+                        float chargelevel = (IsValidEntity(weapon) && weapon > MaxClients ? GetEntPropFloat(weapon, Prop_Send, "m_flChargedDamage") : 0.0);
+                        float add = 10 + (chargelevel / 10);
+                        if (TF2_IsPlayerInCondition(attacker, view_as<TFCond>(46)))
+                            add /= 3;
+                        float rage = GetEntPropFloat(attacker, Prop_Send, "m_flRageMeter");
+                        SetEntPropFloat(attacker, Prop_Send, "m_flRageMeter", (rage + add > 100) ? 100.0 : rage + add);
+                    }
+                    if (!(damagetype & DMG_CRIT))
+                    {
+                        bool ministatus = (TF2_IsPlayerInCondition(attacker, TFCond_CritCola) || TF2_IsPlayerInCondition(attacker, TFCond_Buffed) || TF2_IsPlayerInCondition(attacker, TFCond_CritHype));
+                        damage *= (ministatus) ? 2.222222 : 3.0;
+                        if (wepindex == 230)
+                        {
+                            HaleRage -= RoundFloat(damage/2.0);
+                            if (HaleRage < 0)
+                                HaleRage = 0;
+                        }
+                        return Plugin_Changed;
+                    }
+                    else if (wepindex == 230)
+                    {
+                        HaleRage -= RoundFloat(damage*3.0/2.0);
+                        if (HaleRage < 0)
+                            HaleRage = 0;
+                    }
+				}
                 //VoiDeD's Caber-backstab code. To be added with a few special modifications in 1.40+
                 //Except maybe not because it's semi op.
 /*              if ( IsValidEdict( weapon ) && GetEdictClassname( weapon, wepclassname, sizeof( wepclassname ) ) && strcmp( wepclassname, "tf_weapon_stickbomb", false ) == 0 )
