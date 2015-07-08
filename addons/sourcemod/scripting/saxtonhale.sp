@@ -3726,25 +3726,25 @@ public Action ClientTimer(Handle hTimer)
                     cond = TFCond_Buffed;
                 }
             }
-			if (validwep && weapon == GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary))
-			{
-				if (strncmp(wepclassname, "tf_weapon_pis", 13, false) == 0)
-				{
-					addthecrit = true;
-					if (class == TFClass_Scout && cond == TFCond_HalloweenCritCandy)
-						cond = TFCond_Buffed;
-				}
-				if (strncmp(wepclassname, "tf_weapon_han", 13, false) == 0)
-				{
-					addthecrit = true;
-					cond = TFCond_Buffed;
-				}
-			}
-			if (class == TFClass_Sniper && weapon == GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary))
-			{
-				if (strncmp(wepclassname, "tf_weapon_smg", 13, false) == 0)
-					addthecrit = true;
-			}
+            if (validwep && weapon == GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary))
+            {
+                if (strncmp(wepclassname, "tf_weapon_pis", 13, false) == 0)
+                {
+                    addthecrit = true;
+                    if (class == TFClass_Scout && cond == TFCond_HalloweenCritCandy)
+                        cond = TFCond_Buffed;
+                }
+                if (strncmp(wepclassname, "tf_weapon_han", 13, false) == 0)
+                {
+                    addthecrit = true;
+                    cond = TFCond_Buffed;
+                }
+            }
+            if (class == TFClass_Sniper && weapon == GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary))
+            {
+                if (strncmp(wepclassname, "tf_weapon_smg", 13, false) == 0)
+                    addthecrit = true;
+            }
             if (index == 16 && addthecrit && IsValidEntity(FindPlayerBack(client, { 642 }, 1)))
                 addthecrit = false;
             if (class == TFClass_DemoMan && !IsValidEntity(GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary)))
@@ -5292,12 +5292,12 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
                         RemoveCond(attacker, TFCond_Dazed);
                     }
                 }
-				char wepclassname[32];
-				GetEdictClassname(weapon, wepclassname, sizeof(wepclassname));
-				if (strncmp(wepclassname, "tf_weapon_sni", 13, false) == 0)
-				{
-					if (strncmp(wepclassname, "tf_weapon_sniperrifle", 21, false) == 0)
-					{
+                char wepclassname[32];
+                GetEdictClassname(weapon, wepclassname, sizeof(wepclassname));
+                if (strncmp(wepclassname, "tf_weapon_sni", 13, false) == 0)
+                {
+                    if (strncmp(wepclassname, "tf_weapon_sniperrifle", 21, false) == 0)
+                    {
                         if (VSHRoundState != VSHRState_End)
                         {
                             float chargelevel = (IsValidEntity(weapon) && weapon > MaxClients ? GetEntPropFloat(weapon, Prop_Send, "m_flChargedDamage") : 0.0), time = (GlowTimer > 10 ? 1.0 : 2.0);
@@ -5307,7 +5307,7 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
                             if (GlowTimer > 30.0)
                                 GlowTimer = 30.0;
                         }
-					}
+                    }
                     if (wepindex == 752 && VSHRoundState != VSHRState_End)
                     {
                         float chargelevel = (IsValidEntity(weapon) && weapon > MaxClients ? GetEntPropFloat(weapon, Prop_Send, "m_flChargedDamage") : 0.0);
@@ -5335,7 +5335,7 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
                         if (HaleRage < 0)
                             HaleRage = 0;
                     }
-				}
+                }
                 //VoiDeD's Caber-backstab code. To be added with a few special modifications in 1.40+
                 //Except maybe not because it's semi op.
 /*              if ( IsValidEdict( weapon ) && GetEdictClassname( weapon, wepclassname, sizeof( wepclassname ) ) && strcmp( wepclassname, "tf_weapon_stickbomb", false ) == 0 )
