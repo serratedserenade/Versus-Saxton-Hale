@@ -373,8 +373,8 @@ ConVar cvarTFUseQueue, cvarMPUnbalanceLimit, cvarTFFirstBlood, cvarMPForceCamera
 Handle PointCookie, MusicCookie, VoiceCookie, ClasshelpinfoCookie, doorchecktimer, jumpHUD, rageHUD, healthHUD, infoHUD, MusicTimer;
 //new Handle:cvarCircuitStun;
 //new Handle:cvarForceSpecToHale;
-int PointDelay = 6, RageDMG = 3500, bSpecials = true, AliveToEnable = 5, PointType = 0, TeamRoundCounter, botqueuepoints = 0, tf_arena_use_queue;
 int tf_arena_first_blood, mp_forcecamera, defaulttakedamagetype, mp_teams_unbalance_limit;
+int PointDelay = 6, RageDMG = 3500, bSpecials = true, AliveToEnable = 5, PointType = 0, TeamRoundCounter, botqueuepoints = 0, tf_arena_use_queue, tf_dropped_weapon_lifetime;
 bool haleCrits = false, bDemoShieldCrits = false, bAlwaysShowHealth = true, newRageSentry = true, checkdoors = false, PointReady, g_bHaleRTD = false;
 //new Float:circuitStun = 0.0;
 char currentmap[99];
@@ -685,6 +685,7 @@ public void OnPluginStart()
     cvarMPUnbalanceLimit = FindConVar("mp_teams_unbalance_limit");
     cvarTFFirstBlood = FindConVar("tf_arena_first_blood");
     cvarMPForceCamera = FindConVar("mp_forcecamera");
+    cvarTFWeaponLifeTime = FindConVar("tf_dropped_weapon_lifetime");
     //cvarTFScoutHypeMax = FindConVar("tf_scout_hype_pep_max");
     FindConVar("tf_bot_count").AddChangeHook(HideCvarNotify);
     cvarTFUseQueue.AddChangeHook(HideCvarNotify);
@@ -865,6 +866,7 @@ public void OnConfigsExecuted()
         mp_teams_unbalance_limit = cvarMPUnbalanceLimit.IntValue;
         tf_arena_first_blood = cvarTFFirstBlood.IntValue;
         mp_forcecamera = cvarMPForceCamera.IntValue;
+        tf_dropped_weapon_lifetime = cvarTFWeaponLifeTime.IntValue;
         //tf_scout_hype_pep_max = cvarTFScoutHypeMax.FloatValue;
         cvarTFUseQueue.SetInt(0);
         cvarMPUnbalanceLimit.SetInt(TF2_GetRoundWinCount() ? 0 : 1); // s_bLateLoad ? 0 :
@@ -924,6 +926,7 @@ public void OnMapEnd()
         cvarMPUnbalanceLimit.SetInt(mp_teams_unbalance_limit);
         cvarTFFirstBlood.SetInt(tf_arena_first_blood);
         cvarMPForceCamera.SetInt(mp_forcecamera);
+        cvarTFWeaponLifeTime.SetInt(tf_dropped_weapon_lifetime);
         //cvarTFScoutHypeMax.SetFloat(tf_scout_hype_pep_max);
 #if defined _steamtools_included
         if (steamtools)
@@ -1531,10 +1534,12 @@ public Action event_round_start(Event event, const char[] name, bool dontBroadca
         SetArenaCapEnableTime(60.0);
         SearchForItemPacks();
         cvarMPUnbalanceLimit.SetInt(1);
+        cvarTFWeaponLifeTime.SetInt(tf_dropped_weapon_lifetime);
         CreateTimer(71.0, Timer_EnableCap, _, TIMER_FLAG_NO_MAPCHANGE);
         return Plugin_Continue;
     }
     cvarMPUnbalanceLimit.SetInt(TF2_GetRoundWinCount() ? 0 : 1); // s_bLateLoad ? 0 :
+    cvarTFWeaponLifeTime.SetInt(TF2_GetRoundWinCount() ? 0 : tf_dropped_weapon_lifetime);
     if (FixUnbalancedTeams())
         return Plugin_Continue;
     for (int i = 1; i <= MaxClients; i++)
