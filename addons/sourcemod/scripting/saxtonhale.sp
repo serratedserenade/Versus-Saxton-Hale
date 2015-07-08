@@ -364,17 +364,17 @@ static bool g_bReloadVSHOnRoundEnd = false;
 #define VSHFLAG_CLASSHELPED (1 << 4)
 #define VSHFLAG_HASONGIVED  (1 << 5)
 int VSHFlags[TF_MAX_PLAYERS], Hale = -1, HaleHealthMax, HaleHealth, HaleHealthLast, HaleCharge = 0, HaleRage, NextHale, KSpreeCount = 1, HHHClimbCount;
-float g_flStabbed, g_flMarketed, WeighDownTimer, UberRageCount, GlowTimer, HaleSpeed = 340.0, RageDist = 800.0, Announce = 120.0, tf_scout_hype_pep_max, g_fGoombaDamage = 0.05, g_fGoombaRebound = 300.0;
+float g_flStabbed, g_flMarketed, WeighDownTimer, UberRageCount, GlowTimer, HaleSpeed = 340.0, RageDist = 800.0, Announce = 120.0, g_fGoombaDamage = 0.05, g_fGoombaRebound = 300.0; //tf_scout_hype_pep_max
 bool bEnableSuperDuperJump, bSpawnTeleOnTriggerHurt = false, g_bEnabled = false, g_bAreEnoughPlayersPlaying = false;
 ConVar cvarVersion, cvarHaleSpeed, cvarPointDelay, cvarRageDMG, cvarRageDist, cvarAnnounce, cvarSpecials, cvarEnabled, cvarAliveToEnable, cvarPointType, cvarCrits, cvarRageSentry;
 ConVar cvarFirstRound, cvarDemoShieldCrits, cvarDisplayHaleHP, cvarEnableEurekaEffect, cvarForceHaleTeam, cvarGoombaDamage, cvarGoombaRebound, cvarBossRTD;
 //Stock TF2 convars
-ConVar cvarTFUseQueue, cvarMPUnbalanceLimit, cvarTFFirstBlood, cvarMPForceCamera, cvarTFScoutHypeMax;
+ConVar cvarTFUseQueue, cvarMPUnbalanceLimit, cvarTFFirstBlood, cvarMPForceCamera; //cvarTFScoutHypeMax;
 Handle PointCookie, MusicCookie, VoiceCookie, ClasshelpinfoCookie, doorchecktimer, jumpHUD, rageHUD, healthHUD, infoHUD, MusicTimer;
 //new Handle:cvarCircuitStun;
 //new Handle:cvarForceSpecToHale;
-int PointDelay = 6, RageDMG = 3500, bSpecials = true, AliveToEnable = 5, PointType = 0, TeamRoundCounter, botqueuepoints = 0, tf_arena_use_queue, mp_teams_unbalance_limit;
-int tf_arena_first_blood, mp_forcecamera, defaulttakedamagetype;
+int PointDelay = 6, RageDMG = 3500, bSpecials = true, AliveToEnable = 5, PointType = 0, TeamRoundCounter, botqueuepoints = 0, tf_arena_use_queue;
+int tf_arena_first_blood, mp_forcecamera, defaulttakedamagetype, mp_teams_unbalance_limit;
 bool haleCrits = false, bDemoShieldCrits = false, bAlwaysShowHealth = true, newRageSentry = true, checkdoors = false, PointReady, g_bHaleRTD = false;
 //new Float:circuitStun = 0.0;
 char currentmap[99];
@@ -685,7 +685,7 @@ public void OnPluginStart()
     cvarMPUnbalanceLimit = FindConVar("mp_teams_unbalance_limit");
     cvarTFFirstBlood = FindConVar("tf_arena_first_blood");
     cvarMPForceCamera = FindConVar("mp_forcecamera");
-    cvarTFScoutHypeMax = FindConVar("tf_scout_hype_pep_max");
+    //cvarTFScoutHypeMax = FindConVar("tf_scout_hype_pep_max");
     FindConVar("tf_bot_count").AddChangeHook(HideCvarNotify);
     cvarTFUseQueue.AddChangeHook(HideCvarNotify);
     cvarTFFirstBlood.AddChangeHook(HideCvarNotify);
@@ -865,19 +865,13 @@ public void OnConfigsExecuted()
         mp_teams_unbalance_limit = cvarMPUnbalanceLimit.IntValue;
         tf_arena_first_blood = cvarTFFirstBlood.IntValue;
         mp_forcecamera = cvarMPForceCamera.IntValue;
-        tf_scout_hype_pep_max = cvarTFScoutHypeMax.FloatValue;
-        cvarTFUseQueue.IntValue = 0;
-        cvarMPUnbalanceLimit.IntValue = TF2_GetRoundWinCount() ? 0 : 1; // s_bLateLoad ? 0 :
+        //tf_scout_hype_pep_max = cvarTFScoutHypeMax.FloatValue;
+        cvarTFUseQueue.SetInt(0);
+        cvarMPUnbalanceLimit.SetInt(TF2_GetRoundWinCount() ? 0 : 1); // s_bLateLoad ? 0 :
         //SetConVarInt(FindConVar("mp_teams_unbalance_limit"), GetConVarBool(cvarFirstRound)?0:1);
-        cvarTFFirstBlood.IntValue = 0;
-        cvarMPForceCamera.IntValue = 0;
-        cvarTFScoutHypeMax.FloatValue = 100.0;
-        cvarTFUseQueue.AddChangeHook(ForceOverride);
-        cvarMPUnbalanceLimit.AddChangeHook(ForceOverride);
-        cvarTFFirstBlood.AddChangeHook(ForceOverride);
-        cvarMPForceCamera.AddChangeHook(ForceOverride);
-        cvarTFScoutHypeMax.AddChangeHook(ForceOverride);
-        FindConVar("tf_damage_disablespread").IntValue = 1;
+        cvarTFFirstBlood.SetInt(0);
+        cvarMPForceCamera.SetInt(0);
+        //cvarTFScoutHypeMax.SetFloat(100.0);
 #if defined _steamtools_included
         if (steamtools)
         {
@@ -926,11 +920,11 @@ public void OnMapEnd()
 {
     if (g_bAreEnoughPlayersPlaying || g_bEnabled)
     {
-        FindConVar("tf_arena_use_queue").IntValue = tf_arena_use_queue;
-        FindConVar("mp_teams_unbalance_limit").IntValue = mp_teams_unbalance_limit;
-        FindConVar("tf_arena_first_blood").IntValue = tf_arena_first_blood;
-        FindConVar("mp_forcecamera").IntValue = mp_forcecamera;
-        FindConVar("tf_scout_hype_pep_max").FloatValue = tf_scout_hype_pep_max;
+        cvarTFUseQueue.SetInt(tf_arena_use_queue);
+        cvarMPUnbalanceLimit.SetInt(mp_teams_unbalance_limit);
+        cvarTFFirstBlood.SetInt(tf_arena_first_blood);
+        cvarMPForceCamera.SetInt(mp_forcecamera);
+        //cvarTFScoutHypeMax.SetFloat(tf_scout_hype_pep_max);
 #if defined _steamtools_included
         if (steamtools)
             Steam_SetGameDescription("Team Fortress");
@@ -1163,16 +1157,6 @@ public void HideCvarNotify(ConVar convar, const char[] oldValue, const char[] ne
 {
     FindConVar("sv_tags").Flags &= ~FCVAR_NOTIFY;
     convar.Flags &= ~FCVAR_NOTIFY;
-}
-
-public void ForceOverride(ConVar convar, const char[] oldValue, const char[] newValue)
-{
-	if (convar == cvarTFUseQueue || convar == cvarTFFirstBlood || convar == cvarMPForceCamera)
-		convar.IntValue = 0;
-	else if (convar == cvarMPUnbalanceLimit)
-		convar.IntValue = TF2_GetRoundWinCount() ? 0 : 1;
-	else if (convar == cvarTFScoutHypeMax)
-		convar.FloatValue = 100.0;
 }
 
 public void CvarChange(ConVar convar, const char[] oldValue, const char[] newValue)
@@ -1546,11 +1530,11 @@ public Action event_round_start(Event event, const char[] name, bool dontBroadca
         VSHRoundState = VSHRState_Disabled;
         SetArenaCapEnableTime(60.0);
         SearchForItemPacks();
-        FindConVar("mp_teams_unbalance_limit").IntValue = 1;
+        cvarMPUnbalanceLimit.SetInt(1);
         CreateTimer(71.0, Timer_EnableCap, _, TIMER_FLAG_NO_MAPCHANGE);
         return Plugin_Continue;
     }
-    FindConVar("mp_teams_unbalance_limit").IntValue =  TF2_GetRoundWinCount() ? 0 : 1; // s_bLateLoad ? 0 :
+    cvarMPUnbalanceLimit.SetInt(TF2_GetRoundWinCount() ? 0 : 1); // s_bLateLoad ? 0 :
     if (FixUnbalancedTeams())
         return Plugin_Continue;
     for (int i = 1; i <= MaxClients; i++)
