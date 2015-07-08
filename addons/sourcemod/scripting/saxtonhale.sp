@@ -3706,7 +3706,7 @@ public Action ClientTimer(Handle hTimer)
             }
             switch (index)
             {
-                case 305, 1079, 1081, 56, 16, 1149, 203, 58, 1083, 1105, 1100, 1005, 1092, 812, 833, 997, 39, 351, 740, 588, 595: //Critlist
+                case 305, 1079, 1081, 56, 58, 1083, 1105, 1100, 1005, 1092, 812, 833, 997, 39, 351, 740, 588, 595: //Critlist
                 {
                     int flindex = GetIndexOfWeaponSlot(client, TFWeaponSlot_Primary);
                     if (TF2_GetPlayerClass(client) == TFClass_Pyro && flindex == 594) // No crits if using phlog
@@ -3714,18 +3714,37 @@ public Action ClientTimer(Handle hTimer)
                     else
                         addthecrit = true;
                 }
-                case 22, 23, 160, 209, 294, 449, 773:
+                /*case 22, 23, 160, 209, 294, 449, 773:
                 {
                     addthecrit = true;
                     if (class == TFClass_Scout && cond == TFCond_HalloweenCritCandy)
                         cond = TFCond_Buffed;
-                }
+                }*/
                 case 656:
                 {
                     addthecrit = true;
                     cond = TFCond_Buffed;
                 }
             }
+			if (validwep && weapon == GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary))
+			{
+				if (strncmp(wepclassname, "tf_weapon_pis", 13, false) == 0)
+				{
+					addthecrit = true;
+					if (class == TFClass_Scout && cond == TFCond_HalloweenCritCandy)
+						cond = TFCond_Buffed;
+				}
+				if (strncmp(wepclassname, "tf_weapon_han", 13, false) == 0)
+				{
+					addthecrit = true;
+					cond = TFCond_Buffed;
+				}
+			}
+			if (class == TFClass_Sniper && weapon == GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary))
+			{
+				if (strncmp(wepclassname, "tf_weapon_smg", 13, false) == 0)
+					addthecrit = true;
+			}
             if (index == 16 && addthecrit && IsValidEntity(FindPlayerBack(client, { 642 }, 1)))
                 addthecrit = false;
             if (class == TFClass_DemoMan && !IsValidEntity(GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary)))
