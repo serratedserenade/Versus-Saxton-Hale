@@ -3,6 +3,7 @@
 #endif
 #define _VSH_included
 
+#include <tf2>
 
 // VSH_GetRoundState()
 enum VSHRState
