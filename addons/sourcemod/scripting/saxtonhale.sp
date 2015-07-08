@@ -688,9 +688,9 @@ public void OnPluginStart()
     cvarMPForceCamera = FindConVar("mp_forcecamera");
     cvarTFWeaponLifeTime = FindConVar("tf_dropped_weapon_lifetime");
     cvarTFFeignActivateDamageScale = FindConVar("tf_feign_death_activate_damage_scale");
-	cvarTFFeignDamageScale = FindConVar("tf_feign_death_damage_scale");
-	cvarTFFeignDeathDuration = FindConVar("tf_feign_death_duration");
-	cvarTFStealthDamageReduction = FindConVar("tf_stealth_damage_reduction");
+    cvarTFFeignDamageScale = FindConVar("tf_feign_death_damage_scale");
+    cvarTFFeignDeathDuration = FindConVar("tf_feign_death_duration");
+    cvarTFStealthDamageReduction = FindConVar("tf_stealth_damage_reduction");
     //cvarTFScoutHypeMax = FindConVar("tf_scout_hype_pep_max");
     FindConVar("tf_bot_count").AddChangeHook(HideCvarNotify);
     cvarTFUseQueue.AddChangeHook(HideCvarNotify);
@@ -936,10 +936,10 @@ public void OnMapEnd()
         cvarTFFirstBlood.SetInt(tf_arena_first_blood);
         cvarMPForceCamera.SetInt(mp_forcecamera);
         cvarTFWeaponLifeTime.SetInt(tf_dropped_weapon_lifetime);
-		cvarTFFeignActivateDamageScale.SetFloat(tf_feign_death_activate_damage_scale);
-		cvarTFFeignDamageScale.SetFloat(tf_feign_death_damage_scale);
-		cvarTFFeignDeathDuration.SetInt(tf_feign_death_duration);
-		cvarTFStealthDamageReduction.SetFloat(tf_stealth_damage_reduction);
+        cvarTFFeignActivateDamageScale.SetFloat(tf_feign_death_activate_damage_scale);
+        cvarTFFeignDamageScale.SetFloat(tf_feign_death_damage_scale);
+        cvarTFFeignDeathDuration.SetInt(tf_feign_death_duration);
+        cvarTFStealthDamageReduction.SetFloat(tf_stealth_damage_reduction);
         //cvarTFScoutHypeMax.SetFloat(tf_scout_hype_pep_max);
 #if defined _steamtools_included
         if (steamtools)
@@ -1548,10 +1548,10 @@ public Action event_round_start(Event event, const char[] name, bool dontBroadca
         SearchForItemPacks();
         cvarMPUnbalanceLimit.SetInt(1);
         cvarTFWeaponLifeTime.SetInt(tf_dropped_weapon_lifetime);
-		cvarTFFeignActivateDamageScale.SetFloat(tf_feign_death_activate_damage_scale);
-		cvarTFFeignDamageScale.SetFloat(tf_feign_death_damage_scale);
-		cvarTFFeignDeathDuration.SetInt(tf_feign_death_duration);
-		cvarTFStealthDamageReduction.SetFloat(tf_stealth_damage_reduction);
+        cvarTFFeignActivateDamageScale.SetFloat(tf_feign_death_activate_damage_scale);
+        cvarTFFeignDamageScale.SetFloat(tf_feign_death_damage_scale);
+        cvarTFFeignDeathDuration.SetInt(tf_feign_death_duration);
+        cvarTFStealthDamageReduction.SetFloat(tf_stealth_damage_reduction);
         CreateTimer(71.0, Timer_EnableCap, _, TIMER_FLAG_NO_MAPCHANGE);
         return Plugin_Continue;
     }
@@ -4125,13 +4125,13 @@ public void TF2_OnConditionRemoved(int client, TFCond condition)
 
 public void TF2_OnConditionAdded(int client, TFCond condition)
 {
-	if (g_bEnabled && client != Hale)
+    if (g_bEnabled && client != Hale)
     {
-		if (TF2_GetPlayerClass(client) == TFClass_Spy && condition == TFCond_DeadRingered)
-		{
-			RequestFrame(Frame_RemoveFeignSpeedBuff, client);
-		}
-	}
+        if (TF2_GetPlayerClass(client) == TFClass_Spy && condition == TFCond_DeadRingered)
+        {
+            RequestFrame(Frame_RemoveFeignSpeedBuff, client);
+        }
+    }
 }
 
 public void Frame_RemoveFeignSpeedBuff(int client)
@@ -5041,9 +5041,9 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
                 if (damagetype & DMG_CRIT)
                     damagetype &= ~DMG_CRIT;
                 if (TF2_IsPlayerInCondition(client, TFCond_DeadRingered))
-					damage = 620.0;
-				else if (!TF2_IsPlayerInCondition(client, TFCond_DeadRingered))
-					damage = 850.0;
+                    damage = 620.0;
+                else if (!TF2_IsPlayerInCondition(client, TFCond_DeadRingered))
+                    damage = 850.0;
                 //return Plugin_Changed;
             }
             return Plugin_Changed; //Better to return here.
