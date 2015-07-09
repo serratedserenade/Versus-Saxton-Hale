@@ -3706,7 +3706,7 @@ public Action ClientTimer(Handle hTimer)
             }
             switch (index)
             {
-                case 305, 1079, 1081, 56, 58, 1083, 1105, 1100, 1005, 1092, 812, 833, 997, 39, 351, 740, 588, 595: //Critlist
+                case 305, 1079, 1081, 58, 1083, 1105, 1100, 812, 833, 997, 39, 351, 740, 588, 595: //Critlist
                 {
                     int flindex = GetIndexOfWeaponSlot(client, TFWeaponSlot_Primary);
                     if (TF2_GetPlayerClass(client) == TFClass_Pyro && flindex == 594) // No crits if using phlog
@@ -3740,10 +3740,18 @@ public Action ClientTimer(Handle hTimer)
                     cond = TFCond_Buffed;
                 }
             }
-            if (class == TFClass_Sniper && weapon == GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary))
+            if (validwep && class == TFClass_Sniper)
             {
-                if (strncmp(wepclassname, "tf_weapon_smg", 13, false) == 0)
-                    addthecrit = true;
+                if (weapon == GetPlayerWeaponSlot(client, TFWeaponSlot_Primary))
+                {
+                    if (strncmp(wepclassname, "tf_weapon_comp", 14, false) == 0)
+                        addthecrit = true;
+                }
+                if (weapon == GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary))
+                {
+                    if (strncmp(wepclassname, "tf_weapon_smg", 13, false) == 0)
+                        addthecrit = true;
+                }
             }
             if (index == 16 && addthecrit && IsValidEntity(FindPlayerBack(client, { 642 }, 1)))
                 addthecrit = false;
