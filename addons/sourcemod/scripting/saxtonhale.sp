@@ -452,6 +452,8 @@ static const char haleversiontitles[][] =     //the last line of this is what de
     "1.50",
     "1.51",
     "1.52",
+    "1.53",
+    "1.53",
     PLUGIN_VERSION
 };
 static const char haleversiondates[][] =
@@ -527,6 +529,8 @@ static const char haleversiondates[][] =
     "29 Oct 2014", //  An update I never bothered to throw outdate
     "25 Dec 2014",  //  Merry Xmas
     "9 Mar 2015",
+	"Insert Release Date",
+	"Insert Release Date",
 };
 static const int maxversion = (sizeof(haleversiontitles) - 1);
 Handle OnHaleJump, OnHaleRage, OnHaleWeighdown, OnMusic, OnHaleNext;
@@ -6172,10 +6176,22 @@ void FindVersionData(Panel panel, int versionindex)
     switch (versionindex) // panel.DrawText("1) .");
     {
         // Unnerfed the Easter Bunny's rage.
-        case 70: //1.53
+        case 71: //1.53
+        {
+            panel.DrawText("8) OVERRIDE_MEDIGUNS_ON is now on by default. Mediguns will simlpy have their stats replaced instead of a custom medigun replacement.");
+            panel.DrawText("9) Skinned weapons act like their non-skinned counter-parts.");
+            panel.DrawText("10) Natascha will no longer keep its bonus ammo when being replaced.");
+            panel.DrawText("11) Unnerfed the Easter Bunny's rage.");
+        }
+		case 70: //1.53
         {
             panel.DrawText("1) Ported VSH over to 1.7 syntax.(WildCard65)");
             panel.DrawText("2) Integrated RTD and Goomba overrides.(WildCard65)");
+            panel.DrawText("3) Big Earner provides 3 second speed boost on stab.");
+            panel.DrawText("4) Shortstop provides passive effects even when not active.");
+            panel.DrawText("5) Dead Ringer will reduce melee hits to 62 damage each.");
+            panel.DrawText("6) Dead Ringer does not grant a speed boost on feign death.");
+            panel.DrawText("7) Disabled dropped weapons during VSH rounds.");
         }
         case 69: //1.52
         {
