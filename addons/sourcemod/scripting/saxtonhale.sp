@@ -872,10 +872,10 @@ public void OnConfigsExecuted()
         tf_arena_first_blood = cvarTFFirstBlood.IntValue;
         mp_forcecamera = cvarMPForceCamera.IntValue;
         tf_dropped_weapon_lifetime = cvarTFWeaponLifeTime.IntValue;
-		tf_feign_death_activate_damage_scale = cvarTFFeignActivateDamageScale.FloatValue;
-		tf_feign_death_damage_scale = cvarTFFeignDamageScale.FloatValue;
-		tf_feign_death_duration = cvarTFFeignDeathDuration.IntValue;
-		tf_stealth_damage_reduction = cvarTFStealthDamageReduction.FloatValue;
+        tf_feign_death_activate_damage_scale = cvarTFFeignActivateDamageScale.FloatValue;
+        tf_feign_death_damage_scale = cvarTFFeignDamageScale.FloatValue;
+        tf_feign_death_duration = cvarTFFeignDeathDuration.IntValue;
+        tf_stealth_damage_reduction = cvarTFStealthDamageReduction.FloatValue;
         //tf_scout_hype_pep_max = cvarTFScoutHypeMax.FloatValue;
         cvarTFUseQueue.SetInt(0);
         cvarMPUnbalanceLimit.SetInt(TF2_GetRoundWinCount() ? 0 : 1); // s_bLateLoad ? 0 :
@@ -1557,10 +1557,10 @@ public Action event_round_start(Event event, const char[] name, bool dontBroadca
     }
     cvarMPUnbalanceLimit.SetInt(TF2_GetRoundWinCount() ? 0 : 1); // s_bLateLoad ? 0 :
     cvarTFWeaponLifeTime.SetInt(TF2_GetRoundWinCount() ? 0 : tf_dropped_weapon_lifetime);
-	cvarTFFeignActivateDamageScale.SetFloat(TF2_GetRoundWinCount() ? 0.1 : tf_feign_death_activate_damage_scale);
-	cvarTFFeignDamageScale.SetFloat(TF2_GetRoundWinCount() ? 0.1 : tf_feign_death_damage_scale);
-	cvarTFFeignDeathDuration.SetInt(TF2_GetRoundWinCount() ? 7 : tf_feign_death_duration);
-	cvarTFStealthDamageReduction.SetFloat(TF2_GetRoundWinCount() ? 0.1 : tf_stealth_damage_reduction);
+    cvarTFFeignActivateDamageScale.SetFloat(TF2_GetRoundWinCount() ? 0.1 : tf_feign_death_activate_damage_scale);
+    cvarTFFeignDamageScale.SetFloat(TF2_GetRoundWinCount() ? 0.1 : tf_feign_death_damage_scale);
+    cvarTFFeignDeathDuration.SetInt(TF2_GetRoundWinCount() ? 7 : tf_feign_death_duration);
+    cvarTFStealthDamageReduction.SetFloat(TF2_GetRoundWinCount() ? 0.1 : tf_stealth_damage_reduction);
     if (FixUnbalancedTeams())
         return Plugin_Continue;
     for (int i = 1; i <= MaxClients; i++)
