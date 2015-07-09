@@ -2870,6 +2870,7 @@ public Action MakeNoHale(Handle hTimer, any clientid)
             {
                 TF2_RemoveWeaponSlot(client, TFWeaponSlot_Primary);
                 SpawnWeapon(client, "tf_weapon_minigun", 15, 1, 0, "");
+                SetAmmo(client, 0, 200);
             }
             case 402:
             {
