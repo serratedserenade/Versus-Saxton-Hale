@@ -220,15 +220,15 @@
 	}
 	"vsh_help_scout"
 	{
-		"en"	"The Crit-a-Cola grants crits instead of minicrits.\nThe Fan O' War removes 5% rage on hit.\nPistols gain minicrits, Flying Guillotine is critboosted.\nCandycane drops a small health pack on hit.\nSoda Popper and BFB are replaced with Scatterguns, Bonk! is replaced with Crit-a-Cola.\nWrap Assassin has 2 ornaments."
+		"en"	"The Crit-a-Cola grants crits instead of minicrits.\nThe Fan O' War removes 5%% rage on hit.\nPistols gain minicrits, Flying Guillotine is critboosted.\nCandycane drops a small health pack on hit.\nSoda Popper and BFB are replaced with Scatterguns, Bonk! is replaced with Crit-a-Cola.\nWrap Assassin has 2 ornaments."
 	}
 	"vsh_help_soldier"
 	{
-		"en"	"The Battalion's Backup will fill to 100% on taking a hit from Hale. Its buff causes nearby teammates to take very little damage.\nThe Half-Zatoichi heals 35HP on hit and can overheal to +25. Honorbound is removed on hit.\nBoot weapons lessen fall damage.\nAll guns minicrit Hale in midair.\nDirect Hit crits where it would minicrit.\nReserve Shooter has faster weapon switch and slight damage buff.\nMantreads create greater rocketjumps and deal 5x stomp damage.\nAirstrike gains an extra clip every 200 damage dealt to Hale.\nMarket Gardens deal large amounts of damage, but is not crit boosted."
+		"en"	"The Battalion's Backup will fill to 100%% on taking a hit from Hale. Its buff causes nearby teammates to take very little damage.\nThe Half-Zatoichi heals 35HP on hit and can overheal to +25. Honorbound is removed on hit.\nBoot weapons lessen fall damage.\nAll guns minicrit Hale in midair.\nDirect Hit crits where it would minicrit.\nReserve Shooter has faster weapon switch and slight damage buff.\nMantreads create greater rocketjumps and deal 5x stomp damage.\nAirstrike gains an extra clip every 200 damage dealt to Hale.\nMarket Gardens deal large amounts of damage, but is not crit boosted."
 	}
 	"vsh_help_pyro"
 	{
-		"en"	"The Axtinguisher acts like the Fire Axe.\nThe Flare Gun and Detonator are replaced by the MegaDetonator, all Flare guns are critboosted.\nAirblasting the boss builds rage and lengthens the Vagineer's uber.\nThird Degree gains 10% uber for healers on hit.\nPhlog will grant invulnerability while activating Mmmph, and has a defence buff during Crit Mmmph,\nbut disables flare crits at all time, and has a 50% damage penalty when Mmmph isn't active."
+		"en"	"The Axtinguisher acts like the Fire Axe.\nThe Flare Gun and Detonator are replaced by the MegaDetonator, all Flare guns are critboosted.\nAirblasting the boss builds rage and lengthens the Vagineer's uber.\nThird Degree gains 10%% uber for healers on hit.\nPhlog will grant invulnerability while activating Mmmph, and has a defence buff during Crit Mmmph,\nbut disables flare crits at all time, and has a 50%% damage penalty when Mmmph isn't active."
 	}
 	"vsh_help_demo"
 	{
@@ -244,15 +244,15 @@
 	}
 	"vsh_help_medic"
 	{
-		"en"	"All Mediguns are identical: +25% Ubercharge rate, +25% Faster weapon switch, follow heal target like the Quickfix.\nUbercharge: Kritz+Uber+Quickfix. Charge starts at 41% at the start of the round, then 31% after each activation.\nCharge is increased to 150% after activation.\nSyringe Guns: on hit: +5% to ubercharge, Overdose speed effect.\nCrossbow: critboosted, 1.45x damage, +15% uber on hit."
+		"en"	"All Mediguns are identical: +25%% Ubercharge rate, +25%% Faster weapon switch, follow heal target like the Quickfix.\nUbercharge: Kritz+Uber+Quickfix. Charge starts at 41%% at the start of the round, then 31%% after each activation.\nCharge is increased to 150%% after activation.\nSyringe Guns: on hit: +5%% to ubercharge, Overdose speed effect.\nCrossbow: critboosted, 1.45x damage, +15%% uber on hit."
 	}
 	"vsh_help_sniper"
 	{
-		"en"	"Jarate removes 8% rage.\nAll SMGs are critboosted.\nRazorback is replaced with SMG.\nAll rifles deal 3x damage on non-crits.\nSniper Rifle causes Hale to glow. Glow time scales with charge.\nHitman's Heatmaker gains focus based on damage dealt.\nSydney Sleeper doesn't apply jarate to Hale, adds only half its damage to Hale's rage meter.\nBazaar Bargain is disabled.\nBushwacka climbs walls, but blocks healing while in use.\nCozy Camper grants a bonus SMG that deals -15% damage, 1.5s bleed on hit and is not critboosted."
+		"en"	"Jarate removes 8%% rage.\nAll SMGs are critboosted.\nRazorback is replaced with SMG.\nAll rifles deal 3x damage on non-crits.\nSniper Rifle causes Hale to glow. Glow time scales with charge.\nHitman's Heatmaker gains focus based on damage dealt.\nSydney Sleeper doesn't apply jarate to Hale, adds only half its damage to Hale's rage meter.\nBazaar Bargain is disabled.\nBushwacka climbs walls, but blocks healing while in use.\nCozy Camper grants a bonus SMG that deals -15%% damage, 1.5s bleed on hit and is not critboosted."
 	}
 	"vsh_help_spie"
 	{
-		"en"	"Backstabs deal a percentage of Hale's max HP.\nCloak 'n Dagger replaced with normal watch.\nInvisi-Watch/reskins reduce melee hits and arrows to 85 damage each while cloaked.\nDead-Ringer reduces melee hits and arrows to 62 damage each while the DR is activated or triggered.\nAll watches reduce all other damage by 90% while cloaked/DR is up.\nAll revolvers minicrit.\nYour Eternal Reward has silent decloak and no disguises.\nKunai reduces max HP to 65, backstabs will give you a health bonus.\nAmbassador headshots do 2.5x damage.\nBig Earner gains full cloak on backstab and 3 second speed boost.\nDiamondback gets 2 revenge crits on backstab that do 2.5x damage each."
+		"en"	"Backstabs deal a percentage of Hale's max HP.\nCloak 'n Dagger replaced with normal watch.\nInvisi-Watch/reskins reduce melee hits and arrows to 85 damage each while cloaked.\nDead-Ringer reduces melee hits and arrows to 62 damage each while the DR is activated or triggered.\nAll watches reduce all other damage by 90%% while cloaked/DR is up.\nAll revolvers minicrit.\nYour Eternal Reward has silent decloak and no disguises.\nKunai reduces max HP to 65, backstabs will give you a health bonus.\nAmbassador headshots do 2.5x damage.\nBig Earner gains full cloak on backstab and 3 second speed boost.\nDiamondback gets 2 revenge crits on backstab that do 2.5x damage each."
 	}
 	"vsh_help_melee"
 	{
