@@ -453,7 +453,6 @@ static const char haleversiontitles[][] =     //the last line of this is what de
     "1.51",
     "1.52",
     "1.53",
-    "1.53",
     PLUGIN_VERSION
 };
 static const char haleversiondates[][] =
@@ -529,8 +528,7 @@ static const char haleversiondates[][] =
     "29 Oct 2014", //  An update I never bothered to throw outdate
     "25 Dec 2014",  //  Merry Xmas
     "9 Mar 2015",
-    "Insert Release Date",
-    "Insert Release Date",
+    "10 Jul 2015",
 };
 static const int maxversion = (sizeof(haleversiontitles) - 1);
 Handle OnHaleJump, OnHaleRage, OnHaleWeighdown, OnMusic, OnHaleNext;
@@ -6182,6 +6180,7 @@ void FindVersionData(Panel panel, int versionindex)
             panel.DrawText("10) Natascha will no longer keep its bonus ammo when being replaced.");
             panel.DrawText("11) Unnerfed the Easter Bunny's rage.");
             panel.DrawText("12) Diamondback revenge crits on stab reduced from 3 -> 2.");
+            panel.DrawText("13) Updated English translation phrases. (Class info, etc.)");
         }
 		case 70: //1.53
         {
