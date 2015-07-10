@@ -6175,23 +6175,23 @@ void FindVersionData(Panel panel, int versionindex)
 {
     switch (versionindex) // panel.DrawText("1) .");
     {
-        // Unnerfed the Easter Bunny's rage.
         case 71: //1.53
         {
-            panel.DrawText("8) OVERRIDE_MEDIGUNS_ON is now on by default. Mediguns will simlpy have their stats replaced instead of a custom medigun replacement.");
-            panel.DrawText("9) Skinned weapons act like their non-skinned counter-parts.");
+            panel.DrawText("8) Disabled dropped weapons during VSH rounds.");
+            panel.DrawText("9) OVERRIDE_MEDIGUNS_ON is now on by default. Mediguns will simlpy have their stats replaced instead of a custom medigun replacement.");
             panel.DrawText("10) Natascha will no longer keep its bonus ammo when being replaced.");
             panel.DrawText("11) Unnerfed the Easter Bunny's rage.");
+            panel.DrawText("12) Diamondback revenge crits on stab reduced from 3 -> 2.");
         }
 		case 70: //1.53
         {
             panel.DrawText("1) Ported VSH over to 1.7 syntax.(WildCard65)");
             panel.DrawText("2) Integrated RTD and Goomba overrides.(WildCard65)");
-            panel.DrawText("3) Big Earner provides 3 second speed boost on stab.");
-            panel.DrawText("4) Shortstop provides passive effects even when not active.");
-            panel.DrawText("5) Dead Ringer will reduce melee hits to 62 damage each.");
-            panel.DrawText("6) Dead Ringer does not grant a speed boost on feign death.");
-            panel.DrawText("7) Disabled dropped weapons during VSH rounds.");
+            panel.DrawText("3) Updated compatibility for Gun Mettle changes.");
+            panel.DrawText("4) Big Earner provides 3 second speed boost on stab.");
+            panel.DrawText("5) Shortstop provides passive effects even when not active.");
+            panel.DrawText("6) Dead Ringer will reduce melee hits and arrows to 62 damage each.");
+            panel.DrawText("7) Dead Ringer will not grant a speed boost on feign death.");
         }
         case 69: //1.52
         {
