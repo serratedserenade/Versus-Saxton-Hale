@@ -200,19 +200,19 @@
 	}
 	"vsh_help_hale"
 	{
-		"en"	"Saxton Hale:\nSuper Jump: crouch, look up and stand up.\nWeigh-down: in midair, look down and crouch\nAnchor: Crouchwalk on the ground to prevent all knockback.\nRage (stun): taunt when the Rage Meter is full to stun nearby enemies."
+		"en"	"Saxton Hale:\nSuper Jump: crouch/alt-fire, look up and stand up/let go.\nWeigh-down: in midair, look down and crouch\nAnchor: Crouchwalk on the ground to prevent all knockback.\nRage (stun): taunt/call for Medic when the Rage Meter is full to stun nearby enemies for 5 seconds."
 	}
 	"vsh_help_vagineer"
 	{
-		"en"	"Vagineer:\nSuper Jump: crouch, look up and stand up.\nWeigh-down: in midair, look down and crouch\nRage (uber): taunt when the Rage Meter is full to stun fairly close-by enemies."
+		"en"	"Vagineer:\nSuper Jump: crouch/alt-fire, look up and stand up/let go.\nWeigh-down: in midair, look down and crouch\nRage (uber): taunt/call for Medic when the Rage Meter is full to stun fairly close-by enemies for 5 seconds and negate all knockback for a short while."
 	}
 	"vsh_help_hhh"
 	{
-		"en"	"Horseless Headless Horsemann Jr.:\nTeleporter: crouch, look up and stand up.\nWeigh-down: in midair, look down and crouch\nRage (stun): taunt when Rage Meter is full to stun nearby enemies."
+		"en"	"Horseless Headless Horsemann Jr.:\nTeleport: crouch/alt-fire, look up and stand up/let go.\nWeigh-down: in midair, look down and crouch\nRage (stun): taunt/call for Medic when Rage Meter is full to stun nearby enemies for 5 seconds."
 	}
 	"vsh_help_cbs"
 	{
-		"en"	"Christian Brutal Sniper:\nSuper Jump: crouch, look up and stand up.\nWeigh-down: in midair, look down and crouch\nRage (bow): taunt when Rage Meter is full (9 arrows).\nVery close-by enemies are stunned."
+		"en"	"Christian Brutal Sniper:\nSuper Jump: crouch/alt-fire, look up and stand up/let go.\nWeigh-down: in midair, look down and crouch\nRage (bow): taunt/call for Medic when Rage Meter is full (up to 9 arrows).\nVery close-by enemies are stunned for 5 seconds."
 	}
 	"vsh_respawn_on_medieval"
 	{
@@ -220,43 +220,43 @@
 	}
 	"vsh_help_scout"
 	{
-		"en"	"The Crit-a-Cola grants criticals instead of minicrits.\nThe Fan O' War removes 5pct rage on hit.\nPistols gain minicrits.\nCandycane drops a health pack on hit."
+		"en"	"The Crit-a-Cola grants crits instead of minicrits.\nThe Fan O' War removes 5% rage on hit.\nPistols gain minicrits, Flying Guillotine is critboosted.\nCandycane drops a small health pack on hit.\nSoda Popper and BFB are replaced with Scatterguns, Bonk! is replaced with Crit-a-Cola.\nWrap Assassin has 2 ornaments."
 	}
 	"vsh_help_soldier"
 	{
-		"en"	"The Battalion's Backup fills its meter when hit. Its buff causes nearby teammates to take very little damage.\nThe Half-Zatoichi heals 35HP on hit and can overheal to +25. Honorbound is removed on hit.\nBoot weapons lessen fall damage.\nAll guns minicrit Hale in midair.\nDirect Hit crits where it would minicrit.\nReserve Shooter has faster weapon switch and slight damage buff.\nMantreads create greater rocketjumps and deal 5x stomp damage."
+		"en"	"The Battalion's Backup will fill to 100% on taking a hit from Hale. Its buff causes nearby teammates to take very little damage.\nThe Half-Zatoichi heals 35HP on hit and can overheal to +25. Honorbound is removed on hit.\nBoot weapons lessen fall damage.\nAll guns minicrit Hale in midair.\nDirect Hit crits where it would minicrit.\nReserve Shooter has faster weapon switch and slight damage buff.\nMantreads create greater rocketjumps and deal 5x stomp damage.\nAirstrike gains an extra clip every 200 damage dealt to Hale.\nMarket Gardens deal large amounts of damage, but is not crit boosted."
 	}
 	"vsh_help_pyro"
 	{
-		"en"	"The Axetinguisher is replaced with the Fire Axe.\nThe Flare Gun is replaced by the MegaDetonator and gets crits.\nAirblasting the boss builds rage and lengthens the Vagineer's uber.\nThird Degree gains uber for healers on hit.\nPhlog has a defence buff during Crit Mmmph, but disables flare crits, and has 50% less damage when not in CritMmmph."
+		"en"	"The Axtinguisher acts like the Fire Axe.\nThe Flare Gun and Detonator are replaced by the MegaDetonator, all Flare guns are critboosted.\nAirblasting the boss builds rage and lengthens the Vagineer's uber.\nThird Degree gains 10% uber for healers on hit.\nPhlog will grant invulnerability while activating Mmmph, and has a defence buff during Crit Mmmph,\nbut disables flare crits at all time, and has a 50% damage penalty when Mmmph isn't active."
 	}
 	"vsh_help_demo"
 	{
-		"en"	"The shields block one hit from Hale.\nUsing the shields grants minicrits.\nEyelander/reskins gain heads on hit.\nThe Half-Zatoichi heals 35HP on hit and can overheal to +25. Honorbound is removed on hit.\nDemo boots lessen fall damage."
+		"en"	"The shields block one hit from Hale.\nUsing the shields grants minicrits to your primary weapon.\nEyelander/reskins gain heads on hit.\nThe Half-Zatoichi heals 35HP on hit and can overheal to +25. Honorbound is removed on hit.\nDemo boots lessen fall damage and can stomp like Mantreads."
 	}
 	"vsh_help_heavy"
 	{
-		"en"	"Natascha, the KGB, and the Fists of Steel are replaced with the\nMinigun, Gloves of Running, and Fists, respectively.\nThe Gloves of Running are quite quick but cause you to lose more health.\nThe Holiday Punch will remove any stun on you if you hit Hale while stunned."
+		"en"	"Natascha, the KGB, and the Fists of Steel are replaced with the\nMinigun, Gloves of Running, and Fists, respectively.\nThe Gloves of Running are quite quick but cause you to lose more health.\nThe Holiday Punch will remove any stun on you if you hit Hale while stunned, they are only minicrit boosted."
 	}
 	"vsh_help_eggineer"
 	{
-		"en"	"All maps have only small ammo packs.\nThe Frontier Justice gains crits only while your sentry is targetting Hale.\nThe Eureka Effect is disabled for now."
+		"en"	"The Frontier Justice gains crits only while your sentry is targeting Hale.\nThe Pomson, Rescue Ranger and all pistols are critboosted.\nShort Circuit is replaced with the Wrangler.\nThe Eureka Effect is disabled by default for now."
 	}
 	"vsh_help_medic"
 	{
-		"en"	"Charge: Kritz+Uber. Charge starts at 40percent.\nCharge lasts for 150 percent after activation.\nSyringe Guns: on hit: +5 to ubercharge, Overdose speed effect.\nCrossbow: 100 percent crits, +150pct damage, +10 uber on hit."
+		"en"	"All Mediguns are identical: +25% Ubercharge rate, +25% Faster weapon switch, follow heal target like the Quickfix.\nUbercharge: Kritz+Uber+Quickfix. Charge starts at 41% at the start of the round, then 31% after each activation.\nCharge is increased to 150% after activation.\nSyringe Guns: on hit: +5% to ubercharge, Overdose speed effect.\nCrossbow: critboosted, 1.45x damage, +15% uber on hit."
 	}
 	"vsh_help_sniper"
 	{
-		"en"	"Jarate removes 8pct rage.\nRazorback is replaced with SMG.\nSniper Rifle causes Hale to glow. Glow time scales with charge.\nBushwacka climbs walls, but blocks healing while in use."
+		"en"	"Jarate removes 8% rage.\nAll SMGs are critboosted.\nRazorback is replaced with SMG.\nAll rifles deal 3x damage on non-crits.\nSniper Rifle causes Hale to glow. Glow time scales with charge.\nHitman's Heatmaker gains focus based on damage dealt.\nSydney Sleeper doesn't apply jarate to Hale, adds only half its damage to Hale's rage meter.\nBazaar Bargain is disabled.\nBushwacka climbs walls, but blocks healing while in use.\nCozy Camper grants a bonus SMG that deals -15% damage, 1.5s bleed on hit and is not critboosted."
 	}
 	"vsh_help_spie"
 	{
-		"en"	"Backstab does great damage vs Hale.\nCloaknDagger replaced with normal watch.\nAll revolvers minicrit.\nYour Eternal Reward has silent decloak and no disguises.\nKunai backstabs will give you a health bonus.\nAmbassador headshots do 2.5x damage.\nBig Earner gains full cloak on backstab.\nDiamondback gets 3 revenge crits on backstab that do 2.5x damage."
+		"en"	"Backstabs deal a percentage of Hale's max HP.\nCloak 'n Dagger replaced with normal watch.\nInvisi-Watch/reskins reduce melee hits and arrows to 85 damage each while cloaked.\nDead-Ringer reduces melee hits and arrows to 62 damage each while the DR is activated or triggered.\nAll watches reduce all other damage by 90% while cloaked/DR is up.\nAll revolvers minicrit.\nYour Eternal Reward has silent decloak and no disguises.\nKunai reduces max HP to 65, backstabs will give you a health bonus.\nAmbassador headshots do 2.5x damage.\nBig Earner gains full cloak on backstab and 3 second speed boost.\nDiamondback gets 2 revenge crits on backstab that do 2.5x damage each."
 	}
 	"vsh_help_melee"
 	{
-		"en"	"All melee weapons (except the Spy knives) deal critical hits."
+		"en"	"All melee weapons (except the Spy knives or otherwise stated) are critboosted."
 	}
 	"vsh_thequeue"
 	{
