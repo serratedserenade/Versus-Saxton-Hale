@@ -3701,35 +3701,23 @@ public Action ClientTimer(Handle hTimer)
                 }
             }
             bool addthecrit = false;
-            if (validwep && weapon == GetPlayerWeaponSlot(client, TFWeaponSlot_Melee))  //&& index != 4 && index != 194 && index != 225 && index != 356 && index != 461 && index != 574) addthecrit = true; //class != TFClass_Spy
-            {
-                //slightly longer check but makes sure that any weapon that can backstab will not crit (e.g. Saxxy)
-                if ((TF2_GetPlayerClass(client) != TFClass_Spy || strcmp(wepclassname, "tf_weapon_knife", false) != 0) && index != 416)
-                    addthecrit = true;
-            }
             switch (index)
             {
-                case 305, 1079, 1081, 58, 1083, 1105, 1100, 812, 833, 997, 39, 351, 740, 588, 595: //Critlist
-                {
-                    int flindex = GetIndexOfWeaponSlot(client, TFWeaponSlot_Primary);
-                    if (TF2_GetPlayerClass(client) == TFClass_Pyro && flindex == 594) // No crits if using phlog
-                        addthecrit = false;
-                    else
-                        addthecrit = true;
-                }
-                /*case 22, 23, 160, 209, 294, 449, 773:
-                {
+                case 997, 588: //Specific Critlist
                     addthecrit = true;
-                    if (class == TFClass_Scout && cond == TFCond_HalloweenCritCandy)
-                        cond = TFCond_Buffed;
-                }*/
-                case 656:
+                case 656: //Specifc Minicritlist
                 {
                     addthecrit = true;
                     cond = TFCond_Buffed;
                 }
             }
-            if (validwep && weapon == GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary))
+            if (validwep && weapon == GetPlayerWeaponSlot(client, TFWeaponSlot_Melee))  //&& index != 4 && index != 194 && index != 225 && index != 356 && index != 461 && index != 574) addthecrit = true; //class != TFClass_Spy
+            {
+                //slightly longer check but makes sure that any weapon that can backstab will not crit (e.g. Saxxy)
+                if (strcmp(wepclassname, "tf_weapon_knife", false) != 0 && index != 416)
+                    addthecrit = true;
+            }
+            if (validwep && weapon == GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary)) //Secondary weapon crit list
             {
                 if (strncmp(wepclassname, "tf_weapon_pis", 13, false) == 0)
                 {
@@ -3742,22 +3730,35 @@ public Action ClientTimer(Handle hTimer)
                     addthecrit = true;
                     cond = TFCond_Buffed;
                 }
+                if (strncmp(wepclassname, "tf_weapon_flar", 14, false) == 0)
+                {
+                    int flindex = GetIndexOfWeaponSlot(client, TFWeaponSlot_Primary);
+                    if (TF2_GetPlayerClass(client) == TFClass_Pyro && flindex == 594) // No crits if using phlog
+                        addthecrit = false;
+                    else
+                        addthecrit = true;
+                }
+                if (strncmp(wepclassname, "tf_weapon_smg", 13, false) == 0)
+                {
+                    if (IsValidEntity(FindPlayerBack(client, { 642 }, 1)))
+                        addthecrit = false;
+                    else
+                        addthecrit = true;
+                }
+                if (strncmp(wepclassname, "tf_weapon_jar", 13, false) == 0)
+                    addthecrit = true;
+                if (strncmp(wepclassname, "tf_weapon_clea", 14, false) == 0)
+                    addthecrit = true;
             }
-            if (validwep && class == TFClass_Sniper)
+            if (validwep && weapon == GetPlayerWeaponSlot(client, TFWeaponSlot_Primary)) //Primary weapon crit list
             {
-                if (weapon == GetPlayerWeaponSlot(client, TFWeaponSlot_Primary))
-                {
-                    if (strncmp(wepclassname, "tf_weapon_comp", 14, false) == 0)
-                        addthecrit = true;
-                }
-                if (weapon == GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary))
-                {
-                    if (strncmp(wepclassname, "tf_weapon_smg", 13, false) == 0)
-                        addthecrit = true;
-                }
+                if (strncmp(wepclassname, "tf_weapon_comp", 14, false) == 0)
+                    addthecrit = true;
+                if (strncmp(wepclassname, "tf_weapon_cros", 14, false) == 0)
+                    addthecrit = true;
             }
-            if (index == 16 && addthecrit && IsValidEntity(FindPlayerBack(client, { 642 }, 1)))
-                addthecrit = false;
+            /*if (index == 16 && addthecrit && IsValidEntity(FindPlayerBack(client, { 642 }, 1)))
+                addthecrit = false;*/
             if (class == TFClass_DemoMan && !IsValidEntity(GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary)))
             {
                 addthecrit = true;
