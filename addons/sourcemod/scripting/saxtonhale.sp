@@ -1548,7 +1548,7 @@ public Action event_round_start(Event event, const char[] name, bool dontBroadca
         VSHRoundState = VSHRState_Disabled;
         SetArenaCapEnableTime(60.0);
         SearchForItemPacks();
-        cvarMPUnbalanceLimit.SetInt(1);
+        cvarMPUnbalanceLimit.SetInt(mp_teams_unbalance_limit);
         cvarTFWeaponLifeTime.SetInt(tf_dropped_weapon_lifetime);
         cvarTFFeignActivateDamageScale.SetFloat(tf_feign_death_activate_damage_scale);
         cvarTFFeignDamageScale.SetFloat(tf_feign_death_damage_scale);
@@ -1557,12 +1557,12 @@ public Action event_round_start(Event event, const char[] name, bool dontBroadca
         CreateTimer(71.0, Timer_EnableCap, _, TIMER_FLAG_NO_MAPCHANGE);
         return Plugin_Continue;
     }
-    cvarMPUnbalanceLimit.SetInt(TF2_GetRoundWinCount() ? 0 : 1); // s_bLateLoad ? 0 :
-    cvarTFWeaponLifeTime.SetInt(TF2_GetRoundWinCount() ? 0 : tf_dropped_weapon_lifetime);
-    cvarTFFeignActivateDamageScale.SetFloat(TF2_GetRoundWinCount() ? 0.1 : tf_feign_death_activate_damage_scale);
-    cvarTFFeignDamageScale.SetFloat(TF2_GetRoundWinCount() ? 0.1 : tf_feign_death_damage_scale);
-    cvarTFFeignDeathDuration.SetInt(TF2_GetRoundWinCount() ? 7 : tf_feign_death_duration);
-    cvarTFStealthDamageReduction.SetFloat(TF2_GetRoundWinCount() ? 0.1 : tf_stealth_damage_reduction);
+    cvarMPUnbalanceLimit.SetInt(0);
+    cvarTFWeaponLifeTime.SetInt(0);
+    cvarTFFeignActivateDamageScale.SetFloat(0.1);
+    cvarTFFeignDamageScale.SetFloat(0.1);
+    cvarTFFeignDeathDuration.SetInt(7);
+    cvarTFStealthDamageReduction.SetFloat(0.1);
     if (FixUnbalancedTeams())
         return Plugin_Continue;
     for (int i = 1; i <= MaxClients; i++)
