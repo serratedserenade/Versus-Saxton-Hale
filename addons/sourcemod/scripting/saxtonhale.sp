@@ -2748,7 +2748,7 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
         }
 //      case 526: Soldier rocket launchers / shotguns
     }
-    if (TF2_GetPlayerClass(client) == TFClass_Soldier && (strncmp(classname, "tf_weapon_rocketlauncher", 24, false) == 0 || strncmp(classname, "tf_weapon_shotgun", 17, false) == 0))
+    if (TF2_GetPlayerClass(client) == TFClass_Soldier && (strncmp(classname, "tf_weapon_rocketlauncher", 24, false) == 0 || strncmp(classname, "tf_weapon_particle_cannon", 25, false) == 0 || strncmp(classname, "tf_weapon_shotgun", 17, false) == 0 || strncmp(classname, "tf_weapon_raygun", 16, false) == 0))
     {
         Handle hItemOverride;
         if (iItemDefinitionIndex == 127) hItemOverride = PrepareItemHandle(hItem, _, _, "265 ; 99999.0 ; 179 ; 1.0");
