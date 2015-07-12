@@ -5310,7 +5310,7 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
                 GetEdictClassname(weapon, wepclassname, sizeof(wepclassname));
                 if (strncmp(wepclassname, "tf_weapon_sni", 13, false) == 0)
                 {
-                    if (strncmp(wepclassname, "tf_weapon_sniperrifle", 21, false) == 0)
+                    if (strncmp(wepclassname, "tf_weapon_sniperrifle_", 22, false) < 0 && (wepindex != 230 && wepindex != 526 && wepindex != 752))
                     {
                         if (VSHRoundState != VSHRState_End)
                         {
