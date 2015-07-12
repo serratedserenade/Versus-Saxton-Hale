@@ -453,6 +453,7 @@ static const char haleversiontitles[][] =     //the last line of this is what de
     "1.51",
     "1.52",
     "1.53",
+    "1.53",
     PLUGIN_VERSION
 };
 static const char haleversiondates[][] =
@@ -528,6 +529,7 @@ static const char haleversiondates[][] =
     "29 Oct 2014", //  An update I never bothered to throw outdate
     "25 Dec 2014",  //  Merry Xmas
     "9 Mar 2015",
+    "10 Jul 2015",
     "10 Jul 2015",
 };
 static const int maxversion = (sizeof(haleversiontitles) - 1);
@@ -6174,24 +6176,29 @@ void FindVersionData(Panel panel, int versionindex)
 {
     switch (versionindex) // panel.DrawText("1) .");
     {
+        case 72: //1.53
+        {
+            panel.DrawText("15) TF2 CVARs that VSH changes now properly toggle on servers that have 'hale_first_round' enabled.");
+        }
         case 71: //1.53
         {
-            panel.DrawText("8) Disabled dropped weapons during VSH rounds.");
-            panel.DrawText("9) OVERRIDE_MEDIGUNS_ON is now on by default. Mediguns will simlpy have their stats replaced instead of a custom medigun replacement.");
+            panel.DrawText("8) Disabled dropping weapons during VSH rounds.");
+            panel.DrawText("9) OVERRIDE_MEDIGUNS_ON is now on by default. Mediguns will have their stats overriden instead of being replaced by a custom medigun.");
             panel.DrawText("10) Natascha will no longer keep its bonus ammo when being replaced.");
             panel.DrawText("11) Unnerfed the Easter Bunny's rage.");
             panel.DrawText("12) Diamondback revenge crits on stab reduced from 3 -> 2.");
-            panel.DrawText("13) Updated English translation phrases. (Class info, etc.)");
+            panel.DrawText("13) Fixed not all Soldier weapons minicritting airborne targets.");
+            panel.DrawText("14) Updated English translation phrases. (Class info, etc.)");
         }
-		case 70: //1.53
+	case 70: //1.53
         {
             panel.DrawText("1) Ported VSH over to 1.7 syntax.(WildCard65)");
             panel.DrawText("2) Integrated RTD and Goomba overrides.(WildCard65)");
-            panel.DrawText("3) Updated compatibility for Gun Mettle changes.");
+            panel.DrawText("3) Updated compatibility for Gun Mettle changes(aka skinned weapons work now).");
             panel.DrawText("4) Big Earner provides 3 second speed boost on stab.");
-            panel.DrawText("5) Shortstop provides passive effects even when not active.");
-            panel.DrawText("6) Dead Ringer will reduce melee hits and arrows to 62 damage each.");
-            panel.DrawText("7) Dead Ringer will not grant a speed boost on feign death.");
+            panel.DrawText("5) Shortstop provides passive effects even when not active, as it did before Gun Mettle.");
+            panel.DrawText("6) Dead Ringer will reduce melee hits and arrows to 62 damage each while cloaked. No speed boost on feign death.");
+            panel.DrawText("7) All invis types will reduce other incoming damage by 90%.);
         }
         case 69: //1.52
         {
