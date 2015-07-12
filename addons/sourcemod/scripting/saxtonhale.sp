@@ -6198,7 +6198,7 @@ void FindVersionData(Panel panel, int versionindex)
             panel.DrawText("4) Big Earner provides 3 second speed boost on stab.");
             panel.DrawText("5) Shortstop provides passive effects even when not active, as it did before Gun Mettle.");
             panel.DrawText("6) Dead Ringer will reduce melee hits and arrows to 62 damage each while cloaked. No speed boost on feign death.");
-            panel.DrawText("7) All invis types will reduce other incoming damage by 90%.);
+            panel.DrawText("7) All invis types will reduce other incoming damage by 90%.");
         }
         case 69: //1.52
         {
