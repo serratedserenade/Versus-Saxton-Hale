@@ -975,6 +975,9 @@ void AddToDownload()
     PrecacheSound("vo/announcer_am_capenabled02.mp3", true);
     //PrecacheSound("weapons/barret_arm_zap.wav", true);
     PrecacheSound("player/doubledonk.wav", true);
+#if defined EASTER_BUNNY_ON
+    PrecacheSound("items/pumpkin_pickup.wav", true);
+#endif
     PrecacheParticleSystem("ghost_appearation");
     PrecacheParticleSystem("yikes_fx");
     /*
