@@ -199,7 +199,7 @@ enum e_flNext2
 #define HHHRage2                "vo/halloween_boss/knight_alert.mp3"
 #define HHHAttack               "vo/halloween_boss/knight_attack"
 
-#define HHHTheme                "saxton_hale/hhh_theme.mp3"
+#define HHHTheme                "ui/holiday/gamestartup_halloween.mp3" //"saxton_hale/hhh_theme.mp3"
 
 // Unused
 //#define AxeModel                "models/weapons/c_models/c_headtaker/c_headtaker.mdl"
@@ -1125,9 +1125,10 @@ void AddToDownload()
     PrecacheSound("vo/halloween_boss/knight_death01.mp3", true);
     PrecacheSound("vo/halloween_boss/knight_death02.mp3", true);
     PrecacheSound("misc/halloween/spell_teleport.wav", true);
+    PrecacheSound("ui/holiday/gamestartup_halloween.mp3", true);
     // Download
     PrepareModel(HHHModel);
-    PrepareSound(HHHTheme);
+    //PrepareSound(HHHTheme);
     // Vagineer
     // Precache
     PrecacheSound("vo/engineer_no01.mp3", true);
