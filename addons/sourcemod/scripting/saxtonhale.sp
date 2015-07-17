@@ -7947,19 +7947,19 @@ stock int PrepareModel(const char[] szModelPath, bool bMdlOnly = false)
     if (!bMdlOnly)
     {
         Format(szPath, sizeof(szPath), "%s.phy", szBase);
-        if (FileExists(szPath))
+        if (FileExists(szPath, true))
             AddFileToDownloadsTable(szPath);
         Format(szPath, sizeof(szPath), "%s.sw.vtx", szBase);
-        if (FileExists(szPath))
+        if (FileExists(szPath, true))
             AddFileToDownloadsTable(szPath);
         Format(szPath, sizeof(szPath), "%s.vvd", szBase);
-        if (FileExists(szPath))
+        if (FileExists(szPath, true))
             AddFileToDownloadsTable(szPath);
         Format(szPath, sizeof(szPath), "%s.dx80.vtx", szBase);
-        if (FileExists(szPath))
+        if (FileExists(szPath, true))
             AddFileToDownloadsTable(szPath);
         Format(szPath, sizeof(szPath), "%s.dx90.vtx", szBase);
-        if (FileExists(szPath))
+        if (FileExists(szPath, true))
             AddFileToDownloadsTable(szPath);
     }
     AddFileToDownloadsTable(szModelPath);
