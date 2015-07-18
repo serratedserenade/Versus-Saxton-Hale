@@ -9,7 +9,7 @@
 
     New plugin thread on AlliedMods: https://forums.alliedmods.net/showthread.php?p=2167912
 */
-#define PLUGIN_VERSION "1.53"
+#define PLUGIN_VERSION "1.54"
 #pragma semicolon 1
 #include <tf2items>
 #undef REQUIRE_EXTENSIONS
@@ -452,6 +452,7 @@ static const char haleversiontitles[][] =     //the last line of this is what de
     "1.50",
     "1.51",
     "1.52",
+    "1.53",
     "1.53",
     "1.53",
     "1.53",
@@ -6182,6 +6183,10 @@ void FindVersionData(Panel panel, int versionindex)
 {
     switch (versionindex) // panel.DrawText("1) .");
     {
+        case 74: //1.54
+        {
+            panel.DrawText("Version bump place holder."); //Remove once we have an actual change worthy here.
+        }
         case 73: //1.53
         {
             panel.DrawText("1) Ported VSH over to 1.7 syntax.(WildCard65)");
