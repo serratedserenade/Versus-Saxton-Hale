@@ -199,7 +199,7 @@ enum e_flNext2
 #define HHHRage2                "vo/halloween_boss/knight_alert.mp3"
 #define HHHAttack               "vo/halloween_boss/knight_attack"
 
-#define HHHTheme                "saxton_hale/hhh_theme.mp3"
+#define HHHTheme                "ui/holiday/gamestartup_halloween.mp3" //"saxton_hale/hhh_theme.mp3"
 
 // Unused
 //#define AxeModel                "models/weapons/c_models/c_headtaker/c_headtaker.mdl"
@@ -364,17 +364,18 @@ static bool g_bReloadVSHOnRoundEnd = false;
 #define VSHFLAG_CLASSHELPED (1 << 4)
 #define VSHFLAG_HASONGIVED  (1 << 5)
 int VSHFlags[TF_MAX_PLAYERS], Hale = -1, HaleHealthMax, HaleHealth, HaleHealthLast, HaleCharge = 0, HaleRage, NextHale, KSpreeCount = 1, HHHClimbCount;
-float g_flStabbed, g_flMarketed, WeighDownTimer, UberRageCount, GlowTimer, HaleSpeed = 340.0, RageDist = 800.0, Announce = 120.0, tf_scout_hype_pep_max, g_fGoombaDamage = 0.05, g_fGoombaRebound = 300.0;
+float g_flStabbed, g_flMarketed, WeighDownTimer, UberRageCount, GlowTimer, HaleSpeed = 340.0, RageDist = 800.0, Announce = 120.0, g_fGoombaDamage = 0.05, g_fGoombaRebound = 300.0; //tf_scout_hype_pep_max
+float tf_feign_death_activate_damage_scale, tf_feign_death_damage_scale, tf_stealth_damage_reduction;
 bool bEnableSuperDuperJump, bSpawnTeleOnTriggerHurt = false, g_bEnabled = false, g_bAreEnoughPlayersPlaying = false;
 ConVar cvarVersion, cvarHaleSpeed, cvarPointDelay, cvarRageDMG, cvarRageDist, cvarAnnounce, cvarSpecials, cvarEnabled, cvarAliveToEnable, cvarPointType, cvarCrits, cvarRageSentry;
 ConVar cvarFirstRound, cvarDemoShieldCrits, cvarDisplayHaleHP, cvarEnableEurekaEffect, cvarForceHaleTeam, cvarGoombaDamage, cvarGoombaRebound, cvarBossRTD;
 //Stock TF2 convars
-ConVar cvarTFUseQueue, cvarMPUnbalanceLimit, cvarTFFirstBlood, cvarMPForceCamera, cvarTFScoutHypeMax;
+ConVar cvarTFUseQueue, cvarMPUnbalanceLimit, cvarTFFirstBlood, cvarMPForceCamera, cvarTFWeaponLifeTime, cvarTFFeignActivateDamageScale, cvarTFFeignDamageScale, cvarTFFeignDeathDuration, cvarTFStealthDamageReduction; //cvarTFScoutHypeMax;
 Handle PointCookie, MusicCookie, VoiceCookie, ClasshelpinfoCookie, doorchecktimer, jumpHUD, rageHUD, healthHUD, infoHUD, MusicTimer;
 //new Handle:cvarCircuitStun;
 //new Handle:cvarForceSpecToHale;
-int PointDelay = 6, RageDMG = 3500, bSpecials = true, AliveToEnable = 5, PointType = 0, TeamRoundCounter, botqueuepoints = 0, tf_arena_use_queue, mp_teams_unbalance_limit;
-int tf_arena_first_blood, mp_forcecamera, defaulttakedamagetype;
+int PointDelay = 6, RageDMG = 3500, bSpecials = true, AliveToEnable = 5, PointType = 0, TeamRoundCounter, botqueuepoints = 0, tf_arena_use_queue, tf_dropped_weapon_lifetime;
+int tf_arena_first_blood, mp_forcecamera, defaulttakedamagetype, mp_teams_unbalance_limit, tf_feign_death_duration;
 bool haleCrits = false, bDemoShieldCrits = false, bAlwaysShowHealth = true, newRageSentry = true, checkdoors = false, PointReady, g_bHaleRTD = false;
 //new Float:circuitStun = 0.0;
 char currentmap[99];
@@ -451,6 +452,9 @@ static const char haleversiontitles[][] =     //the last line of this is what de
     "1.50",
     "1.51",
     "1.52",
+    "1.53",
+    "1.53",
+    "1.53",
     PLUGIN_VERSION
 };
 static const char haleversiondates[][] =
@@ -526,6 +530,9 @@ static const char haleversiondates[][] =
     "29 Oct 2014", //  An update I never bothered to throw outdate
     "25 Dec 2014",  //  Merry Xmas
     "9 Mar 2015",
+    "10 Jul 2015",
+    "10 Jul 2015",
+    "10 Jul 2015",
 };
 static const int maxversion = (sizeof(haleversiontitles) - 1);
 Handle OnHaleJump, OnHaleRage, OnHaleWeighdown, OnMusic, OnHaleNext;
@@ -685,7 +692,12 @@ public void OnPluginStart()
     cvarMPUnbalanceLimit = FindConVar("mp_teams_unbalance_limit");
     cvarTFFirstBlood = FindConVar("tf_arena_first_blood");
     cvarMPForceCamera = FindConVar("mp_forcecamera");
-    cvarTFScoutHypeMax = FindConVar("tf_scout_hype_pep_max");
+    cvarTFWeaponLifeTime = FindConVar("tf_dropped_weapon_lifetime");
+    cvarTFFeignActivateDamageScale = FindConVar("tf_feign_death_activate_damage_scale");
+    cvarTFFeignDamageScale = FindConVar("tf_feign_death_damage_scale");
+    cvarTFFeignDeathDuration = FindConVar("tf_feign_death_duration");
+    cvarTFStealthDamageReduction = FindConVar("tf_stealth_damage_reduction");
+    //cvarTFScoutHypeMax = FindConVar("tf_scout_hype_pep_max");
     FindConVar("tf_bot_count").AddChangeHook(HideCvarNotify);
     cvarTFUseQueue.AddChangeHook(HideCvarNotify);
     cvarTFFirstBlood.AddChangeHook(HideCvarNotify);
@@ -865,19 +877,18 @@ public void OnConfigsExecuted()
         mp_teams_unbalance_limit = cvarMPUnbalanceLimit.IntValue;
         tf_arena_first_blood = cvarTFFirstBlood.IntValue;
         mp_forcecamera = cvarMPForceCamera.IntValue;
-        tf_scout_hype_pep_max = cvarTFScoutHypeMax.FloatValue;
-        cvarTFUseQueue.IntValue = 0;
-        cvarMPUnbalanceLimit.IntValue = TF2_GetRoundWinCount() ? 0 : 1; // s_bLateLoad ? 0 :
+        tf_dropped_weapon_lifetime = cvarTFWeaponLifeTime.IntValue;
+        tf_feign_death_activate_damage_scale = cvarTFFeignActivateDamageScale.FloatValue;
+        tf_feign_death_damage_scale = cvarTFFeignDamageScale.FloatValue;
+        tf_feign_death_duration = cvarTFFeignDeathDuration.IntValue;
+        tf_stealth_damage_reduction = cvarTFStealthDamageReduction.FloatValue;
+        //tf_scout_hype_pep_max = cvarTFScoutHypeMax.FloatValue;
+        cvarTFUseQueue.SetInt(0);
+        cvarMPUnbalanceLimit.SetInt(TF2_GetRoundWinCount() ? 0 : 1); // s_bLateLoad ? 0 :
         //SetConVarInt(FindConVar("mp_teams_unbalance_limit"), GetConVarBool(cvarFirstRound)?0:1);
-        cvarTFFirstBlood.IntValue = 0;
-        cvarMPForceCamera.IntValue = 0;
-        cvarTFScoutHypeMax.FloatValue = 100.0;
-        cvarTFUseQueue.AddChangeHook(ForceOverride);
-        cvarMPUnbalanceLimit.AddChangeHook(ForceOverride);
-        cvarTFFirstBlood.AddChangeHook(ForceOverride);
-        cvarMPForceCamera.AddChangeHook(ForceOverride);
-        cvarTFScoutHypeMax.AddChangeHook(ForceOverride);
-        FindConVar("tf_damage_disablespread").IntValue = 1;
+        cvarTFFirstBlood.SetInt(0);
+        cvarMPForceCamera.SetInt(0);
+        //cvarTFScoutHypeMax.SetFloat(100.0);
 #if defined _steamtools_included
         if (steamtools)
         {
@@ -926,11 +937,16 @@ public void OnMapEnd()
 {
     if (g_bAreEnoughPlayersPlaying || g_bEnabled)
     {
-        FindConVar("tf_arena_use_queue").IntValue = tf_arena_use_queue;
-        FindConVar("mp_teams_unbalance_limit").IntValue = mp_teams_unbalance_limit;
-        FindConVar("tf_arena_first_blood").IntValue = tf_arena_first_blood;
-        FindConVar("mp_forcecamera").IntValue = mp_forcecamera;
-        FindConVar("tf_scout_hype_pep_max").FloatValue = tf_scout_hype_pep_max;
+        cvarTFUseQueue.SetInt(tf_arena_use_queue);
+        cvarMPUnbalanceLimit.SetInt(mp_teams_unbalance_limit);
+        cvarTFFirstBlood.SetInt(tf_arena_first_blood);
+        cvarMPForceCamera.SetInt(mp_forcecamera);
+        cvarTFWeaponLifeTime.SetInt(tf_dropped_weapon_lifetime);
+        cvarTFFeignActivateDamageScale.SetFloat(tf_feign_death_activate_damage_scale);
+        cvarTFFeignDamageScale.SetFloat(tf_feign_death_damage_scale);
+        cvarTFFeignDeathDuration.SetInt(tf_feign_death_duration);
+        cvarTFStealthDamageReduction.SetFloat(tf_stealth_damage_reduction);
+        //cvarTFScoutHypeMax.SetFloat(tf_scout_hype_pep_max);
 #if defined _steamtools_included
         if (steamtools)
             Steam_SetGameDescription("Team Fortress");
@@ -959,6 +975,9 @@ void AddToDownload()
     PrecacheSound("vo/announcer_am_capenabled02.mp3", true);
     //PrecacheSound("weapons/barret_arm_zap.wav", true);
     PrecacheSound("player/doubledonk.wav", true);
+#if defined EASTER_BUNNY_ON
+    PrecacheSound("items/pumpkin_pickup.wav", true);
+#endif
     PrecacheParticleSystem("ghost_appearation");
     PrecacheParticleSystem("yikes_fx");
     /*
@@ -1106,9 +1125,10 @@ void AddToDownload()
     PrecacheSound("vo/halloween_boss/knight_death01.mp3", true);
     PrecacheSound("vo/halloween_boss/knight_death02.mp3", true);
     PrecacheSound("misc/halloween/spell_teleport.wav", true);
+    PrecacheSound("ui/holiday/gamestartup_halloween.mp3", true);
     // Download
     PrepareModel(HHHModel);
-    PrepareSound(HHHTheme);
+    //PrepareSound(HHHTheme);
     // Vagineer
     // Precache
     PrecacheSound("vo/engineer_no01.mp3", true);
@@ -1163,16 +1183,6 @@ public void HideCvarNotify(ConVar convar, const char[] oldValue, const char[] ne
 {
     FindConVar("sv_tags").Flags &= ~FCVAR_NOTIFY;
     convar.Flags &= ~FCVAR_NOTIFY;
-}
-
-public void ForceOverride(ConVar convar, const char[] oldValue, const char[] newValue)
-{
-	if (convar == cvarTFUseQueue || convar == cvarTFFirstBlood || convar == cvarMPForceCamera)
-		convar.IntValue = 0;
-	else if (convar == cvarMPUnbalanceLimit)
-		convar.IntValue = TF2_GetRoundWinCount() ? 0 : 1;
-	else if (convar == cvarTFScoutHypeMax)
-		convar.FloatValue = 100.0;
 }
 
 public void CvarChange(ConVar convar, const char[] oldValue, const char[] newValue)
@@ -1546,11 +1556,21 @@ public Action event_round_start(Event event, const char[] name, bool dontBroadca
         VSHRoundState = VSHRState_Disabled;
         SetArenaCapEnableTime(60.0);
         SearchForItemPacks();
-        FindConVar("mp_teams_unbalance_limit").IntValue = 1;
+        cvarMPUnbalanceLimit.SetInt(mp_teams_unbalance_limit);
+        cvarTFWeaponLifeTime.SetInt(tf_dropped_weapon_lifetime);
+        cvarTFFeignActivateDamageScale.SetFloat(tf_feign_death_activate_damage_scale);
+        cvarTFFeignDamageScale.SetFloat(tf_feign_death_damage_scale);
+        cvarTFFeignDeathDuration.SetInt(tf_feign_death_duration);
+        cvarTFStealthDamageReduction.SetFloat(tf_stealth_damage_reduction);
         CreateTimer(71.0, Timer_EnableCap, _, TIMER_FLAG_NO_MAPCHANGE);
         return Plugin_Continue;
     }
-    FindConVar("mp_teams_unbalance_limit").IntValue =  TF2_GetRoundWinCount() ? 0 : 1; // s_bLateLoad ? 0 :
+    cvarMPUnbalanceLimit.SetInt(0);
+    cvarTFWeaponLifeTime.SetInt(0);
+    cvarTFFeignActivateDamageScale.SetFloat(0.1);
+    cvarTFFeignDamageScale.SetFloat(0.1);
+    cvarTFFeignDeathDuration.SetInt(7);
+    cvarTFStealthDamageReduction.SetFloat(0.1);
     if (FixUnbalancedTeams())
         return Plugin_Continue;
     for (int i = 1; i <= MaxClients; i++)
@@ -2669,9 +2689,9 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
                 return Plugin_Changed;
             }
         }
-        case 220: // Shortstop (Removed shortstop reload penalty I guess? Makes it act like scattergun...)
+        case 220: // Shortstop (Removed shortstop reload penalty, and provides bonuses without being active)
         {
-            Handle hItemOverride = PrepareItemHandle(hItem, _, _, "328 ; 1", true);
+            Handle hItemOverride = PrepareItemHandle(hItem, _, _, "128 ; 0 ; 241 ; 1");
             if (hItemOverride != null)
             {
                 hItem = hItemOverride;
@@ -2736,7 +2756,7 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
         }
 //      case 526: Soldier rocket launchers / shotguns
     }
-    if (TF2_GetPlayerClass(client) == TFClass_Soldier && (strncmp(classname, "tf_weapon_rocketlauncher", 24, false) == 0 || strncmp(classname, "tf_weapon_shotgun", 17, false) == 0))
+    if (TF2_GetPlayerClass(client) == TFClass_Soldier && (strncmp(classname, "tf_weapon_rocketlauncher", 24, false) == 0 || strncmp(classname, "tf_weapon_particle_cannon", 25, false) == 0 || strncmp(classname, "tf_weapon_shotgun", 17, false) == 0 || strncmp(classname, "tf_weapon_raygun", 16, false) == 0))
     {
         Handle hItemOverride;
         if (iItemDefinitionIndex == 127) hItemOverride = PrepareItemHandle(hItem, _, _, "265 ; 99999.0 ; 179 ; 1.0");
@@ -2747,7 +2767,7 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
             return Plugin_Changed;
         }
     }
-    #if defined OVERRIDE_MEDIGUNS_ON
+#if defined OVERRIDE_MEDIGUNS_ON
     //Medic mediguns
     if (TF2_GetPlayerClass(client) == TFClass_Medic && (strncmp(classname, "tf_weapon_medigun", 17, false) == 0))
     {
@@ -2759,7 +2779,7 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
             return Plugin_Changed;
         }
     }
-    #endif
+#endif
     return Plugin_Continue;
 }
 
@@ -2860,6 +2880,7 @@ public Action MakeNoHale(Handle hTimer, any clientid)
             {
                 TF2_RemoveWeaponSlot(client, TFWeaponSlot_Primary);
                 SpawnWeapon(client, "tf_weapon_minigun", 15, 1, 0, "");
+                SetAmmo(client, 0, 200);
             }
             case 402:
             {
@@ -2968,12 +2989,10 @@ public Action MakeNoHale(Handle hTimer, any clientid)
     if (TF2_GetPlayerClass(client) == TFClass_Medic)
     {
         weapon = GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary);
-        #if defined OVERRIDE_MEDIGUNS_ON
+#if defined OVERRIDE_MEDIGUNS_ON
         if (GetEntPropFloat(weapon, Prop_Send, "m_flChargeLevel") < 0.41)
             SetEntPropFloat(weapon, Prop_Send, "m_flChargeLevel", 0.41);
-        #endif
-
-        #if !defined OVERRIDE_MEDIGUNS_ON
+#else
         int mediquality = (weapon > MaxClients && IsValidEdict(weapon) ? GetEntProp(weapon, Prop_Send, "m_iEntityQuality") : -1);
         if (mediquality != 10)
         {
@@ -2986,7 +3005,7 @@ public Action MakeNoHale(Handle hTimer, any clientid)
             }
             SetEntPropFloat(weapon, Prop_Send, "m_flChargeLevel", 0.41);
         }
-        #endif
+#endif
     }
     return Plugin_Continue;
 }
@@ -3576,7 +3595,7 @@ public Action ClientTimer(Handle hTimer)
                 strcopy(wepclassname, sizeof(wepclassname), "");
             bool validwep = (strncmp(wepclassname, "tf_wea", 6, false) == 0);
             int index = (validwep ? GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex") : -1);
-            if (TF2_IsPlayerInCondition(client, TFCond_Cloaked))
+            /*if (TF2_IsPlayerInCondition(client, TFCond_Cloaked))
             {
                 if (GetClientCloakIndex(client) == 59)
                 {
@@ -3585,7 +3604,7 @@ public Action ClientTimer(Handle hTimer)
                 }
                 else
                     TF2_AddCondition(client, TFCond_DeadRingered, 0.3);
-            }
+            }*/
             bool bHudAdjust = false;
             // Chdata's Deadringer Notifier
             if (TF2_GetPlayerClass(client) == TFClass_Spy)
@@ -3690,15 +3709,36 @@ public Action ClientTimer(Handle hTimer)
                 }
             }
             bool addthecrit = false;
+            switch (index)
+            {
+                case 997, 588: //Specific Critlist
+                    addthecrit = true;
+                case 656: //Specifc Minicritlist
+                {
+                    addthecrit = true;
+                    cond = TFCond_Buffed;
+                }
+            }
             if (validwep && weapon == GetPlayerWeaponSlot(client, TFWeaponSlot_Melee))  //&& index != 4 && index != 194 && index != 225 && index != 356 && index != 461 && index != 574) addthecrit = true; //class != TFClass_Spy
             {
                 //slightly longer check but makes sure that any weapon that can backstab will not crit (e.g. Saxxy)
                 if (strcmp(wepclassname, "tf_weapon_knife", false) != 0 && index != 416)
                     addthecrit = true;
             }
-            switch (index)
+            if (validwep && weapon == GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary)) //Secondary weapon crit list
             {
-                case 305, 1079, 1081, 56, 16, 1149, 203, 58, 1083, 1105, 1100, 1005, 1092, 812, 833, 997, 39, 351, 740, 588, 595: //Critlist
+                if (strncmp(wepclassname, "tf_weapon_pis", 13, false) == 0)
+                {
+                    addthecrit = true;
+                    if (class == TFClass_Scout && cond == TFCond_HalloweenCritCandy)
+                        cond = TFCond_Buffed;
+                }
+                if (strncmp(wepclassname, "tf_weapon_han", 13, false) == 0)
+                {
+                    addthecrit = true;
+                    cond = TFCond_Buffed;
+                }
+                if (strncmp(wepclassname, "tf_weapon_flar", 14, false) == 0)
                 {
                     int flindex = GetIndexOfWeaponSlot(client, TFWeaponSlot_Primary);
                     if (TF2_GetPlayerClass(client) == TFClass_Pyro && flindex == 594) // No crits if using phlog
@@ -3706,20 +3746,27 @@ public Action ClientTimer(Handle hTimer)
                     else
                         addthecrit = true;
                 }
-                case 22, 23, 160, 209, 294, 449, 773:
+                if (strncmp(wepclassname, "tf_weapon_smg", 13, false) == 0)
                 {
-                    addthecrit = true;
-                    if (class == TFClass_Scout && cond == TFCond_HalloweenCritCandy)
-                        cond = TFCond_Buffed;
+                    if (IsValidEntity(FindPlayerBack(client, { 642 }, 1)))
+                        addthecrit = false;
+                    else
+                        addthecrit = true;
                 }
-                case 656:
-                {
+                if (strncmp(wepclassname, "tf_weapon_jar", 13, false) == 0)
                     addthecrit = true;
-                    cond = TFCond_Buffed;
-                }
+                if (strncmp(wepclassname, "tf_weapon_clea", 14, false) == 0)
+                    addthecrit = true;
             }
-            if (index == 16 && addthecrit && IsValidEntity(FindPlayerBack(client, { 642 }, 1)))
-                addthecrit = false;
+            if (validwep && weapon == GetPlayerWeaponSlot(client, TFWeaponSlot_Primary)) //Primary weapon crit list
+            {
+                if (strncmp(wepclassname, "tf_weapon_comp", 14, false) == 0)
+                    addthecrit = true;
+                if (strncmp(wepclassname, "tf_weapon_cros", 14, false) == 0)
+                    addthecrit = true;
+            }
+            /*if (index == 16 && addthecrit && IsValidEntity(FindPlayerBack(client, { 642 }, 1)))
+                addthecrit = false;*/
             if (class == TFClass_DemoMan && !IsValidEntity(GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary)))
             {
                 addthecrit = true;
@@ -4113,6 +4160,27 @@ public void TF2_OnConditionRemoved(int client, TFCond condition)
 {
     if (TF2_GetPlayerClass(client) == TFClass_Scout && condition == TFCond_CritHype)
         TF2_AddCondition(client, TFCond_SpeedBuffAlly, 0.01);   //recalc their speed
+}
+
+public void TF2_OnConditionAdded(int client, TFCond condition)
+{
+    if (g_bEnabled && client != Hale)
+    {
+        if (TF2_GetPlayerClass(client) == TFClass_Spy && condition == TFCond_DeadRingered)
+        {
+            RequestFrame(Frame_RemoveFeignSpeedBuff, client);
+        }
+    }
+}
+
+public void Frame_RemoveFeignSpeedBuff(int client)
+{
+	if (IsClientInGame(client))
+	{
+		TF2_RemoveCondition(client, TFCond_SpeedBuffAlly);
+		SetVariantString("ParticleEffectStop");
+		AcceptEntityInput(client, "DispatchEffect");
+	}
 }
 
 public Action RTD_CanRollDice(int client)
@@ -4998,7 +5066,7 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
             TF2_AddCondition(client, TFCond_SpeedBuffAlly, 1.0);
             return Plugin_Continue;
         }
-        if (TF2_GetPlayerClass(client) == TFClass_Spy)  //eggs probably do melee damage to spies, then? That's not ideal, but eh.
+        if ((TF2_GetPlayerClass(client) == TFClass_Spy) && ((damagetype & DMG_CLUB) || Special == VSHSpecial_CBS)) //Only Melee hits and CBS arrows get altered damage
         {
             if (GetEntProp(client, Prop_Send, "m_bFeignDeathReady") && !TF2_IsPlayerInCondition(client, TFCond_Cloaked))
             {
@@ -5007,11 +5075,14 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
                 damage = 620.0;
                 //return Plugin_Changed;
             }
-            else if (TF2_IsPlayerInCondition(client, TFCond_Cloaked) && TF2_IsPlayerInCondition(client, TFCond_DeadRingered))
+            else if (TF2_IsPlayerInCondition(client, TFCond_Cloaked))
             {
                 if (damagetype & DMG_CRIT)
                     damagetype &= ~DMG_CRIT;
-                damage = 850.0;
+                if (TF2_IsPlayerInCondition(client, TFCond_DeadRingered))
+                    damage = 620.0;
+                else //if (!TF2_IsPlayerInCondition(client, TFCond_DeadRingered))
+                    damage = 850.0;
                 //return Plugin_Changed;
             }
             return Plugin_Changed; //Better to return here.
@@ -5111,7 +5182,7 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
                             }
                         }
                     }
-                    case 14, 201, 230, 402, 526, 664, 752, 792, 801, 851, 881, 890, 899, 908, 957, 966, 1098:
+                    /*case 14, 201, 230, 402, 526, 664, 752, 792, 801, 851, 881, 890, 899, 908, 957, 966, 1098:
                     {
                         switch (wepindex)   //cleaner to read than if wepindex == || wepindex == || etc
                         {
@@ -5155,7 +5226,7 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
                             if (HaleRage < 0)
                                 HaleRage = 0;
                         }
-                    }
+                    }*/
                     case 355:
                     {
                         float rage = 0.05*RageDMG;
@@ -5241,6 +5312,50 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
                         RemoveCond(attacker, TFCond_Dazed);
                     }
                 }
+                char wepclassname[32];
+                GetEdictClassname(weapon, wepclassname, sizeof(wepclassname));
+                if (strncmp(wepclassname, "tf_weapon_sni", 13, false) == 0)
+                {
+                    if (strncmp(wepclassname, "tf_weapon_sniperrifle_", 22, false) < 0 && (wepindex != 230 && wepindex != 526 && wepindex != 752))
+                    {
+                        if (VSHRoundState != VSHRState_End)
+                        {
+                            float chargelevel = (IsValidEntity(weapon) && weapon > MaxClients ? GetEntPropFloat(weapon, Prop_Send, "m_flChargedDamage") : 0.0), time = (GlowTimer > 10 ? 1.0 : 2.0);
+                            time += (GlowTimer > 10 ? (GlowTimer > 20 ? 1 : 2) : 4)*(chargelevel/100);
+                            SetEntProp(client, Prop_Send, "m_bGlowEnabled", 1);
+                            GlowTimer += RoundToCeil(time);
+                            if (GlowTimer > 30.0)
+                                GlowTimer = 30.0;
+                        }
+                    }
+                    if (wepindex == 752 && VSHRoundState != VSHRState_End)
+                    {
+                        float chargelevel = (IsValidEntity(weapon) && weapon > MaxClients ? GetEntPropFloat(weapon, Prop_Send, "m_flChargedDamage") : 0.0);
+                        float add = 10 + (chargelevel / 10);
+                        if (TF2_IsPlayerInCondition(attacker, view_as<TFCond>(46)))
+                            add /= 3;
+                        float rage = GetEntPropFloat(attacker, Prop_Send, "m_flRageMeter");
+                        SetEntPropFloat(attacker, Prop_Send, "m_flRageMeter", (rage + add > 100) ? 100.0 : rage + add);
+                    }
+                    if (!(damagetype & DMG_CRIT))
+                    {
+                        bool ministatus = (TF2_IsPlayerInCondition(attacker, TFCond_CritCola) || TF2_IsPlayerInCondition(attacker, TFCond_Buffed) || TF2_IsPlayerInCondition(attacker, TFCond_CritHype));
+                        damage *= (ministatus) ? 2.222222 : 3.0;
+                        if (wepindex == 230)
+                        {
+                            HaleRage -= RoundFloat(damage/2.0);
+                            if (HaleRage < 0)
+                                HaleRage = 0;
+                        }
+                        return Plugin_Changed;
+                    }
+                    else if (wepindex == 230)
+                    {
+                        HaleRage -= RoundFloat(damage*3.0/2.0);
+                        if (HaleRage < 0)
+                            HaleRage = 0;
+                    }
+                }
                 //VoiDeD's Caber-backstab code. To be added with a few special modifications in 1.40+
                 //Except maybe not because it's semi op.
 /*              if ( IsValidEdict( weapon ) && GetEdictClassname( weapon, wepclassname, sizeof( wepclassname ) ) && strcmp( wepclassname, "tf_weapon_stickbomb", false ) == 0 )
@@ -5318,8 +5433,11 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
                     }*/
                     if (wepindex == 356) // Kunai
                         AddPlayerHealth(attacker, 180, 270, true);
-                    if (wepindex == 461) // Big Earner gives full cloak on backstab
+                    if (wepindex == 461) // Big Earner gives full cloak on backstab and speed boost for 3 seconds
+                    {
                         SetEntPropFloat(attacker, Prop_Send, "m_flCloakMeter", 100.0);
+                        TF2_AddCondition(attacker, TFCond_SpeedBuffAlly, 3.0);
+                    }
                     char s[PLATFORM_MAX_PATH];
                     switch (Special)
                     {
@@ -6064,11 +6182,33 @@ void FindVersionData(Panel panel, int versionindex)
 {
     switch (versionindex) // panel.DrawText("1) .");
     {
-        // Unnerfed the Easter Bunny's rage.
-        case 70: //1.53
+        case 73: //1.53
         {
             panel.DrawText("1) Ported VSH over to 1.7 syntax.(WildCard65)");
             panel.DrawText("2) Integrated RTD and Goomba overrides.(WildCard65)");
+            panel.DrawText("3) Updated compatibility for Gun Mettle changes(aka skinned weapons work now and cloak isn't broken).(Starblaster64)");
+            panel.DrawText("4) Big Earner provides 3 second speed boost on stab.(Starblaster64)");
+            panel.DrawText("5) Shortstop provides passive effects even when not active, as it did before Gun Mettle.(Chdata)");
+
+        }
+        case 72: //1.53
+        {
+            panel.DrawText("6) Dead Ringer will reduce melee hits and arrows to 62 damage each while cloaked. No speed boost on feign death.(Chdata)");
+            panel.DrawText("7) All invis types will reduce other incoming damage by 90%.(Starblaster64)");
+            panel.DrawText("8) Disabled dropping weapons during VSH rounds.(Starblaster64)");
+            panel.DrawText("9) OVERRIDE_MEDIGUNS_ON is now on by default. Mediguns will have their stats overriden instead of being replaced by a custom medigun.(Starblaster64)");
+        }
+        case 71: //1.53
+        {
+            panel.DrawText("10) Natascha will no longer keep its bonus ammo when being replaced.(Starblaster64)");
+            panel.DrawText("11) Unnerfed the Easter Bunny's rage.(Chdata)");
+            panel.DrawText("12) Diamondback revenge crits on stab reduced from 3 -> 2.(Chdata)");
+            panel.DrawText("13) Fixed not all Soldier guns minicritting airborne targets.(Starblaster64)");
+            panel.DrawText("14) Updated English translation phrases, class info, etc.(Starblaster64)");
+        }
+        case 70: //1.53
+        {
+            panel.DrawText("15) TF2 CVARs that VSH changes now properly toggle on servers that have 'hale_first_round' enabled.(Starblaster64 & WildCard65)");
         }
         case 69: //1.52
         {
