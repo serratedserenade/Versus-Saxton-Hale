@@ -4176,12 +4176,12 @@ public void TF2_OnConditionAdded(int client, TFCond condition)
 
 public void Frame_RemoveFeignSpeedBuff(int client)
 {
-	if (IsClientInGame(client))
-	{
-		TF2_RemoveCondition(client, TFCond_SpeedBuffAlly);
-		SetVariantString("ParticleEffectStop");
-		AcceptEntityInput(client, "DispatchEffect");
-	}
+    if (IsClientInGame(client))
+    {
+        TF2_RemoveCondition(client, TFCond_SpeedBuffAlly);
+        SetVariantString("ParticleEffectStop");
+        AcceptEntityInput(client, "DispatchEffect");
+    }
 }
 
 public Action RTD_CanRollDice(int client)
