@@ -364,13 +364,16 @@ static bool g_bReloadVSHOnRoundEnd = false;
 #define VSHFLAG_CLASSHELPED (1 << 4)
 #define VSHFLAG_HASONGIVED  (1 << 5)
 int VSHFlags[TF_MAX_PLAYERS], Hale = -1, HaleHealthMax, HaleHealth, HaleHealthLast, HaleCharge = 0, HaleRage, NextHale, KSpreeCount = 1, HHHClimbCount;
-float g_flStabbed, g_flMarketed, WeighDownTimer, UberRageCount, GlowTimer, HaleSpeed = 340.0, RageDist = 800.0, Announce = 120.0, g_fGoombaDamage = 0.05, g_fGoombaRebound = 300.0; //tf_scout_hype_pep_max
+float g_flStabbed, g_flMarketed, WeighDownTimer, UberRageCount, GlowTimer, HaleSpeed = 340.0, RageDist = 800.0, Announce = 120.0, g_fGoombaDamage = 0.05, g_fGoombaRebound = 300.0, tf_scout_hype_pep_max, tf_scout_hype_pep_mod;
 float tf_feign_death_activate_damage_scale, tf_feign_death_damage_scale, tf_stealth_damage_reduction;
 bool bEnableSuperDuperJump, bSpawnTeleOnTriggerHurt = false, g_bEnabled = false, g_bAreEnoughPlayersPlaying = false;
 ConVar cvarVersion, cvarHaleSpeed, cvarPointDelay, cvarRageDMG, cvarRageDist, cvarAnnounce, cvarSpecials, cvarEnabled, cvarAliveToEnable, cvarPointType, cvarCrits, cvarRageSentry;
 ConVar cvarFirstRound, cvarDemoShieldCrits, cvarDisplayHaleHP, cvarEnableEurekaEffect, cvarForceHaleTeam, cvarGoombaDamage, cvarGoombaRebound, cvarBossRTD;
+#if defined _tf2attributes_included
+ConVar cvarEnableBFB, cvarBFBDamage, cvarBFBBuff;
+#endif
 //Stock TF2 convars
-ConVar cvarTFUseQueue, cvarMPUnbalanceLimit, cvarTFFirstBlood, cvarMPForceCamera, cvarTFWeaponLifeTime, cvarTFFeignActivateDamageScale, cvarTFFeignDamageScale, cvarTFFeignDeathDuration, cvarTFStealthDamageReduction; //cvarTFScoutHypeMax;
+ConVar cvarTFUseQueue, cvarMPUnbalanceLimit, cvarTFFirstBlood, cvarMPForceCamera, cvarTFWeaponLifeTime, cvarTFFeignActivateDamageScale, cvarTFFeignDamageScale, cvarTFFeignDeathDuration, cvarTFStealthDamageReduction, cvarTFScoutHypeMax, cvarTFScoutHypeMod;
 Handle PointCookie, MusicCookie, VoiceCookie, ClasshelpinfoCookie, doorchecktimer, jumpHUD, rageHUD, healthHUD, infoHUD, MusicTimer;
 //new Handle:cvarCircuitStun;
 //new Handle:cvarForceSpecToHale;
@@ -682,6 +685,11 @@ public void OnPluginStart()
     //cvarCircuitStun = CreateConVar("hale_circuit_stun", "0", "0 to disable Short Circuit stun, >0 to make it stun Hale for x seconds", FCVAR_PLUGIN, true, 0.0);
     //cvarForceSpecToHale = CreateConVar("hale_spec_force_boss", "0", "1- if a spectator is up next, will force them to Hale + spectators will gain queue points, else spectators are ignored by plugin", FCVAR_PLUGIN, true, 0.0, true, 1.0);
     cvarEnableEurekaEffect = CreateConVar("hale_enable_eureka", "0", "1- allow Eureka Effect, else disallow", FCVAR_PLUGIN, true, 0.0, true, 1.0);
+#if defined _tf2attributes_included
+    cvarEnableBFB = CreateConVar("hale_enable_bfb", "10.0", "0 - Disable BFB, 1.0> - Enable modified BFB with buff duration in seconds.", FCVAR_PLUGIN, true, 0.0, false);
+    cvarBFBDamage = CreateConVar("hale_bfb_damage", "2.0", "Multiplier of how much damage (100) is required to fill BFB boost", FCVAR_PLUGIN, true, 1.0, false);
+    cvarBFBBuff = CreateConVar("hale_bfb_buff", "16", "Default is Minicrits. Buff condition applied to BFB Scouts when they fill their boost meter. Examples: 5-Uber, 33-Crits, 82-Bumper Car.", FCVAR_PLUGIN, true, 0.0, false);
+#endif
     cvarForceHaleTeam = CreateConVar("hale_force_team", "0", "0- Use plugin logic, 1- random team, 2- red, 3- blue", FCVAR_PLUGIN, true, 0.0, true, 3.0);
     cvarGoombaDamage = CreateConVar("hale_goomba_damage", "0.05", "How much the Goomba damage should be multipled by when goomba stomping the boss (requires Goomba Stomp)", _, true, 0.01, true, 1.0);
     cvarGoombaRebound = CreateConVar("hale_goomba_jump", "300.0", "How high players should rebound after goomba stomping the boss (requires Goomba Stomp)", _, true, 0.0);
@@ -698,7 +706,8 @@ public void OnPluginStart()
     cvarTFFeignDamageScale = FindConVar("tf_feign_death_damage_scale");
     cvarTFFeignDeathDuration = FindConVar("tf_feign_death_duration");
     cvarTFStealthDamageReduction = FindConVar("tf_stealth_damage_reduction");
-    //cvarTFScoutHypeMax = FindConVar("tf_scout_hype_pep_max");
+    cvarTFScoutHypeMax = FindConVar("tf_scout_hype_pep_max");
+    cvarTFScoutHypeMod = FindConVar("tf_scout_hype_pep_mod");
     FindConVar("tf_bot_count").AddChangeHook(HideCvarNotify);
     cvarTFUseQueue.AddChangeHook(HideCvarNotify);
     cvarTFFirstBlood.AddChangeHook(HideCvarNotify);
@@ -883,13 +892,17 @@ public void OnConfigsExecuted()
         tf_feign_death_damage_scale = cvarTFFeignDamageScale.FloatValue;
         tf_feign_death_duration = cvarTFFeignDeathDuration.IntValue;
         tf_stealth_damage_reduction = cvarTFStealthDamageReduction.FloatValue;
-        //tf_scout_hype_pep_max = cvarTFScoutHypeMax.FloatValue;
+        tf_scout_hype_pep_max = cvarTFScoutHypeMax.FloatValue;
+        tf_scout_hype_pep_mod = cvarTFScoutHypeMod.FloatValue;
         cvarTFUseQueue.SetInt(0);
         cvarMPUnbalanceLimit.SetInt(TF2_GetRoundWinCount() ? 0 : 1); // s_bLateLoad ? 0 :
         //SetConVarInt(FindConVar("mp_teams_unbalance_limit"), GetConVarBool(cvarFirstRound)?0:1);
         cvarTFFirstBlood.SetInt(0);
         cvarMPForceCamera.SetInt(0);
-        //cvarTFScoutHypeMax.SetFloat(100.0);
+#if defined _tf2attributes_included
+        cvarTFScoutHypeMax.SetFloat(100.0);
+        cvarTFScoutHypeMod.SetFloat(cvarBFBDamage.FloatValue);
+#endif
 #if defined _steamtools_included
         if (steamtools)
         {
@@ -947,7 +960,8 @@ public void OnMapEnd()
         cvarTFFeignDamageScale.SetFloat(tf_feign_death_damage_scale);
         cvarTFFeignDeathDuration.SetInt(tf_feign_death_duration);
         cvarTFStealthDamageReduction.SetFloat(tf_stealth_damage_reduction);
-        //cvarTFScoutHypeMax.SetFloat(tf_scout_hype_pep_max);
+        cvarTFScoutHypeMax.SetFloat(tf_scout_hype_pep_max);
+        cvarTFScoutHypeMod.SetFloat(tf_scout_hype_pep_mod);
 #if defined _steamtools_included
         if (steamtools)
             Steam_SetGameDescription("Team Fortress");
@@ -2699,6 +2713,15 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
                 return Plugin_Changed;
             }
         }
+        case 772: //Baby Face's Blaster
+        {
+            Handle hItemOverride = PrepareItemHandle(hItem, _, _, "54 ; 0.8 ; 418 ; 1.0 ; 419 ; 25.0 ; 733 ; 1.0");
+            if (hItemOverride != null)
+            {
+                hItem = hItemOverride;
+                return Plugin_Changed;
+            }
+        }
         case 226: // The Battalion's Backup
         {
             Handle hItemOverride = PrepareItemHandle(hItem, _, _, "252 ; 0.25"); //125 ; -10
@@ -2888,10 +2911,23 @@ public Action MakeNoHale(Handle hTimer, any clientid)
                 TF2_RemoveWeaponSlot(client, TFWeaponSlot_Primary);
                 SpawnWeapon(client, "tf_weapon_sniperrifle", 14, 1, 0, "");
             }
-            case 772, 448: // Block BFB and Soda Popper
+            case 448: // Block Soda Popper
             {
                 TF2_RemoveWeaponSlot(client, TFWeaponSlot_Primary);
                 SpawnWeapon(client, "tf_weapon_scattergun", 13, 1, 0, "");
+            }
+            case 772: //Block BFB if specified in config or compiled without TF2Attributes
+            {
+#if defined _tf2attributes_included
+                if (!cvarEnableBFB.FloatValue)
+                {
+                    TF2_RemoveWeaponSlot(client, TFWeaponSlot_Primary);
+                    SpawnWeapon(client, "tf_weapon_scattergun", 13, 1, 0, "");
+                }
+#else
+                TF2_RemoveWeaponSlot(client, TFWeaponSlot_Primary);
+                SpawnWeapon(client, "tf_weapon_scattergun", 13, 1, 0, "");
+#endif
             }
             case 237:
             {
@@ -3809,6 +3845,47 @@ public Action ClientTimer(Handle hTimer)
                         TF2_RemoveCondition(client, TFCond_Kritzkrieged);
                 }
             }
+            if (class == TFClass_Scout)
+            {
+#if defined _tf2attributes_included
+                if (cvarEnableBFB.FloatValue >= 1.0)
+                {
+                    if (GetIndexOfWeaponSlot(client, TFWeaponSlot_Primary) == 772)
+                    {
+                        float hypeDuration = cvarEnableBFB.FloatValue;
+                        int pepBrawler = GetPlayerWeaponSlot(client, TFWeaponSlot_Primary);
+                        float hypeMeter = GetEntPropFloat(client, Prop_Send, "m_flHypeMeter");
+                        if (!TF2_IsPlayerInCondition(client, view_as<TFCond>(43)))
+                        {
+                            if (hypeMeter < 56.0)
+                            {
+                                TF2Attrib_SetByDefIndex(pepBrawler, 418, 1.0);
+                                TF2Attrib_SetByDefIndex(pepBrawler, 419, 25.0);
+                                TF2Attrib_SetByDefIndex(pepBrawler, 733, 1.0);
+                                TF2Attrib_SetByDefIndex(pepBrawler, 54, 0.8);
+                                TF2Attrib_RemoveByDefIndex(pepBrawler, 532);
+                            }
+                            if (hypeMeter >= 56.0 && hypeMeter < 99.0)
+                            {
+                                TF2Attrib_SetByDefIndex(pepBrawler, 532, 0.02); //Stop players from kiting Hale indefinitely without needing to deal any damage
+                            }
+                            if (hypeMeter >= 99.0)
+                            {
+                                TF2_AddCondition(client, view_as<TFCond>(43), hypeDuration); //Non-functioning 'reprogrammed' cond as a pseudo-timer
+                                TF2Attrib_SetByDefIndex(pepBrawler, 418, 0.0);
+                                TF2Attrib_SetByDefIndex(pepBrawler, 419, 0.0);
+                                TF2Attrib_SetByDefIndex(pepBrawler, 733, 0.0);
+                                TF2Attrib_SetByDefIndex(pepBrawler, 54, 0.95); //Lower speed penalty so the Scout can get to ~520 HU/s briefly
+                                TF2Attrib_SetByDefIndex(pepBrawler, 532, 1.5/hypeDuration);
+                            }
+
+                        }
+                        if (TF2_IsPlayerInCondition(client, view_as<TFCond>(43)))
+                            TF2_AddCondition(client, view_as<TFCond>(cvarBFBBuff.IntValue), 0.3); //Regularly re-apply buff condition, in-case it got removed (eg. if set to Uber)
+                    }
+                }
+#endif
+            }
         }
     }
     return Plugin_Continue;
@@ -4159,8 +4236,10 @@ public Action Destroy(int client, const char[] command, int argc)
 
 public void TF2_OnConditionRemoved(int client, TFCond condition)
 {
-    if (TF2_GetPlayerClass(client) == TFClass_Scout && condition == TFCond_CritHype)
-        TF2_AddCondition(client, TFCond_SpeedBuffAlly, 0.01);   //recalc their speed
+#if defined _tf2attributes_included
+    if (TF2_GetPlayerClass(client) == TFClass_Scout && condition == view_as<TFCond>(cvarBFBBuff.IntValue)) //TFCond_CritHype
+        TF2_AddCondition(client, TFCond_SpeedBuffAlly, 0.1);   //recalc their speed
+#endif
 }
 
 public void TF2_OnConditionAdded(int client, TFCond condition)
