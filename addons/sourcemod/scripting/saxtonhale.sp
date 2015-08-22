@@ -687,8 +687,8 @@ public void OnPluginStart()
     cvarEnableEurekaEffect = CreateConVar("hale_enable_eureka", "0", "1- allow Eureka Effect, else disallow", FCVAR_PLUGIN, true, 0.0, true, 1.0);
 #if defined _tf2attributes_included
     cvarEnableBFB = CreateConVar("hale_enable_bfb", "10.0", "0 - Disable BFB, 1.0> - Enable modified BFB with buff duration in seconds.", FCVAR_PLUGIN, true, 0.0, false);
-    cvarBFBDamage = CreateConVar("hale_bfb_damage", "2.0", "Multiplier of how much damage (100) is required to fill BFB boost", FCVAR_PLUGIN, true, 1.0, false);
-    cvarBFBBuff = CreateConVar("hale_bfb_buff", "16", "Default is Minicrits. Buff condition applied to BFB Scouts when they fill their boost meter. Examples: 5-Uber, 33-Crits, 82-Bumper Car.", FCVAR_PLUGIN, true, 0.0, false);
+    cvarBFBDamage = CreateConVar("hale_bfb_damage", "3.0", "Multiplier of how much damage (100) is required to fill BFB boost.", FCVAR_PLUGIN, true, 0.01, false);
+    cvarBFBBuff = CreateConVar("hale_bfb_buff", "16", "Default is Minicrits (16). Determines condition applied to BFB Scouts when they fill their boost meter.", FCVAR_PLUGIN, true, 0.0, false);
 #endif
     cvarForceHaleTeam = CreateConVar("hale_force_team", "0", "0- Use plugin logic, 1- random team, 2- red, 3- blue", FCVAR_PLUGIN, true, 0.0, true, 3.0);
     cvarGoombaDamage = CreateConVar("hale_goomba_damage", "0.05", "How much the Goomba damage should be multipled by when goomba stomping the boss (requires Goomba Stomp)", _, true, 0.01, true, 1.0);
@@ -3852,36 +3852,11 @@ public Action ClientTimer(Handle hTimer)
                 {
                     if (GetIndexOfWeaponSlot(client, TFWeaponSlot_Primary) == 772)
                     {
-                        float hypeDuration = cvarEnableBFB.FloatValue;
-                        int pepBrawler = GetPlayerWeaponSlot(client, TFWeaponSlot_Primary);
                         float hypeMeter = GetEntPropFloat(client, Prop_Send, "m_flHypeMeter");
-                        if (!TF2_IsPlayerInCondition(client, view_as<TFCond>(43)))
-                        {
-                            if (hypeMeter < 56.0)
-                            {
-                                TF2Attrib_SetByDefIndex(pepBrawler, 418, 1.0);
-                                TF2Attrib_SetByDefIndex(pepBrawler, 419, 25.0);
-                                TF2Attrib_SetByDefIndex(pepBrawler, 733, 1.0);
-                                TF2Attrib_SetByDefIndex(pepBrawler, 54, 0.8);
-                                TF2Attrib_RemoveByDefIndex(pepBrawler, 532);
-                            }
-                            if (hypeMeter >= 56.0 && hypeMeter < 99.0)
-                            {
-                                TF2Attrib_SetByDefIndex(pepBrawler, 532, 0.02); //Stop players from kiting Hale indefinitely without needing to deal any damage
-                            }
-                            if (hypeMeter >= 99.0)
-                            {
-                                TF2_AddCondition(client, view_as<TFCond>(43), hypeDuration); //Non-functioning 'reprogrammed' cond as a pseudo-timer
-                                TF2Attrib_SetByDefIndex(pepBrawler, 418, 0.0);
-                                TF2Attrib_SetByDefIndex(pepBrawler, 419, 0.0);
-                                TF2Attrib_SetByDefIndex(pepBrawler, 733, 0.0);
-                                TF2Attrib_SetByDefIndex(pepBrawler, 54, 0.95); //Lower speed penalty so the Scout can get to ~520 HU/s briefly
-                                TF2Attrib_SetByDefIndex(pepBrawler, 532, 1.5/hypeDuration);
-                            }
-
-                        }
-                        if (TF2_IsPlayerInCondition(client, view_as<TFCond>(43)))
-                            TF2_AddCondition(client, view_as<TFCond>(cvarBFBBuff.IntValue), 0.3); //Regularly re-apply buff condition, in-case it got removed (eg. if set to Uber)
+                        if (hypeMeter >= 99.0)
+                            TF2_AddCondition(client, view_as<TFCond>(43), 0.01); //Triggers OnConditionAdded
+                        if (TF2_IsPlayerInCondition(client, view_as<TFCond>(78)))
+                            TF2_AddCondition(client, view_as<TFCond>(cvarBFBBuff.IntValue), 0.3); //Constantly re-apply buff condition, to support conds that might be removed (eg. 5-Uber, 11-Kritz)
                     }
                 }
 #endif
@@ -4236,10 +4211,25 @@ public Action Destroy(int client, const char[] command, int argc)
 
 public void TF2_OnConditionRemoved(int client, TFCond condition)
 {
+    if (g_bEnabled && client != Hale)
+    {
+        if (TF2_GetPlayerClass(client) == TFClass_Scout) //TFCond_CritHype
+        {
 #if defined _tf2attributes_included
-    if (TF2_GetPlayerClass(client) == TFClass_Scout && condition == view_as<TFCond>(cvarBFBBuff.IntValue)) //TFCond_CritHype
-        TF2_AddCondition(client, TFCond_SpeedBuffAlly, 0.1);   //recalc their speed
+            if (cvarEnableBFB.FloatValue >= 1.0 && condition == view_as<TFCond>(78))
+            {
+                int pepBrawler = GetPlayerWeaponSlot(client, TFWeaponSlot_Primary);
+                TF2Attrib_SetByDefIndex(pepBrawler, 418, 1.0);
+                TF2Attrib_SetByDefIndex(pepBrawler, 419, 25.0);
+                TF2Attrib_SetByDefIndex(pepBrawler, 733, 1.0);
+                TF2Attrib_SetByDefIndex(pepBrawler, 54, 0.8);
+                TF2Attrib_RemoveByDefIndex(pepBrawler, 532);
+                TF2_AddCondition(client, TFCond_SpeedBuffAlly, 0.01);   //recalc their speed
+                RequestFrame(Frame_RemoveFeignSpeedBuff, client); //Just to make sure the speed boost particles go away
+            }
 #endif
+        }
+    }
 }
 
 public void TF2_OnConditionAdded(int client, TFCond condition)
@@ -4250,17 +4240,31 @@ public void TF2_OnConditionAdded(int client, TFCond condition)
         {
             RequestFrame(Frame_RemoveFeignSpeedBuff, client);
         }
+        if (TF2_GetPlayerClass(client) == TFClass_Scout)
+        {
+            if (cvarEnableBFB.FloatValue >= 1.0 && condition == view_as<TFCond>(43))
+            {
+                float hypeDuration = cvarEnableBFB.FloatValue;
+                int pepBrawler = GetPlayerWeaponSlot(client, TFWeaponSlot_Primary);
+                TF2_AddCondition(client, view_as<TFCond>(78), hypeDuration);
+                TF2Attrib_SetByDefIndex(pepBrawler, 418, 0.0);
+                TF2Attrib_SetByDefIndex(pepBrawler, 419, 0.0);
+                TF2Attrib_SetByDefIndex(pepBrawler, 733, 0.0);
+                TF2Attrib_SetByDefIndex(pepBrawler, 54, 0.90); //Lower speed penalty so the Scout can get to ~520 HU/s briefly
+                TF2Attrib_SetByDefIndex(pepBrawler, 532, 1.5/hypeDuration);
+            }
+        }
     }
 }
 
 public void Frame_RemoveFeignSpeedBuff(int client)
 {
-	if (IsClientInGame(client))
-	{
-		TF2_RemoveCondition(client, TFCond_SpeedBuffAlly);
-		SetVariantString("ParticleEffectStop");
-		AcceptEntityInput(client, "DispatchEffect");
-	}
+    if (IsClientInGame(client))
+    {
+        TF2_RemoveCondition(client, TFCond_SpeedBuffAlly);
+        SetVariantString("ParticleEffectStop");
+        AcceptEntityInput(client, "DispatchEffect");
+    }
 }
 
 public Action RTD_CanRollDice(int client)
