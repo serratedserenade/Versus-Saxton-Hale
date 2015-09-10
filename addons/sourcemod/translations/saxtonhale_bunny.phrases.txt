@@ -22,6 +22,6 @@
 	}
 	"vsh_help_bunny"
 	{
-		"en"	"The Easter Bunny:\nI think he wants to give out candy? Maybe?\nSuper Jump: crouch, look up and stand up.\nWeigh-down: in midair, look down and crouch\nRage (Happy Easter, Fools): taunt when Rage Meter is full.\nNearby enemies are stunned."
+		"en"	"The Easter Bunny:\nI think he wants to give out candy? Maybe?\nSuper Jump: crouch/alt-fire, look up and stand up/let go.\nWeigh-down: in midair, look down and crouch\nRage (Happy Easter, Fools): taunt when Rage Meter is full.\nNearby enemies are stunned for 5 seconds."
 	}
 }
