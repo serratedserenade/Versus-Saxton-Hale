@@ -9,7 +9,7 @@
     
     New plugin thread on AlliedMods: https://forums.alliedmods.net/showthread.php?p=2167912
 */
-#define PLUGIN_VERSION "1.52"
+#define PLUGIN_VERSION "1.53"
 #pragma semicolon 1
 #include <tf2_stocks>
 #include <tf2items>
@@ -448,6 +448,7 @@ new mp_teams_unbalance_limit;
 new tf_arena_first_blood;
 new mp_forcecamera;
 new Float:tf_scout_hype_pep_max;
+new tf_dropped_weapon_lifetime;
 new defaulttakedamagetype;
 
 static const String:haleversiontitles[][] =     //the last line of this is what determines the displayed plugin version
@@ -745,6 +746,7 @@ public OnPluginStart()
     HookConVarChange(FindConVar("tf_bot_count"), HideCvarNotify);
     HookConVarChange(FindConVar("tf_arena_use_queue"), HideCvarNotify);
     HookConVarChange(FindConVar("tf_arena_first_blood"), HideCvarNotify);
+    HookConVarChange(FindConVar("tf_dropped_weapon_lifetime"), HideCvarNotify);
     HookConVarChange(FindConVar("mp_friendlyfire"), HideCvarNotify);
 
     HookEvent("teamplay_round_start", event_round_start);
@@ -925,6 +927,7 @@ public OnConfigsExecuted()
         tf_arena_first_blood = GetConVarInt(FindConVar("tf_arena_first_blood"));
         mp_forcecamera = GetConVarInt(FindConVar("mp_forcecamera"));
         tf_scout_hype_pep_max = GetConVarFloat(FindConVar("tf_scout_hype_pep_max"));
+        tf_dropped_weapon_lifetime = GetConVarInt(FindConVar("tf_dropped_weapon_lifetime"));
         SetConVarInt(FindConVar("tf_arena_use_queue"), 0);
         SetConVarInt(FindConVar("mp_teams_unbalance_limit"), TF2_GetRoundWinCount() ? 0 : 1); // s_bLateLoad ? 0 : 
         //SetConVarInt(FindConVar("mp_teams_unbalance_limit"), GetConVarBool(cvarFirstRound)?0:1);
@@ -932,6 +935,7 @@ public OnConfigsExecuted()
         SetConVarInt(FindConVar("mp_forcecamera"), 0);
         SetConVarFloat(FindConVar("tf_scout_hype_pep_max"), 100.0);
         SetConVarInt(FindConVar("tf_damage_disablespread"), 1);
+        SetConVarInt(FindConVar("tf_dropped_weapon_lifetime"), 0);
 #if defined _steamtools_included
         if (steamtools)
         {
@@ -985,6 +989,7 @@ public OnMapEnd()
         SetConVarInt(FindConVar("tf_arena_first_blood"), tf_arena_first_blood);
         SetConVarInt(FindConVar("mp_forcecamera"), mp_forcecamera);
         SetConVarFloat(FindConVar("tf_scout_hype_pep_max"), tf_scout_hype_pep_max);
+        SetConVarInt(FindConVar("tf_dropped_weapon_lifetime"), tf_dropped_weapon_lifetime);
 #if defined _steamtools_included
         if (steamtools)
         {
@@ -2864,7 +2869,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         }
         case 220: // Shortstop (Removed shortstop reload penalty I guess? Makes it act like scattergun...)
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "328 ; 1", true);
+            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "241 ; 1", true);
             if (hItemOverride != INVALID_HANDLE)
             {
                 hItem = hItemOverride;
@@ -3779,14 +3784,14 @@ public Action:ClientTimer(Handle:hTimer)
             if (weapon <= MaxClients || !IsValidEntity(weapon) || !GetEdictClassname(weapon, wepclassname, sizeof(wepclassname))) strcopy(wepclassname, sizeof(wepclassname), "");
             new bool:validwep = (strncmp(wepclassname, "tf_wea", 6, false) == 0);
             new index = (validwep ? GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex") : -1);
-            if (TF2_IsPlayerInCondition(client, TFCond_Cloaked))
+            /*if (TF2_IsPlayerInCondition(client, TFCond_Cloaked))
             {
                 if (GetClientCloakIndex(client) == 59)
                 {
                     if (TF2_IsPlayerInCondition(client, TFCond_DeadRingered)) TF2_RemoveCondition(client, TFCond_DeadRingered);
                 }
                 else TF2_AddCondition(client, TFCond_DeadRingered, 0.3);
-            }
+            }*/
 
             new bool:bHudAdjust = false;
 
@@ -4953,7 +4958,10 @@ public Action:Timer_Damage(Handle:hTimer, any:id)
 {
     new client = GetClientOfUserId(id);
     if (IsValidClient(client)) // IsValidClient(client, false)
-        CPrintToChat(client, "{olive}[VSH] %t. %t %i{default}", "vsh_damage", Damage[client], "vsh_scores", RoundFloat(Damage[client] / 600.0));
+        CPrintToChat(client, "{olive}[VSH]{default} %t. %t %i",
+            "vsh_damage", Damage[client],
+            "vsh_scores", RoundFloat(Damage[client] / 600.0)
+        );
     return Plugin_Continue;
 }
 /*public Action:Timer_DissolveRagdoll(Handle:timer, any:userid)
@@ -5214,22 +5222,36 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
             return Plugin_Continue;
         }
 
-        if (TF2_GetPlayerClass(client) == TFClass_Spy)  //eggs probably do melee damage to spies, then? That's not ideal, but eh.
+        new bool:bDontDeadRingDamage = false;
+        new TFClassType:iClass = TF2_GetPlayerClass(client);
+
+        switch (iClass)
         {
-            if (GetEntProp(client, Prop_Send, "m_bFeignDeathReady") && !TF2_IsPlayerInCondition(client, TFCond_Cloaked))
+            case TFClass_Spy:
             {
-                if (damagetype & DMG_CRIT) damagetype &= ~DMG_CRIT;
-                damage = 620.0;
-                return Plugin_Changed;
+                if (damagecustom != TF_CUSTOM_BOOTS_STOMP)
+                {
+                    if (GetEntProp(client, Prop_Send, "m_bFeignDeathReady") || TF2_IsPlayerInCondition(client, TFCond_Cloaked))
+                    {
+                        damagetype &= ~DMG_CRIT;
+
+                        new clk = GetClientCloakIndex(client);
+
+                        if (damagetype & DMG_CLUB && !bDontDeadRingDamage) // Check melee damage so eggs from bunny don't get processed here.
+                        {
+                            damage = (clk == 59) ? 620.0 : 850.0;
+                        }
+                        else if (bDontDeadRingDamage) // This is in preparation for for future stuff.
+                        {
+                            damage *= 10.0; 
+                        }
+
+                        return Plugin_Changed;
+                    }
+                }
             }
-            if (TF2_IsPlayerInCondition(client, TFCond_Cloaked) && TF2_IsPlayerInCondition(client, TFCond_DeadRingered))
-            {
-                if (damagetype & DMG_CRIT) damagetype &= ~DMG_CRIT;
-                damage = 850.0;
-                return Plugin_Changed;
-            }
-//          return Plugin_Changed;
         }
+
         new buffweapon = GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary);
         new buffindex = (IsValidEntity(buffweapon) && buffweapon > MaxClients ? GetEntProp(buffweapon, Prop_Send, "m_iItemDefinitionIndex") : -1);
         if (buffindex == 226)
@@ -5584,9 +5606,10 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                     {
                         AddPlayerHealth(attacker, 180, 270, true);
                     }
-                    if (wepindex == 461) // Big Earner gives full cloak on backstab
+                    if (wepindex == 461) // Big Earner gives full cloak on backstab and speed boost for 3 seconds
                     {
                         SetEntPropFloat(attacker, Prop_Send, "m_flCloakMeter", 100.0);
+                        TF2_AddCondition(attacker, TFCond_SpeedBuffAlly, 3.0);
                     }
                     decl String:s[PLATFORM_MAX_PATH];
                     switch (Special)
