@@ -9,7 +9,7 @@
     
     New plugin thread on AlliedMods: https://forums.alliedmods.net/showthread.php?p=2167912
 */
-#define PLUGIN_VERSION "1.53"
+#define PLUGIN_VERSION "1.54"
 #pragma semicolon 1
 #include <tf2_stocks>
 #include <tf2items>
@@ -43,8 +43,7 @@
 
 #define HALEHHH_TELEPORTCHARGE (25 * HALEHHH_TELEPORTCHARGETIME)
 #define HALE_JUMPCHARGE (25 * HALE_JUMPCHARGETIME)
-
-
+       
 #define TF_MAX_PLAYERS          34             //  Sourcemod supports up to 64 players? Too bad TF2 doesn't. 33 player server +1 for 0 (console/world)
 #define MAX_ENTITIES            2049           //  This is probably TF2 specific
 #define MAX_CENTER_TEXT         192            //  PrintCenterText()
@@ -59,7 +58,7 @@
 #define MIN_INT                 -2147483648    //  PriorityCenterText
 #define MAX_DIGITS              12             //  10 + \0 for IntToString. And negative signs.
 
-//#define OVERRIDE_MEDIGUNS_ON
+#define OVERRIDE_MEDIGUNS_ON
 
 // TF2 Weapon Loadout Slots
 enum
@@ -93,6 +92,33 @@ enum
     Month_Oct,
     Month_Nov,
     Month_Dec
+}
+
+// Default stock weapon item definition indexes for GunmettleToIndex()
+enum
+{
+    TFWeapon_Invalid = -1,
+
+    TFWeapon_SniperRifle = 14,
+    TFWeapon_SMG = 16,
+    TFWeapon_Scattergun = 13,
+
+    TFWeapon_Shotgun = 10,
+    TFWeapon_ShotgunSoldier = 10,
+    TFWeapon_ShotgunPyro = 12,
+    TFWeapon_ShotgunHeavy = 11,
+    TFWeapon_ShotgunEngie = 9,
+
+    TFWeapon_Minigun = 15,
+    TFWeapon_Flamethrower = 21,
+    TFWeapon_RocketLauncher = 18,
+    TFWeapon_Medigun = 29,
+    TFWeapon_StickyLauncher = 20,
+    TFWeapon_Revolver = 24,
+
+    TFWeapon_Pistol = 23,
+    TFWeapon_PistolScout = 23,
+    TFWeapon_PistolEngie = 22
 }
 
 // START FILE DEFINTIONS & ENUMS
@@ -198,7 +224,7 @@ enum e_flNext2
 #define HHHRage2                "vo/halloween_boss/knight_alert.mp3"
 #define HHHAttack               "vo/halloween_boss/knight_attack"
 
-#define HHHTheme                "saxton_hale/hhh_theme.mp3"
+#define HHHTheme                "ui/holiday/gamestartup_halloween.mp3"
 
 // Unused
 //#define AxeModel                "models/weapons/c_models/c_headtaker/c_headtaker.mdl"
@@ -449,153 +475,28 @@ new tf_arena_first_blood;
 new mp_forcecamera;
 new Float:tf_scout_hype_pep_max;
 new tf_dropped_weapon_lifetime;
+new Float:tf_feign_death_activate_damage_scale, Float:tf_feign_death_damage_scale, Float:tf_stealth_damage_reduction, Float:tf_feign_death_duration, Float:tf_feign_death_speed_duration; // Cloak damage fixes
 new defaulttakedamagetype;
 
 static const String:haleversiontitles[][] =     //the last line of this is what determines the displayed plugin version
 {
-    "1.0",
-    "1.1",
-    "1.11",
-    "1.12",
-    "1.2",
-    "1.22",
-    "1.23",
-    "1.24",
-    "1.25",
-    "1.26",
-    "Christian Brutal Sniper",
-    "1.28",
-    "1.29",
-    "1.30",
-    "1.31",
-    "1.32",
-    "1.33",
-    "1.34",
-    "1.35",
-    "1.35_3",
-    "1.36",
-    "1.36",
-    "1.36",
-    "1.36",
-    "1.36",
-    "1.36",
-    "1.362",
-    "1.363",
-    "1.364",
-    "1.365",
-    "1.366",
-    "1.367",
-    "1.368",
-    "1.369",
-    "1.369",
-    "1.369",
-    "1.37",
-    "1.37b",    //15 Nov 2011
-    "1.38",
-    "1.38",
-    "1.39beta",
-    "1.39beta",
-    "1.39beta",
-    "1.39c",
-    "1.39c",
-    "1.39c",
-    "1.40",
-    "1.41",
-    "1.42",
-    "1.43",
-    "1.43",
-    "1.43",
-    "1.44",
-    "1.44",
-    "1.45",
-    "1.45",
-    "1.45",
-    "1.45",
-    "1.45",
-    "1.46",
-    "1.46",
-    "1.46",
-    "1.47",
-    "1.47",
-    "1.48",
-    "1.48",
-    "1.49",
-    "1.50",
-    "1.51",
-    PLUGIN_VERSION
+    "1.0", "1.1", "1.11", "1.12", "1.2", "1.22", "1.23", "1.24", "1.25", "1.26", "Christian Brutal Sniper", "1.28", "1.29", "1.30", "1.31", "1.32", "1.33", "1.34", "1.35", "1.35_3", "1.36", "1.36", "1.36", "1.36", "1.36", "1.36", "1.362", "1.363", "1.364", "1.365", "1.366", "1.367", "1.368", "1.369", "1.369", "1.369", "1.37", "1.37b", "1.38", "1.38", "1.39beta", "1.39beta", "1.39beta", "1.39c", "1.39c", "1.39c", "1.40", "1.41", "1.42", "1.43", "1.43", "1.43", "1.44", "1.44", "1.45", "1.45", "1.45", "1.45", "1.45", "1.46", "1.46", "1.46", "1.47", "1.47", "1.48", "1.48", "1.49", "1.50",
+    "1.51", // 1.38 - (15 Nov 2011)
+    "1.52",
+    "1.53",
+    "1.53",
+    "1.54"
+    ,PLUGIN_VERSION
 };
 static const String:haleversiondates[][] =
 {
-    "--",
-    "--",
-    "--",
-    "--",
-    "--",
-    "--",
-    "--",
-    "--",
-    "--",
-    "--",
-    "--",
-    "--",
-    "--",
-    "--",
-    "--",
-    "--",
-    "--",
-    "--",
-    "--",
-    "--",
-    "--",
-    "--",
-    "--",
-    "--",
-    "--",
-    "--",
-    "--",
-    "--",
-    "--",
-    "--",
-    "--",
-    "25 Aug 2011",
-    "26 Aug 2011",
-    "09 Oct 2011",
-    "09 Oct 2011",
-    "09 Oct 2011",
-    "15 Nov 2011",
-    "15 Nov 2011",
-    "17 Dec 2011",
-    "17 Dec 2011",
-    "05 Mar 2012",
-    "05 Mar 2012",
-    "05 Mar 2012",
-    "16 Jul 2012",
-    "16 Jul 2012",
-    "16 Jul 2012",
-    "10 Oct 2012",
-    "25 Feb 2013",
-    "30 Mar 2013",
-    "14 Jul 2014",
-    "15 Jul 2014",
-    "15 Jul 2014",
-    "15 Jul 2014",
-    "15 Jul 2014",
-    "18 Jul 2014",
-    "17 Jul 2014",
-    "17 Jul 2014",
-    "17 Jul 2014",
-    "17 Jul 2014",
-    "27 Jul 2014",
-    "19 Jul 2014",
-    "19 Jul 2014",
-    "04 Aug 2014",
-    "04 Aug 2014",
-    "14 Aug 2014",
-    "14 Aug 2014",
-    "18 Aug 2014",
-    "04 Oct 2014",
+    "--", "--", "--", "--", "--", "--", "--", "--", "--", "--", "--", "--", "--", "--", "--", "--", "--", "--", "--", "--", "--", "--", "--", "--", "--", "--", "--", "--", "--", "--", "--", "25 Aug 2011", "26 Aug 2011", "09 Oct 2011", "09 Oct 2011", "09 Oct 2011", "15 Nov 2011", "15 Nov 2011", "17 Dec 2011", "17 Dec 2011", "05 Mar 2012", "05 Mar 2012", "05 Mar 2012", "16 Jul 2012", "16 Jul 2012", "16 Jul 2012", "10 Oct 2012", "25 Feb 2013", "30 Mar 2013", "14 Jul 2014", "15 Jul 2014", "15 Jul 2014", "15 Jul 2014", "15 Jul 2014", "18 Jul 2014", "17 Jul 2014", "17 Jul 2014", "17 Jul 2014", "17 Jul 2014", "27 Jul 2014", "19 Jul 2014", "19 Jul 2014", "04 Aug 2014", "04 Aug 2014", "14 Aug 2014", "14 Aug 2014", "18 Aug 2014", "04 Oct 2014",
     "29 Oct 2014", //  An update I never bothered to throw outdate
-    "25 Dec 2014"  //  Merry Xmas
+    "25 Dec 2014", //  Merry Xmas
+    "10 Sep 2015",
+    "9 Mar 2015",  // This has to do with page ordering
+    "10 Sep 2015",
+    "10 Sep 2015"
 };
 static const maxversion = (sizeof(haleversiontitles) - 1);
 new Handle:OnHaleJump;
@@ -746,8 +647,13 @@ public OnPluginStart()
     HookConVarChange(FindConVar("tf_bot_count"), HideCvarNotify);
     HookConVarChange(FindConVar("tf_arena_use_queue"), HideCvarNotify);
     HookConVarChange(FindConVar("tf_arena_first_blood"), HideCvarNotify);
-    HookConVarChange(FindConVar("tf_dropped_weapon_lifetime"), HideCvarNotify);
     HookConVarChange(FindConVar("mp_friendlyfire"), HideCvarNotify);
+    HookConVarChange(FindConVar("tf_dropped_weapon_lifetime"), HideCvarNotify);
+    HookConVarChange(FindConVar("tf_feign_death_activate_damage_scale"), HideCvarNotify);
+    HookConVarChange(FindConVar("tf_feign_death_damage_scale"), HideCvarNotify);
+    HookConVarChange(FindConVar("tf_feign_death_duration"), HideCvarNotify);
+    HookConVarChange(FindConVar("tf_feign_death_speed_duration"), HideCvarNotify);
+    HookConVarChange(FindConVar("tf_stealth_damage_reduction"), HideCvarNotify);
 
     HookEvent("teamplay_round_start", event_round_start);
     HookEvent("teamplay_round_win", event_round_end);
@@ -928,6 +834,12 @@ public OnConfigsExecuted()
         mp_forcecamera = GetConVarInt(FindConVar("mp_forcecamera"));
         tf_scout_hype_pep_max = GetConVarFloat(FindConVar("tf_scout_hype_pep_max"));
         tf_dropped_weapon_lifetime = GetConVarInt(FindConVar("tf_dropped_weapon_lifetime"));
+        tf_feign_death_activate_damage_scale = GetConVarFloat(FindConVar("tf_feign_death_activate_damage_scale"));
+        tf_feign_death_damage_scale = GetConVarFloat(FindConVar("tf_feign_death_damage_scale"));
+        tf_stealth_damage_reduction = GetConVarFloat(FindConVar("tf_stealth_damage_reduction"));
+        tf_feign_death_duration = GetConVarFloat(FindConVar("tf_feign_death_duration"));
+        tf_feign_death_speed_duration = GetConVarFloat(FindConVar("tf_feign_death_speed_duration"));
+        
         SetConVarInt(FindConVar("tf_arena_use_queue"), 0);
         SetConVarInt(FindConVar("mp_teams_unbalance_limit"), TF2_GetRoundWinCount() ? 0 : 1); // s_bLateLoad ? 0 : 
         //SetConVarInt(FindConVar("mp_teams_unbalance_limit"), GetConVarBool(cvarFirstRound)?0:1);
@@ -936,6 +848,13 @@ public OnConfigsExecuted()
         SetConVarFloat(FindConVar("tf_scout_hype_pep_max"), 100.0);
         SetConVarInt(FindConVar("tf_damage_disablespread"), 1);
         SetConVarInt(FindConVar("tf_dropped_weapon_lifetime"), 0);
+
+        SetConVarFloat(FindConVar("tf_feign_death_activate_damage_scale"), 0.1);
+        SetConVarFloat(FindConVar("tf_feign_death_damage_scale"), 0.1);
+        SetConVarFloat(FindConVar("tf_stealth_damage_reduction"), 0.1);
+        SetConVarFloat(FindConVar("tf_feign_death_duration"), 7.0);
+        SetConVarFloat(FindConVar("tf_feign_death_speed_duration"), 0.0);
+
 #if defined _steamtools_included
         if (steamtools)
         {
@@ -990,6 +909,12 @@ public OnMapEnd()
         SetConVarInt(FindConVar("mp_forcecamera"), mp_forcecamera);
         SetConVarFloat(FindConVar("tf_scout_hype_pep_max"), tf_scout_hype_pep_max);
         SetConVarInt(FindConVar("tf_dropped_weapon_lifetime"), tf_dropped_weapon_lifetime);
+
+        SetConVarFloat(FindConVar("tf_feign_death_activate_damage_scale"), tf_feign_death_activate_damage_scale);
+        SetConVarFloat(FindConVar("tf_feign_death_damage_scale"), tf_feign_death_damage_scale);
+        SetConVarFloat(FindConVar("tf_stealth_damage_reduction"), tf_stealth_damage_reduction);
+        SetConVarFloat(FindConVar("tf_feign_death_duration"), tf_feign_death_duration);
+        SetConVarFloat(FindConVar("tf_feign_death_speed_duration"), tf_feign_death_speed_duration);
 #if defined _steamtools_included
         if (steamtools)
         {
@@ -1218,11 +1143,12 @@ AddToDownload()
 
     PrecacheSound("misc/halloween/spell_teleport.wav", true);
 
+    PrecacheSound(HHHTheme, true);
+
     // Download
 
     PrepareModel(HHHModel);
-    PrepareSound(HHHTheme);
-
+    
 
     // Vagineer
 
@@ -2777,189 +2703,149 @@ public Action:MakeHale(Handle:hTimer)
 public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefinitionIndex, &Handle:hItem)
 {
 //    if (!g_bEnabled) return Plugin_Continue; // This messes up the first round sometimes
-    if (RoundCount <= 0 && !GetConVarBool(cvarFirstRound)) return Plugin_Continue;
+    //if (RoundCount <= 0 && !GetConVarBool(cvarFirstRound)) return Plugin_Continue;
 
 //  if (client == Hale) return Plugin_Continue;
 //  if (hItem != INVALID_HANDLE) return Plugin_Continue;
+
+    new Handle:hItemOverride = INVALID_HANDLE;
+    new TFClassType:iClass = TF2_GetPlayerClass(client);
+
     switch (iItemDefinitionIndex)
     {
-        case 39, 351, 1081: // Megadetonator
+        case 39, 351, 1081, 740: // Megadetonator
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "25 ; 0.5 ; 207 ; 1.33 ; 144 ; 1.0 ; 58 ; 3.2", true);
-
-            if (hItemOverride != INVALID_HANDLE)
-            {
-                hItem = hItemOverride;
-
-                return Plugin_Changed;
-            }
+            hItemOverride = PrepareItemHandle(hItem, _, _, "25 ; 0.5 ; 207 ; 1.33 ; 144 ; 1.0 ; 58 ; 3.2", true);
         }
         case 40, 1146: // Backburner
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "165 ; 1");
-            if (hItemOverride != INVALID_HANDLE)
-            {
-                hItem = hItemOverride;
-                return Plugin_Changed;
-            }
+            hItemOverride = PrepareItemHandle(hItem, _, _, "165 ; 1");
         }
         case 648: // Wrap assassin
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "279 ; 2.0");
-            if (hItemOverride != INVALID_HANDLE)
-            {
-                hItem = hItemOverride;
-                return Plugin_Changed;
-            }
+            hItemOverride = PrepareItemHandle(hItem, _, _, "279 ; 2.0");
         }
         case 224: // Letranger
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "166 ; 15 ; 1 ; 0.8", true);
-
-            if (hItemOverride != INVALID_HANDLE)
-            {
-                hItem = hItemOverride;
-
-                return Plugin_Changed;
-            }
+            hItemOverride = PrepareItemHandle(hItem, _, _, "166 ; 15 ; 1 ; 0.8", true);
         }
         case 225, 574: // YER
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "155 ; 1 ; 160 ; 1", true);
-
-            if (hItemOverride != INVALID_HANDLE)
-            {
-                hItem = hItemOverride;
-
-                return Plugin_Changed;
-            }
+            hItemOverride = PrepareItemHandle(hItem, _, _, "155 ; 1 ; 160 ; 1", true);
         }
         case 232, 401: // Bushwacka + Shahanshah
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "236 ; 1");
-
-            if (hItemOverride != INVALID_HANDLE)
-            {
-                hItem = hItemOverride;
-
-                return Plugin_Changed;
-            }
+            hItemOverride = PrepareItemHandle(hItem, _, _, "236 ; 1");
         }
         case 356: // Kunai
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "125 ; -60");
-
-            if (hItemOverride != INVALID_HANDLE)
-            {
-                hItem = hItemOverride;
-
-                return Plugin_Changed;
-            }
+            hItemOverride = PrepareItemHandle(hItem, _, _, "125 ; -60");
         }
         case 405, 608: // Demo boots have falling stomp damage
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "259 ; 1 ; 252 ; 0.25");
-
-            if (hItemOverride != INVALID_HANDLE)
-            {
-                hItem = hItemOverride;
-
-                return Plugin_Changed;
-            }
+            hItemOverride = PrepareItemHandle(hItem, _, _, "259 ; 1 ; 252 ; 0.25");
         }
-        case 220: // Shortstop (Removed shortstop reload penalty I guess? Makes it act like scattergun...)
+        case 220: // Shortstop - Effects are no longer 'only while active'. Otherwise acts like post-gunmettle shortstop.
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "241 ; 1", true);
-            if (hItemOverride != INVALID_HANDLE)
-            {
-                hItem = hItemOverride;
-                return Plugin_Changed;
-            }
+            hItemOverride = PrepareItemHandle(hItem, _, _, "525 ; 1 ; 526 ; 1.2 ; 533 ; 1.4 ; 534 ; 1.4 ; 328 ; 1 ; 241 ; 1.5", true);
         }
         case 226: // The Battalion's Backup
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "252 ; 0.25"); //125 ; -10
-
-            if (hItemOverride != INVALID_HANDLE)
-            {
-                hItem = hItemOverride;
-
-                return Plugin_Changed;
-            }
+            hItemOverride = PrepareItemHandle(hItem, _, _, "252 ; 0.25"); //125 ; -10
         }
         case 305, 1079: // Medic Xbow
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "17 ; 0.15 ; 2 ; 1.45"); // ; 266 ; 1.0");
-            if (hItemOverride != INVALID_HANDLE)
-            {
-                hItem = hItemOverride;
-                return Plugin_Changed;
-            }
+            hItemOverride = PrepareItemHandle(hItem, _, _, "17 ; 0.15 ; 2 ; 1.45"); // ; 266 ; 1.0");
         }
         case 56, 1005, 1092: // Huntsman
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "2 ; 1.5 ; 76 ; 2.0");
-            if (hItemOverride != INVALID_HANDLE)
-            {
-                hItem = hItemOverride;
-                return Plugin_Changed;
-            }
+            hItemOverride = PrepareItemHandle(hItem, _, _, "2 ; 1.5 ; 76 ; 2.0");
         }
-        case 38, 457: // Axtinguisher
+        case 38, 457, 154: // Axtinguisher
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "", true);
-            if (hItemOverride != INVALID_HANDLE)
-            {
-                hItem = hItemOverride;
-                return Plugin_Changed;
-            }
+            hItemOverride = PrepareItemHandle(hItem, _, _, "", true);
         }
         case 43, 239, 1100, 1084: // GRU
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "107 ; 1.5 ; 1 ; 0.5 ; 128 ; 1 ; 191 ; -7", true);
-            if (hItemOverride != INVALID_HANDLE)
-            {
-                hItem = hItemOverride;
-                return Plugin_Changed;
-            }
+            hItemOverride = PrepareItemHandle(hItem, _, _, "107 ; 1.5 ; 1 ; 0.5 ; 128 ; 1 ; 191 ; -7", true);
         }
         case 415: // Reserve Shooter
         {
-            new Handle:hItemOverride = PrepareItemHandle(hItem, _, _, "179 ; 1 ; 265 ; 99999.0 ; 178 ; 0.6 ; 2 ; 1.1 ; 3 ; 0.5 ; 551 ; 1", true);
-
-            if (hItemOverride != INVALID_HANDLE)
+            if (iClass == TFClass_Soldier) // Soldier shotguns get 40% rocket jump
             {
-                hItem = hItemOverride;
+                hItemOverride = PrepareItemHandle(hItem, _, _, "135 ; 0.6 ; 179 ; 1 ; 265 ; 99999.0 ; 178 ; 0.6 ; 3 ; 0.67 ; 551 ; 1 ; 5 ; 1.15", true);
+            }
+            else
+            {
+                hItemOverride = PrepareItemHandle(hItem, _, _,             "179 ; 1 ; 265 ; 99999.0 ; 178 ; 0.6 ; 3 ; 0.67 ; 551 ; 1 ; 5 ; 1.15", true); //  ; 2 ; 1.1
+            }
+        
+        }
+    }
 
-                return Plugin_Changed;
+    if (hItemOverride != INVALID_HANDLE) // This has to be here, else stuff below can overwrite what's above
+    {
+        hItem = hItemOverride;
+
+        return Plugin_Changed;
+    }
+
+    switch (iClass)
+    {
+        case TFClass_Sniper:
+        {
+            if (StrEqual(classname, "tf_weapon_club", false) || StrEqual(classname, "saxxy", false))
+            {
+                switch (iItemDefinitionIndex)
+                {
+                    case 401: // Shahanshah
+                    {
+                        hItemOverride = PrepareItemHandle(hItem, _, _, "236 ; 1 ; 224 ; 1.66 ; 225 ; 0.5");
+                    }
+                    default:
+                    {
+                        hItemOverride = PrepareItemHandle(hItem, _, _, "236 ; 1"); // Block healing while in use.
+                    }
+                }
             }
         }
-//      case 526: Soldier rocket launchers / shotguns
-    }
-    if (TF2_GetPlayerClass(client) == TFClass_Soldier && (strncmp(classname, "tf_weapon_rocketlauncher", 24, false) == 0 || strncmp(classname, "tf_weapon_shotgun", 17, false) == 0))
-    {
-        new Handle:hItemOverride;
-        if (iItemDefinitionIndex == 127) hItemOverride = PrepareItemHandle(hItem, _, _, "265 ; 99999.0 ; 179 ; 1.0");
-        else hItemOverride = PrepareItemHandle(hItem, _, _, "265 ; 99999.0");
-        if (hItemOverride != INVALID_HANDLE)
+        case TFClass_Soldier: // TODO if (TF2_GetPlayerClass(client) == TFClass_Soldier && (strncmp(classname, "tf_weapon_rocketlauncher", 24, false) == 0 || strncmp(classname, "tf_weapon_particle_cannon", 25, false) == 0 || strncmp(classname, "tf_weapon_shotgun", 17, false) == 0 || strncmp(classname, "tf_weapon_raygun", 16, false) == 0))
         {
-            hItem = hItemOverride;
-            return Plugin_Changed;
+            if (StrStarts(classname, "tf_weapon_shotgun", false) || GunmettleToIndex(iItemDefinitionIndex) == TFWeapon_Shotgun)
+            {
+                hItemOverride = PrepareItemHandle(hItem, _, _, "135 ; 0.6 ; 265 ; 99999.0"); // Soldier shotguns get 40% rocket jump dmg reduction     ; 265 ; 99999.0
+            }
+            else if (StrStarts(classname, "tf_weapon_rocketlauncher", false)  || GunmettleToIndex(iItemDefinitionIndex) == TFWeapon_RocketLauncher)
+            {
+                if (iItemDefinitionIndex == 127) // Direct hit
+                {
+                    hItemOverride = PrepareItemHandle(hItem, _, _, "265 ; 99999.0 ; 179 ; 1"); //  ; 215 ; 300.0
+                }
+                else
+                {
+                    hItemOverride = PrepareItemHandle(hItem, _, _, "265 ; 99999.0 ; 488 ; 1", (iItemDefinitionIndex == 237)); // Rocket jumper
+                }
+            }
         }
-    }
-    #if defined OVERRIDE_MEDIGUNS_ON
-    //Medic mediguns
-    if (TF2_GetPlayerClass(client) == TFClass_Medic && (strncmp(classname, "tf_weapon_medigun", 17, false) == 0))
-    {
-        new Handle:hItemOverride;
-        hItemOverride = PrepareItemHandle(hItem, _, _, "18 ; 0.0 ; 10 ; 1.25 ; 178 ; 0.75 ; 144 ; 2.0", true);
-        if (hItemOverride != INVALID_HANDLE)
+#if defined OVERRIDE_MEDIGUNS_ON
+        case TFClass_Medic:
         {
-            hItem = hItemOverride;
-            return Plugin_Changed;
+            //Medic mediguns
+            if (StrStarts(classname, "tf_weapon_medigun", false) || GunmettleToIndex(iItemDefinitionIndex) == TFWeapon_Medigun)
+            {
+                hItemOverride = PrepareItemHandle(hItem, _, _, "10 ; 1.25 ; 178 ; 0.75 ; 18 ; 0", true);
+            }
         }
+#endif
     }
-    #endif
+
+    if (hItemOverride != INVALID_HANDLE)
+    {
+        hItem = hItemOverride;
+
+        return Plugin_Changed;
+    }
+
     return Plugin_Continue;
 }
 Handle:PrepareItemHandle(Handle:hItem, String:name[] = "", index = -1, const String:att[] = "", bool:dontpreserve = false)
@@ -3067,6 +2953,7 @@ public Action:MakeNoHale(Handle:hTimer, any:clientid)
             {
                 TF2_RemoveWeaponSlot(client, TFWeaponSlot_Primary);
                 SpawnWeapon(client, "tf_weapon_minigun", 15, 1, 0, "");
+                SetAmmo(client, 0, 200);
             }
             case 402:
             {
@@ -3179,25 +3066,23 @@ public Action:MakeNoHale(Handle:hTimer, any:clientid)
     if (TF2_GetPlayerClass(client) == TFClass_Medic)
     {
         weapon = GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary);
-        #if defined OVERRIDE_MEDIGUNS_ON
+#if defined OVERRIDE_MEDIGUNS_ON
         if (GetEntPropFloat(weapon, Prop_Send, "m_flChargeLevel") < 0.41)
             SetEntPropFloat(weapon, Prop_Send, "m_flChargeLevel", 0.41);
-        #endif
-        
-        #if !defined OVERRIDE_MEDIGUNS_ON
+#else
         new mediquality = (weapon > MaxClients && IsValidEdict(weapon) ? GetEntProp(weapon, Prop_Send, "m_iEntityQuality") : -1);
         if (mediquality != 10)
         {
             TF2_RemoveWeaponSlot(client, TFWeaponSlot_Secondary);
-            weapon = SpawnWeapon(client, "tf_weapon_medigun", 35, 5, 10, "18 ; 0.0 ; 10 ; 1.25 ; 178 ; 0.75 ; 144 ; 2.0");  //200 ; 1 for area of effect healing    // ; 178 ; 0.75 ; 128 ; 1.0 Faster switch-to
+            weapon = SpawnWeapon(client, "tf_weapon_medigun", 35, 5, 10, "18 ; 0.0 ; 10 ; 1.25 ; 178 ; 0.75");  //200 ; 1 for area of effect healing    // ; 178 ; 0.75 ; 128 ; 1.0 Faster switch-to
             if (GetIndexOfWeaponSlot(client, TFWeaponSlot_Melee) == 142)
             {
                 SetEntityRenderMode(weapon, RENDER_TRANSCOLOR);
-                SetEntityRenderColor(weapon, 255, 255, 255, 75); // What is the point of making gunslinger translucent? When will a medic ever even have a gunslinger equipped???
+                SetEntityRenderColor(weapon, 255, 255, 255, 75); // What is the point of making gunslinger translucent? When will a medic ever even have a gunslinger equipped???  According to FlaminSarge: Randomizer Hale
             }
             SetEntPropFloat(weapon, Prop_Send, "m_flChargeLevel", 0.41);
         }
-        #endif
+#endif
     }
     return Plugin_Continue;
 }
@@ -3926,7 +3811,9 @@ public Action:ClientTimer(Handle:hTimer)
             }
             switch (index)
             {
-                case 305, 1079, 1081, 56, 16, 1149, 203, 58, 1083, 1105, 1100, 1005, 1092, 812, 833, 997, 39, 351, 740, 588, 595: //Critlist
+                case 305, 1079, 1081, 56, 16, 203,
+                     1149, 15001, 15022, 15032, 15037, 15058, // SMG
+                     58, 1083, 1105, 1100, 1005, 1092, 812, 833, 997, 39, 351, 740, 588, 595, 751: //Critlist
                 {
                     new flindex = GetIndexOfWeaponSlot(client, TFWeaponSlot_Primary);
 
@@ -3935,7 +3822,8 @@ public Action:ClientTimer(Handle:hTimer)
                     else
                         addthecrit = true;
                 }
-                case 22, 23, 160, 209, 294, 449, 773:
+                case 22, 23, 160, 209, 294, 449, 773,          // Scout pistol minicrits - Engie crits
+                     15013, 15018, 15035, 15041, 15046, 15056: // Gunmettle
                 {
                     addthecrit = true;
                     if (class == TFClass_Scout && cond == TFCond_HalloweenCritCandy) cond = TFCond_Buffed;
@@ -4359,6 +4247,51 @@ public Action:Destroy(client, const String:command[], argc)
     if (IsValidClient(client) && TF2_GetPlayerClass(client) == TFClass_Engineer && TF2_IsPlayerInCondition(client, TFCond_Taunting) && GetIndexOfWeaponSlot(client, TFWeaponSlot_Melee) == 589)
         return Plugin_Handled;
     return Plugin_Continue;
+}
+
+static bool:s_bPreventDeadringEffects[TF_MAX_PLAYERS] = {false, ...};
+
+public TF2_OnConditionAdded(client, TFCond:cond)
+{
+    if (!g_bEnabled)
+    {
+        return;
+    }
+
+    if (client != Hale)
+    {
+        switch (cond)
+        {
+            case TFCond_Cloaked:
+            {
+                switch (GetClientCloakIndex(client))
+                {
+                    case 59: // Deadringer
+                    {
+                        s_bPreventDeadringEffects[client] = true;
+                        RequestFrame(Frame_AllowDeadringEffects, client);
+                    }
+                }
+            }
+            case TFCond_DeadRingered, TFCond_SpeedBuffAlly: //, TFCond:102
+            {
+                if (s_bPreventDeadringEffects[client])
+                {
+                    TF2_RemoveCondition(client, cond);
+                }
+            }
+        }
+    }
+}
+
+public Frame_AllowDeadringEffects(any:client)
+{
+    s_bPreventDeadringEffects[client] = false;
+    if (IsClientInGame(client))
+    {
+        SetVariantString("ParticleEffectStop");
+        AcceptEntityInput(client, "DispatchEffect");
+    }
 }
 
 public TF2_OnConditionRemoved(client, TFCond:condition)
@@ -5357,11 +5290,16 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                             }
                         }
                     }
-                    case 14, 201, 230, 402, 526, 664, 752, 792, 801, 851, 881, 890, 899, 908, 957, 966, 1098:
+                    case 14, 201, 664,
+                         230, 402, 526, 1098, 752, // 752,            // Non-stock weapons
+                         792, 801, 851, 881, 890, 899, 908, 957, 966, // Botkillers
+                         15000, 15007, 15019, 15023, 15033, 15059:    // Gunmettle weapons
                     {
-                        switch (wepindex)   //cleaner to read than if wepindex == || wepindex == || etc
+                        switch (wepindex) // Stock sniper rifle highlights Hale
                         {
-                            case 14, 201, 664, 792, 801, 851, 881, 890, 899, 908, 957, 966:
+                            case 14, 201, 664,
+                                 792, 801, 851, 881, 890, 899, 908, 957, 966,
+                                 15000, 15007, 15019, 15023, 15033, 15059:
                             {
                                 if (VSHRoundState != VSHRState_End)
                                 {
@@ -5419,7 +5357,8 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                             //     TF2_RemoveCondition(attacker, TFCond_BlastJumping);   // Prevent HHH from being market gardened more than once in midair during a teleport
                             // }
 
-                            damage = (Pow(float(HaleHealthMax), (0.74074)) + 512.0 - (g_flMarketed/128.0*float(HaleHealthMax)) )/3.0;    //divide by 3 because this is basedamage and lolcrits (0.714286)) + 1024.0)
+                            new Float:flHaleHealthMax = float(HaleHealthMax);
+                            damage = (Pow(flHaleHealthMax*0.0015, 2.0) + 650.0 - (g_flMarketed/128.0*flHaleHealthMax))/3.0;    //divide by 3 because this is basedamage and lolcrits
                             damagetype |= DMG_CRIT;
 
                             if (RemoveCond(attacker, TFCond_Parachute))   // If you parachuted to do this, remove your parachute.
@@ -5478,7 +5417,7 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
 
                         if (iCrits > 0) //If a revenge crit was used, give a damage bonus
                         {
-                            damage = 85.0;
+                            flDamage = 66.6667;
                             return Plugin_Changed;
                         }
                     }
@@ -5591,7 +5530,7 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
 
                     new pistol = GetIndexOfWeaponSlot(attacker, TFWeaponSlot_Primary);
 
-                    if (pistol == 525) //Diamondback gives 3 crits on backstab
+                    if (pistol == 525) //Diamondback gives 2 crits on backstab
                     {
                         new iCrits = GetEntProp(attacker, Prop_Send, "m_iRevengeCrits");
                         SetEntProp(attacker, Prop_Send, "m_iRevengeCrits", iCrits+2);
@@ -5902,19 +5841,14 @@ public Action:TF2_CalcIsAttackCritical(client, weapon, String:weaponname[], &boo
     }
     else if (IsValidEntity(weapon))
     {
-        new index = GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex");
-        if (index == 232 && StrEqual(weaponname, "tf_weapon_club", false))
+        if (TF2_GetPlayerClass(client) == TFClass_Sniper && IsWeaponSlotActive(client, TFWeaponSlot_Melee)) // index == 232 && StrEqual(weaponname, "tf_weapon_club", false)
         {
             SickleClimbWalls(client, weapon);
         }
     }
     return Plugin_Continue;
 }
-public Timer_NoAttacking(any:ref)
-{
-    new weapon = EntRefToEntIndex(ref);
-    SetNextAttack(weapon, 1.56);
-}
+
 SickleClimbWalls(client, weapon)     //Credit to Mecha the Slag
 {
     if (!IsValidClient(client) || (GetClientHealth(client)<=15) )return;
@@ -5932,7 +5866,11 @@ SickleClimbWalls(client, weapon)     //Credit to Mecha the Slag
 
     new TRIndex = TR_GetEntityIndex(INVALID_HANDLE);
     GetEdictClassname(TRIndex, classname, sizeof(classname));
-    if (!StrEqual(classname, "worldspawn")) return;
+
+    if (!((StrStarts(classname, "prop_") && classname[5] != 'p') || StrEqual(classname, "worldspawn")))
+    {
+        return;
+    }
 
     decl Float:fNormal[3];
     TR_GetPlaneNormal(INVALID_HANDLE, fNormal);
@@ -5960,10 +5898,18 @@ SickleClimbWalls(client, weapon)     //Credit to Mecha the Slag
 
     RequestFrame(Timer_NoAttacking, EntIndexToEntRef(weapon));
 }
+
+public Timer_NoAttacking(any:ref)
+{
+    new weapon = EntRefToEntIndex(ref);
+    SetNextAttack(weapon, 1.56);
+}
+
 public bool:TraceRayDontHitSelf(entity, mask, any:data)
 {
     return (entity != data);
 }
+
 FindNextHale(bool:array[])
 {
     new tBoss = -1;
@@ -6354,7 +6300,39 @@ FindVersionData(Handle:panel, versionindex)
 {
     switch (versionindex) // DrawPanelText(panel, "1) .");
     {
-        // Unnerfed the Easter Bunny's rage.
+        case 72: // 1.54
+        {
+            DrawPanelText(panel, "1) Soldier shotgun: 40% reduced self blast damage.");
+            DrawPanelText(panel, "2) Rocket jumper now becomes a reskinned default rocket launcher that deals damage like normal.");
+            DrawPanelText(panel, "3) Removed quick-fix attribute from mediguns. .");
+            DrawPanelText(panel, "4) Scorch shot now acts like Mega-Detonator.");
+            DrawPanelText(panel, "5) Pain Train now acts like a stock weapon.");
+            DrawPanelText(panel, "6) Diamondback revenge crits on stab reduced from 3 -> 2.");
+        }
+        case 73: // 1.54
+        {
+            DrawPanelText(panel, "7) Diamondback revenge hits deal 200 dmg instead of 255.");
+            DrawPanelText(panel, "8) Market garden formula now scales the same as backstabs - but does less than backstabs.");
+        }
+        case 71: // 1.53
+        { 
+            DrawPanelText(panel, "1) Undid 1.7 syntax. (Chdata)");
+            //DrawPanelText(panel, "2) Integrated RTD and Goomba overrides. (WildCard65)");    // I'll redo this one later - Chdata
+            DrawPanelText(panel, "2) Shahanshah: 1.66x dmg if <50% hp, 0.5x dmg if >50% hp.");
+            DrawPanelText(panel, "3) Big Earner provides 3 second speed boost on stab.");
+            DrawPanelText(panel, "4) Shortstop provides passive effects even when not active.");
+            DrawPanelText(panel, "5) Reverted gunmettle changes to deadringer and watch.");
+            DrawPanelText(panel, "6) Watches do not give speed boosts on cloak.");
+        }
+        case 70: // 1.53
+        {
+            DrawPanelText(panel, "7) Deadringer reduces melee damage to 62, and normal watch to 85.");
+            DrawPanelText(panel, "8) OVERRIDE_MEDIGUNS_ON is now on by default. Mediguns will simply have their stats replaced instead of a custom medigun replacement.");
+            DrawPanelText(panel, "9) Gunmettle weapons act like their non-skinned counter-parts.");
+            DrawPanelText(panel, "10) Natascha will no longer keep its bonus ammo when being replaced.");
+            DrawPanelText(panel, "11) Unnerfed the Easter Bunny's rage.");
+            DrawPanelText(panel, "12) Disabled dropped weapons during VSH rounds.");
+        }
         case 69: //1.52
         {
             DrawPanelText(panel, "1) Added the new festive/other weapons!");
@@ -8299,31 +8277,31 @@ stock PrepareModel(const String:szModelPath[], bool:bMdlOnly = false)
     if (!bMdlOnly)
     {
         Format(szPath, sizeof(szPath), "%s.phy", szBase);
-        if (FileExists(szPath))
+        if (FileExists(szPath, true))
         {
             AddFileToDownloadsTable(szPath);
         }
         
         Format(szPath, sizeof(szPath), "%s.sw.vtx", szBase);
-        if (FileExists(szPath))
+        if (FileExists(szPath, true))
         {
             AddFileToDownloadsTable(szPath);
         }
         
         Format(szPath, sizeof(szPath), "%s.vvd", szBase);
-        if (FileExists(szPath))
+        if (FileExists(szPath, true))
         {
             AddFileToDownloadsTable(szPath);
         }
         
         Format(szPath, sizeof(szPath), "%s.dx80.vtx", szBase);
-        if (FileExists(szPath))
+        if (FileExists(szPath, true))
         {
             AddFileToDownloadsTable(szPath);
         }
         
         Format(szPath, sizeof(szPath), "%s.dx90.vtx", szBase);
-        if (FileExists(szPath))
+        if (FileExists(szPath, True))
         {
             AddFileToDownloadsTable(szPath);
         }
@@ -8704,3 +8682,56 @@ stock FindStringIndex2(tableidx, const String:str[])
     return INVALID_STRING_INDEX;
 }
 #endif
+
+/*
+    Converts the many gunmettle indices to whatever the default is
+
+    TODO: Throw botkillers into this category
+*/
+stock GunmettleToIndex(iGun, iClass = -1)
+{
+    switch (iGun)
+    {
+        case 15000, 15007, 15019, 15023, 15033, 15059: return TFWeapon_SniperRifle;
+        case 15001, 15022, 15032, 15037, 15058: return TFWeapon_SMG;
+        case 15002, 15015, 15021, 15029, 15036, 15053: return TFWeapon_Scattergun;
+        case 15003, 15016, 15044, 15047:
+        {
+            switch (iClass)
+            {
+                case TFClass_Soldier: return TFWeapon_ShotgunSoldier;
+                case TFClass_Pyro: return TFWeapon_ShotgunPyro;
+                case TFClass_Heavy: return TFWeapon_ShotgunHeavy;
+                case TFClass_Engineer: return TFWeapon_ShotgunEngie;
+
+            }
+            return TFWeapon_Shotgun;
+        }
+        case 15004, 15020, 15026, 15031, 15040, 15055: return TFWeapon_Minigun;
+        case 15005, 15017, 15030, 15034, 15049, 15054: return TFWeapon_Flamethrower;
+        case 15006, 15014, 15028, 15043, 15052, 15057: return TFWeapon_RocketLauncher;
+        case 15008, 15010, 15025, 15039, 15050: return TFWeapon_Medigun;
+        case 15009, 15012, 15024, 15038, 15045, 15048: return TFWeapon_StickyLauncher;
+        case 15011, 15027, 15042, 15051: return TFWeapon_Revolver;
+        case 15013, 15018, 15035, 15041, 15046, 15056:
+        {
+            switch (iClass)
+            {
+                case TFClass_Scout: return TFWeapon_PistolScout;
+                case TFClass_Engineer: return TFWeapon_PistolEngie;
+            }
+            return TFWeapon_Pistol;
+        }
+    }
+    return TFWeapon_Invalid;
+}
+
+stock bool:StrStarts(const String:szStr[], const String:szSubStr[], bool:bCaseSensitive = true)
+{
+    return !StrContains(szStr, szSubStr, bCaseSensitive);
+}
+
+stock bool:IsWeaponSlotActive(iClient, iSlot)
+{
+    return GetPlayerWeaponSlot(iClient, iSlot) == GetEntPropEnt(iClient, Prop_Send, "m_hActiveWeapon");
+}
