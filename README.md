@@ -11,7 +11,7 @@ The precursor to [FF2](https://github.com/50DKP/FF2-Official).
 Copy the `addons` folder to the server's `tf/` folder.  
 The `scripting` folder within is entirely unnecessary unless you are a modder or want to disable the easter boss.  
 
-###For people updating to 1.52
+###For people updating to 1.54
 Make sure you are updated to Sourcemod 1.6.3 or greater. v1.50+ is now incompatible with older versions.  
 Generally, with Team Fortress 2, Valve updates say you almost always have to use the latest SM snapshots anyway.  
 

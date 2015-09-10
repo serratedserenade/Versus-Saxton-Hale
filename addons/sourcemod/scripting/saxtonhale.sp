@@ -2703,7 +2703,21 @@ public Action:MakeHale(Handle:hTimer)
 public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefinitionIndex, &Handle:hItem)
 {
 //    if (!g_bEnabled) return Plugin_Continue; // This messes up the first round sometimes
+
+
     //if (RoundCount <= 0 && !GetConVarBool(cvarFirstRound)) return Plugin_Continue;
+/*
+    7:52 AM - C:/hdata: may as well just comment this out and give the custom items during the first round too
+    7:52 AM - C:/hdata: here's why it happens
+    7:52 AM - C:/hdata: tf2_ongivenamed item sometimes only fires once between multiple rounds
+    7:52 AM - C:/hdata: so if it doesn't fire on the first round
+    7:52 AM - C:/hdata: then the custom stats never appear the second round (which becomes a hale round)
+    7:53 AM - C:/hdata: it's what I did when I had the arena round
+    7:53 AM - C:/hdata: just gave people the slightly modded weapons
+    7:53 AM - C:/hdata: it didn't make much difference since it was only one round
+
+     - It only refires if the player changes their class or loadout. No change in equipped items = no call of this native
+*/
 
 //  if (client == Hale) return Plugin_Continue;
 //  if (hItem != INVALID_HANDLE) return Plugin_Continue;
@@ -5417,7 +5431,7 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
 
                         if (iCrits > 0) //If a revenge crit was used, give a damage bonus
                         {
-                            flDamage = 66.6667;
+                            damage = 66.6667;
                             return Plugin_Changed;
                         }
                     }
@@ -8301,7 +8315,7 @@ stock PrepareModel(const String:szModelPath[], bool:bMdlOnly = false)
         }
         
         Format(szPath, sizeof(szPath), "%s.dx90.vtx", szBase);
-        if (FileExists(szPath, True))
+        if (FileExists(szPath, true))
         {
             AddFileToDownloadsTable(szPath);
         }
