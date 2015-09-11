@@ -948,6 +948,9 @@ AddToDownload()
 
     //PrecacheSound("weapons/barret_arm_zap.wav", true);
     PrecacheSound("player/doubledonk.wav", true);
+#if defined EASTER_BUNNY_ON
+    PrecacheSound("items/pumpkin_pickup.wav", true); // Only necessary for servers that don't have halloween holiday mode enabled.
+#endif
 
     PrecacheParticleSystem("ghost_appearation");
     PrecacheParticleSystem("yikes_fx");
@@ -2151,12 +2154,15 @@ public Action:StartHaleTimer(Handle:hTimer)
     //if (playing < 5)
     //  playing += 2;
     // Chdata's slightly reworked Hale HP calculation (in light of removing the above two lines)
-    HaleHealthMax = RoundFloat(Pow(((760.8+playing)*(playing-1)), 1.0341)) + 2046;
-    //HaleHealthMax = RoundFloat(Pow(((760.0+playing)*(playing-1)), 1.04));
-    if (HaleHealthMax < 2046)
+    HaleHealthMax = RoundFloat(Pow(((760.8 + playing)*(playing - 1)), 1.0341));
+
+    HaleHealthMax += 2048;
+
+    if (HaleHealthMax <= 0) // Rare glitches can cause his health to become negative.
     {
-        HaleHealthMax = 2046;
+        HaleHealthMax = 2048;
     }
+
     SetEntProp(Hale, Prop_Data, "m_iMaxHealth", HaleHealthMax);
     SetEntityHealth(Hale, HaleHealthMax);
     HaleHealth = HaleHealthMax;
@@ -3178,7 +3184,7 @@ public Action:event_uberdeployed(Handle:event, const String:name[], bool:dontBro
         new medigun = GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary);
         if (IsValidEntity(medigun))
         {
-            GetEdictClassname(medigun, s, sizeof(s));
+            GetEntityClassname(medigun, s, sizeof(s));
             if (strcmp(s, "tf_weapon_medigun", false) == 0)
             {
                 TF2_AddCondition(client, TFCond_HalloweenCritCandy, 0.5, client);
@@ -3680,7 +3686,7 @@ public Action:ClientTimer(Handle:hTimer)
             if (!(GetClientButtons(client) & IN_SCORE)) ShowSyncHudText(client, rageHUD, "%t: %d", "vsh_damage_own", Damage[client]);
             new TFClassType:class = TF2_GetPlayerClass(client);
             new weapon = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
-            if (weapon <= MaxClients || !IsValidEntity(weapon) || !GetEdictClassname(weapon, wepclassname, sizeof(wepclassname))) strcopy(wepclassname, sizeof(wepclassname), "");
+            if (weapon <= MaxClients || !IsValidEntity(weapon) || !GetEntityClassname(weapon, wepclassname, sizeof(wepclassname))) strcopy(wepclassname, sizeof(wepclassname), "");
             new bool:validwep = (strncmp(wepclassname, "tf_wea", 6, false) == 0);
             new index = (validwep ? GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex") : -1);
             /*if (TF2_IsPlayerInCondition(client, TFCond_Cloaked))
@@ -5291,8 +5297,8 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                                 if (IsValidEntity(medigun))
                                 {
                                     new String:s[64];
-                                    GetEdictClassname(medigun, s, sizeof(s));
-                                    if (strcmp(s, "tf_weapon_medigun", false) == 0)
+                                    GetEntityClassname(medigun, s, sizeof(s));
+                                    if (StrEqual(s, "tf_weapon_medigun", false))
                                     {
                                         new Float:uber = GetEntPropFloat(medigun, Prop_Send, "m_flChargeLevel") + (0.1 / healercount);
                                         new Float:max = 1.0;
