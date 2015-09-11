@@ -18,8 +18,7 @@ Generally, with Team Fortress 2, Valve updates say you almost always have to use
 Also be sure to install [TF2Attributes](https://forums.alliedmods.net/showthread.php?t=210221).
 
 TF2Attributes is used for Hale's anchor ability and for giving mantreads their increased jump height.  
-If you don't want to use TF2Attributes, simply recompile saxtonhale.sp  
-It will only include those features if it's being compiled with the tf2attribute's include.  
+It will be used automatically if VSH detects the plugin. VSH no longer has to be recompiled to change this.  
 
 Look through the folders inside the `addons/sourcemod/` folder.
 
@@ -39,4 +38,7 @@ The following files are no longer needed and can be deleted:
 ###To disable the Easter Bunny
 Find the line `#define EASTER_BUNNY_ON` in `saxtonhale.sp`, put a ```//``` infront of the ```#define```, and recompile the plugin using include files from a recent snapshot of [SourceMod](http://www.sourcemod.net).
 
-Remember: TF2Items, Sourcemod 1.6.3 or higher, and morecolors.inc are required to be able to compile it, as well as the Steamtools and TF2Attributes includes if you use them.
+Remember: TF2Items, Sourcemod 1.6.3 or higher, and morecolors.inc are required to be able to compile it.
+
+If you use them, the Steamtools, TF2Attributes, RTD, and Goomba includes must also be used.  
+Not including any of these in the compilation will completely disable their features, even if you have those plugins running.
