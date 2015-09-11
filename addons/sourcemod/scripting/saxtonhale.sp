@@ -28,16 +28,23 @@
 #tryinclude <steamtools>
 #define REQUIRE_EXTENSIONS
 
-//  TODO: Use LibraryExists for this
-//#undef REQUIRE_PLUGIN
-#tryinclude <tf2attributes>
-//#define REQUIRE_PLUGIN
+#undef REQUIRE_PLUGIN
+#tryinclude <tf2attributes>         // Set up this way, not including any of these prevents VSH's integration for them from running at all.
+#tryinclude <goomba>                // But if one is included, VSH can still run with or without that plugin actually being there / working.
+#tryinclude <rtd>                   // It just won't use them if they are not there, and use them if they're loaded.
+#define REQUIRE_PLUGIN
 
+static bool:g_bSteamToolsIsRunning = false;
+static bool:g_bTF2AttributesIsRunning = false;
+//static bool:g_bGoombaStompIsRunning = false;     // Not necessary, because we only use callbacks from these plugins - we don't call any natives ourself.
+//static bool:g_bRollTheDiceIsRunning = false;
 
 #define CBS_MAX_ARROWS 9
 
 #define EASTER_BUNNY_ON         // Add a "//" before this line [or delete it] to remove the easter bunny
+#define OVERRIDE_MEDIGUNS_ON    // Blocking this will make all mediguns be visually replaced with a kritkrieg model instead of keeping their reskinned versions
 
+// Not recommended to change the super jump defines below without knowing how they work.
 #define HALEHHH_TELEPORTCHARGETIME 2
 #define HALE_JUMPCHARGETIME 1
 
@@ -48,6 +55,8 @@
 #define MAX_ENTITIES            2049           //  This is probably TF2 specific
 #define MAX_CENTER_TEXT         192            //  PrintCenterText()
 
+#define FCVAR_VERSION           FCVAR_NOTIFY|FCVAR_DONTRECORD|FCVAR_CHEAT
+
 // Player team values from Team Fortress 2... but without the annoying enum type thing
 #define TEAM_UNOWEN             0
 #define TEAM_SPEC               1
@@ -57,8 +66,6 @@
 #define MAX_INT                 2147483647     //  PriorityCenterText
 #define MIN_INT                 -2147483648    //  PriorityCenterText
 #define MAX_DIGITS              12             //  10 + \0 for IntToString. And negative signs.
-
-#define OVERRIDE_MEDIGUNS_ON
 
 // TF2 Weapon Loadout Slots
 enum
@@ -374,9 +381,6 @@ static const String:BunnyRandomVoice[][] = {
 
 #define SOUNDEXCEPT_MUSIC 0
 #define SOUNDEXCEPT_VOICE 1
-#if defined _steamtools_included
-new bool:steamtools = false;
-#endif
 new OtherTeam = 2;
 new HaleTeam = 3;
 new VSHRoundState = VSHRState_Disabled;
@@ -389,94 +393,100 @@ new Incoming;
 
 static bool:g_bReloadVSHOnRoundEnd = false;
 
-new Damage[TF_MAX_PLAYERS];
-new AirDamage[TF_MAX_PLAYERS]; // Air Strike
-new curHelp[TF_MAX_PLAYERS];
-new uberTarget[TF_MAX_PLAYERS];
+static Damage[TF_MAX_PLAYERS];
+static AirDamage[TF_MAX_PLAYERS]; // Air Strike
+static curHelp[TF_MAX_PLAYERS];
+static uberTarget[TF_MAX_PLAYERS];
 #define VSHFLAG_HELPED          (1 << 0)
 #define VSHFLAG_UBERREADY       (1 << 1)
 #define VSHFLAG_NEEDSTODUCK (1 << 2)
 #define VSHFLAG_BOTRAGE     (1 << 3)
 #define VSHFLAG_CLASSHELPED (1 << 4)
 #define VSHFLAG_HASONGIVED  (1 << 5)
-new VSHFlags[TF_MAX_PLAYERS];
-new Hale = -1;
-new HaleHealthMax;
-new HaleHealth;
-new HaleHealthLast;
-new HaleCharge = 0;
-new HaleRage;
-new NextHale;
-new Float:g_flStabbed;
-new Float:g_flMarketed;
-//new Float:HPTime;
-//new Float:KSpreeTimer;
-new Float:WeighDownTimer;
-new KSpreeCount = 1;
-new Float:UberRageCount;
-new Float:GlowTimer;
-new bool:bEnableSuperDuperJump;
-//new bool:bTenSecStart[2] = {false, false};
-new bool:bSpawnTeleOnTriggerHurt = false;
-new HHHClimbCount;
-//new bool:bNoTaunt = false;
-new Handle:cvarVersion;
-new Handle:cvarHaleSpeed;
-new Handle:cvarPointDelay;
-new Handle:cvarRageDMG;
-new Handle:cvarRageDist;
-new Handle:cvarAnnounce;
-new Handle:cvarSpecials;
-new Handle:cvarEnabled;
-new Handle:cvarAliveToEnable;
-new Handle:cvarPointType;
-new Handle:cvarCrits;
-new Handle:cvarRageSentry;
-new Handle:cvarFirstRound;
-new Handle:cvarDemoShieldCrits;
-new Handle:cvarDisplayHaleHP;
-//new Handle:cvarCircuitStun;
-//new Handle:cvarForceSpecToHale;
-new Handle:cvarEnableEurekaEffect;
-new Handle:cvarForceHaleTeam;
-new Handle:PointCookie;
-new Handle:MusicCookie;
-new Handle:VoiceCookie;
-new Handle:ClasshelpinfoCookie;
-new Handle:doorchecktimer;
-new Handle:jumpHUD;
-new Handle:rageHUD;
-new Handle:healthHUD;
-new Handle:infoHUD;
-new bool:g_bEnabled = false;
-new bool:g_bAreEnoughPlayersPlaying = false;
-new Float:HaleSpeed = 340.0;
-new PointDelay = 6;
-new RageDMG = 3500;
-new Float:RageDist = 800.0;
-new Float:Announce = 120.0;
-new bSpecials = true;
-new AliveToEnable = 5;
-new PointType = 0;
-new bool:haleCrits = false;
-new bool:bDemoShieldCrits = false;
-new bool:bAlwaysShowHealth = true;
-new bool:newRageSentry = true;
-//new Float:circuitStun = 0.0;
-new Handle:MusicTimer;
-new TeamRoundCounter;
-new botqueuepoints = 0;
-new String:currentmap[99];
-new bool:checkdoors = false;
-new bool:PointReady;
-new tf_arena_use_queue;
-new mp_teams_unbalance_limit;
-new tf_arena_first_blood;
-new mp_forcecamera;
-new Float:tf_scout_hype_pep_max;
-new tf_dropped_weapon_lifetime;
-new Float:tf_feign_death_activate_damage_scale, Float:tf_feign_death_damage_scale, Float:tf_stealth_damage_reduction, Float:tf_feign_death_duration, Float:tf_feign_death_speed_duration; // Cloak damage fixes
-new defaulttakedamagetype;
+static VSHFlags[TF_MAX_PLAYERS];
+static Hale = -1;
+static HaleHealthMax;
+static HaleHealth;
+static HaleHealthLast;
+static HaleCharge = 0;
+static HaleRage;
+static NextHale;
+static Float:g_flStabbed;
+static Float:g_flMarketed;
+//static Float:HPTime;
+//static Float:KSpreeTimer;
+static Float:WeighDownTimer;
+static KSpreeCount = 1;
+static Float:UberRageCount;
+static Float:GlowTimer;
+static bool:bEnableSuperDuperJump;
+//static bool:bTenSecStart[2] = {false, false};
+static bool:bSpawnTeleOnTriggerHurt = false;
+static HHHClimbCount;
+//static bool:bNoTaunt = false;
+static Handle:cvarCanBossRTD;
+static Handle:cvarReboundFromBossGoomba; // These apply when you goomba stomp the boss.
+static Handle:cvarDmgMultFromBossGoomba; // To change what happens when the boss goomba stomps mercenaries, use goomba stomp's original convars.
+static Handle:cvarDmgAddFromBossGoomba;
+static Handle:cvarCanBossGoombaStompPlayers; // Whether or not the boss can trigger goomba stomp against mercenaries. Does not affect whether or not players can goomba the boss.
+static Handle:cvarCanWeMantreadGoomba;
+static Handle:cvarVersion;
+static Handle:cvarHaleSpeed;
+static Handle:cvarPointDelay;
+static Handle:cvarRageDMG;
+static Handle:cvarRageDist;
+static Handle:cvarAnnounce;
+static Handle:cvarSpecials;
+static Handle:cvarEnabled;
+static Handle:cvarAliveToEnable;
+static Handle:cvarPointType;
+static Handle:cvarCrits;
+static Handle:cvarRageSentry;
+static Handle:cvarFirstRound;
+static Handle:cvarDemoShieldCrits;
+static Handle:cvarDisplayHaleHP;
+//static Handle:cvarCircuitStun;
+//static Handle:cvarForceSpecToHale;
+static Handle:cvarEnableEurekaEffect;
+static Handle:cvarForceHaleTeam;
+static Handle:PointCookie;
+static Handle:MusicCookie;
+static Handle:VoiceCookie;
+static Handle:ClasshelpinfoCookie;
+static Handle:doorchecktimer;
+static Handle:jumpHUD;
+static Handle:rageHUD;
+static Handle:healthHUD;
+static Handle:infoHUD;
+static bool:g_bEnabled = false;
+static bool:g_bAreEnoughPlayersPlaying = false;
+static Float:HaleSpeed = 340.0;
+static PointDelay = 6;
+static RageDMG = 3500;
+static Float:RageDist = 800.0;
+static Float:Announce = 120.0;
+static bSpecials = true;
+static AliveToEnable = 5;
+static PointType = 0;
+static bool:haleCrits = false;
+static bool:bDemoShieldCrits = false;
+static bool:bAlwaysShowHealth = true;
+static bool:newRageSentry = true;
+//static Float:circuitStun = 0.0;
+static Handle:MusicTimer;
+static TeamRoundCounter;
+static botqueuepoints = 0;
+static String:currentmap[99];
+static bool:checkdoors = false;
+static bool:PointReady;
+static tf_arena_use_queue;
+static mp_teams_unbalance_limit;
+static tf_arena_first_blood;
+static mp_forcecamera;
+static Float:tf_scout_hype_pep_max;
+static tf_dropped_weapon_lifetime;
+static Float:tf_feign_death_activate_damage_scale, Float:tf_feign_death_damage_scale, Float:tf_stealth_damage_reduction, Float:tf_feign_death_duration, Float:tf_feign_death_speed_duration; // Cloak damage fixes
+static defaulttakedamagetype;
 
 static const String:haleversiontitles[][] =     //the last line of this is what determines the displayed plugin version
 {
@@ -485,6 +495,7 @@ static const String:haleversiontitles[][] =     //the last line of this is what 
     "1.52",
     "1.53",
     "1.53",
+    "1.54",
     "1.54"
     ,PLUGIN_VERSION
 };
@@ -495,6 +506,7 @@ static const String:haleversiondates[][] =
     "25 Dec 2014", //  Merry Xmas
     "10 Sep 2015",
     "9 Mar 2015",  // This has to do with page ordering
+    "11 Sep 2015",
     "10 Sep 2015",
     "10 Sep 2015"
 };
@@ -526,6 +538,49 @@ public Plugin:myinfo = {
     version = PLUGIN_VERSION,
     url = "https://forums.alliedmods.net/showthread.php?p=2167912",
 };
+
+// Check for whether or not optional plugins are running and relay that info to VSH.
+public OnAllPluginsLoaded()
+{
+    g_bSteamToolsIsRunning    = LibraryExists("SteamTools");
+    g_bTF2AttributesIsRunning = LibraryExists("tf2attributes");
+    //g_bGoombaStompIsRunning   = LibraryExists("goomba");
+    //g_bRollTheDiceIsRunning   = LibraryExists("TF2: Roll the Dice");
+}
+
+public OnLibraryAdded(const String:name[])
+{
+    SetPluginDetection(name, true);
+}
+
+public OnLibraryRemoved(const String:name[])
+{
+    SetPluginDetection(name, false);
+}
+
+SetPluginDetection(const String:name[], bool:bBool)
+{
+    if (StrEqual(name, "SteamTools"))
+    {
+        g_bSteamToolsIsRunning = bBool;
+    }
+    else if (StrEqual(name, "tf2attributes"))
+    {
+        g_bTF2AttributesIsRunning = bBool;
+    }
+    /*else if (StrEqual(name, "goomba"))
+    {
+        g_bGoombaStompIsRunning = bBool;
+    }
+    else if (StrEqual(name, "TF2: Roll the Dice"))
+    {
+        g_bRollTheDiceIsRunning = bBool;
+    }*/
+    /*else if (StrEqual(name, "hale_achievements"))
+    {
+        ACH_Enabled = bBool;
+    }*/
+}
 
 public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max)
 {
@@ -622,26 +677,34 @@ public OnPluginStart()
 //  RegAdminCmd("hale_eggs", Command_Eggs, ADMFLAG_ROOT);   //WILL CRASH.
     //ACH_Enabled=LibraryExists("hale_achievements");
     LogMessage("===Versus Saxton Hale Initializing - v%s===", haleversiontitles[maxversion]);
-    cvarVersion = CreateConVar("hale_version", haleversiontitles[maxversion], "VS Saxton Hale Version", FCVAR_NOTIFY|FCVAR_PLUGIN|FCVAR_SPONLY|FCVAR_DONTRECORD);
-    cvarHaleSpeed = CreateConVar("hale_speed", "340.0", "Speed of Saxton Hale", FCVAR_PLUGIN);
-    cvarPointType = CreateConVar("hale_point_type", "0", "Select condition to enable point (0 - alive players, 1 - time)", FCVAR_PLUGIN, true, 0.0, true, 1.0);
-    cvarPointDelay = CreateConVar("hale_point_delay", "6", "Addition (for each player) delay before point's activation.", FCVAR_PLUGIN);
-    cvarAliveToEnable = CreateConVar("hale_point_alive", "5", "Enable control points when there are X people left alive.", FCVAR_PLUGIN);
-    cvarRageDMG = CreateConVar("hale_rage_damage", "3500", "Damage required for Hale to gain rage", FCVAR_PLUGIN, true, 0.0);
-    cvarRageDist  = CreateConVar("hale_rage_dist", "800.0", "Distance to stun in Hale's rage. Vagineer and CBS are /3 (/2 for sentries)", FCVAR_PLUGIN, true, 0.0);
-    cvarAnnounce = CreateConVar("hale_announce", "120.0", "Info about mode will show every X seconds. Must be greater than 1.0 to show.", FCVAR_PLUGIN, true, 0.0);
-    cvarSpecials = CreateConVar("hale_specials", "1", "Enable Special Rounds (Vagineer, HHH, CBS)", FCVAR_PLUGIN, true, 0.0, true, 1.0);
-    cvarEnabled = CreateConVar("hale_enabled", "1", "Do you really want set it to 0?", FCVAR_PLUGIN, true, 0.0, true, 1.0);
-    cvarCrits = CreateConVar("hale_crits", "0", "Can Hale get crits?", FCVAR_PLUGIN, true, 0.0, true, 1.0);
-    cvarDemoShieldCrits = CreateConVar("hale_shield_crits", "0", "Does Demoman's shield grant crits (1) or minicrits (0)?", FCVAR_PLUGIN, true, 0.0, true, 1.0);
-    cvarDisplayHaleHP = CreateConVar("hale_hp_display", "1", "Display Hale Health at all times.", FCVAR_PLUGIN, true, 0.0, true, 1.0);
-    cvarRageSentry = CreateConVar("hale_ragesentrydamagemode", "1", "If 0, to repair a sentry that has been damaged by rage, the Engineer must pick it up and put it back down.", FCVAR_PLUGIN, true, 0.0, true, 1.0);
-    cvarFirstRound = CreateConVar("hale_first_round", "0", "Disable(0) or Enable(1) VSH in 1st round.", FCVAR_PLUGIN, true, 0.0, true, 1.0);
-    //cvarCircuitStun = CreateConVar("hale_circuit_stun", "0", "0 to disable Short Circuit stun, >0 to make it stun Hale for x seconds", FCVAR_PLUGIN, true, 0.0);
-    //cvarForceSpecToHale = CreateConVar("hale_spec_force_boss", "0", "1- if a spectator is up next, will force them to Hale + spectators will gain queue points, else spectators are ignored by plugin", FCVAR_PLUGIN, true, 0.0, true, 1.0);
-    cvarEnableEurekaEffect = CreateConVar("hale_enable_eureka", "0", "1- allow Eureka Effect, else disallow", FCVAR_PLUGIN, true, 0.0, true, 1.0);
-    cvarForceHaleTeam = CreateConVar("hale_force_team", "0", "0- Use plugin logic, 1- random team, 2- red, 3- blue", FCVAR_PLUGIN, true, 0.0, true, 3.0);
+    cvarVersion = CreateConVar("hale_version", haleversiontitles[maxversion], "VS Saxton Hale Version", FCVAR_VERSION);
+    cvarHaleSpeed = CreateConVar("hale_speed", "340.0", "Speed of Saxton Hale", FCVAR_NOTIFY);
+    cvarPointType = CreateConVar("hale_point_type", "0", "Select condition to enable point (0 - alive players, 1 - time)", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+    cvarPointDelay = CreateConVar("hale_point_delay", "6", "Addition (for each player) delay before point's activation.", FCVAR_NOTIFY);
+    cvarAliveToEnable = CreateConVar("hale_point_alive", "5", "Enable control points when there are X people left alive.", FCVAR_NOTIFY);
+    cvarRageDMG = CreateConVar("hale_rage_damage", "3500", "Damage required for Hale to gain rage", FCVAR_NOTIFY, true, 0.0);
+    cvarRageDist  = CreateConVar("hale_rage_dist", "800.0", "Distance to stun in Hale's rage. Vagineer and CBS are /3 (/2 for sentries)", FCVAR_NOTIFY, true, 0.0);
+    cvarAnnounce = CreateConVar("hale_announce", "120.0", "Info about mode will show every X seconds. Must be greater than 1.0 to show.", FCVAR_NOTIFY, true, 0.0);
+    cvarSpecials = CreateConVar("hale_specials", "1", "Enable Special Rounds (Vagineer, HHH, CBS)", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+    cvarEnabled = CreateConVar("hale_enabled", "1", "Do you really want set it to 0?", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+    cvarCrits = CreateConVar("hale_crits", "0", "Can Hale get crits?", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+    cvarDemoShieldCrits = CreateConVar("hale_shield_crits", "0", "Does Demoman's shield grant crits (1) or minicrits (0)?", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+    cvarDisplayHaleHP = CreateConVar("hale_hp_display", "1", "Display Hale Health at all times.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+    cvarRageSentry = CreateConVar("hale_ragesentrydamagemode", "1", "If 0, to repair a sentry that has been damaged by rage, the Engineer must pick it up and put it back down.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+    cvarFirstRound = CreateConVar("hale_first_round", "0", "Disable(0) or Enable(1) VSH in 1st round.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+    //cvarCircuitStun = CreateConVar("hale_circuit_stun", "0", "0 to disable Short Circuit stun, >0 to make it stun Hale for x seconds", FCVAR_NOTIFY, true, 0.0);
+    //cvarForceSpecToHale = CreateConVar("hale_spec_force_boss", "0", "1- if a spectator is up next, will force them to Hale + spectators will gain queue points, else spectators are ignored by plugin", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+    cvarEnableEurekaEffect = CreateConVar("hale_enable_eureka", "0", "1- allow Eureka Effect, else disallow", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+    cvarForceHaleTeam = CreateConVar("hale_force_team", "0", "0- Use plugin logic, 1- random team, 2- red, 3- blue", FCVAR_NOTIFY, true, 0.0, true, 3.0);
     
+    // 3rd Party Plugin integrations
+    cvarCanBossGoombaStompPlayers = CreateConVar("hale_can_boss_goomba_stomp", "0", "Can the boss goomba mercenaries? 0 to disallow boss, 1 to allow boss (requires Goomba Stomp)", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+    cvarCanWeMantreadGoomba = CreateConVar("hale_mantread_goomba", "0", "Can Soldier/Demo goomba and mantread at the same time? 0 = Soldier/Demo can only mantread if using boots | 1 = Soldier/Demo can get double stomps (requires Goomba Stomp)", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+    cvarDmgMultFromBossGoomba = CreateConVar("vsh_boss_goomba_dmg_lifemultiplier", "0.025", "How much damage the boss will receive based on its remaining health. (requires Goomba Stomp)", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+    cvarDmgAddFromBossGoomba = CreateConVar("vsh_boss_goomba_dmg_add", "450.0", "Add this amount of damage against the boss after vsh_boss_goomba_dmg_lifemultiplier calculation. (requires Goomba Stomp)", FCVAR_NOTIFY, true, 0.0);
+    cvarReboundFromBossGoomba = CreateConVar("vsh_boss_goomba_rebound_power", "300.0", "How much velocity players should rebound after goomba stomping the boss (requires Goomba Stomp)", FCVAR_NOTIFY, true, 0.0);
+    cvarCanBossRTD = CreateConVar("hale_boss_rtd", "0", "Can the boss use rtd? 0 to disallow boss, 1 to allow boss (requires Roll The Dice)", FCVAR_NOTIFY, true, 0.0, true, 1.0);
+
     // bFriendlyFire = GetConVarBool(FindConVar("mp_friendlyfire"));
     // HookConVarChange(FindConVar("mp_friendlyfire"), HideCvarNotify);
     HookConVarChange(FindConVar("tf_bot_count"), HideCvarNotify);
@@ -749,7 +812,7 @@ public OnPluginStart()
             SDKHook(client, SDKHook_PreThinkPost, OnPreThinkPost);
 
 #if defined _tf2attributes_included
-            if (IsPlayerAlive(client))
+            if (g_bTF2AttributesIsRunning && IsPlayerAlive(client))
             {
                 TF2Attrib_RemoveByName(client, "damage force reduction");
             }
@@ -758,9 +821,7 @@ public OnPluginStart()
     }
 
     AddNormalSoundHook(HookSound);
-#if defined _steamtools_included
-    steamtools = LibraryExists("SteamTools");
-#endif
+
     AddMultiTargetFilter("@hale", HaleTargetFilter, "the current Boss", false);
     AddMultiTargetFilter("@!hale", HaleTargetFilter, "all non-Boss players", false);
 }
@@ -786,24 +847,6 @@ public bool:HaleTargetFilter(const String:pattern[], Handle:clients)
     }
 
     return true;
-}
-public OnLibraryAdded(const String:name[])
-{
-#if defined _steamtools_included
-    if (strcmp(name, "SteamTools", false) == 0)
-        steamtools = true;
-#endif
-//  if (strcmp(name, "hale_achievements", false) == 0)
-//      ACH_Enabled = true;
-}
-public OnLibraryRemoved(const String:name[])
-{
-#if defined _steamtools_included
-    if (strcmp(name, "SteamTools", false) == 0)
-        steamtools = false;
-#endif
-//  if (strcmp(name, "hale_achievements", false) == 0)
-//      ACH_Enabled = false;
 }
 
 public OnConfigsExecuted()
@@ -856,7 +899,7 @@ public OnConfigsExecuted()
         SetConVarFloat(FindConVar("tf_feign_death_speed_duration"), 0.0);
 
 #if defined _steamtools_included
-        if (steamtools)
+        if (g_bSteamToolsIsRunning)
         {
             decl String:gameDesc[64];
             Format(gameDesc, sizeof(gameDesc), "VS Saxton Hale (%s)", haleversiontitles[maxversion]);
@@ -916,7 +959,7 @@ public OnMapEnd()
         SetConVarFloat(FindConVar("tf_feign_death_duration"), tf_feign_death_duration);
         SetConVarFloat(FindConVar("tf_feign_death_speed_duration"), tf_feign_death_speed_duration);
 #if defined _steamtools_included
-        if (steamtools)
+        if (g_bSteamToolsIsRunning)
         {
             Steam_SetGameDescription("Team Fortress");
         }
@@ -1269,7 +1312,7 @@ public CvarChange(Handle:convar, const String:oldValue[], const String:newValue[
         {
             g_bAreEnoughPlayersPlaying = true;
 #if defined _steamtools_included
-            if (steamtools)
+            if (g_bSteamToolsIsRunning)
             {
                 decl String:gameDesc[64];
                 Format(gameDesc, sizeof(gameDesc), "VS Saxton Hale (%s)", haleversiontitles[maxversion]);
@@ -1516,7 +1559,7 @@ public Action:event_round_start(Handle:event, const String:name[], bool:dontBroa
     if (!GetConVarBool(cvarEnabled))
     {
 #if defined _steamtools_included
-        if (g_bAreEnoughPlayersPlaying && steamtools)
+        if (g_bAreEnoughPlayersPlaying && g_bSteamToolsIsRunning)
         {
             Steam_SetGameDescription("Team Fortress");
         }
@@ -1579,11 +1622,12 @@ public Action:event_round_start(Handle:event, const String:name[], bool:dontBroa
         if (IsClientInGame(ionplay))
         {
 #if defined _tf2attributes_included
-            if (IsPlayerAlive(ionplay))
+            if (g_bTF2AttributesIsRunning && IsPlayerAlive(ionplay)) // Since the natives are marked as optional, is it truly necessary to make this bool in the first place?
             {
                 TF2Attrib_RemoveByName(ionplay, "damage force reduction");
             }
 #endif
+
             StopHaleMusic(ionplay);
             if (IsClientParticipating(ionplay)) //GetEntityTeamNum(ionplay) > _:TFTeam_Spectator)
             {
@@ -2946,13 +2990,16 @@ public Action:MakeNoHale(Handle:hTimer, any:clientid)
         HelpPanel2(client);
 
 #if defined _tf2attributes_included
-    if (IsValidEntity(FindPlayerBack(client, { 444 }, 1)))    //  Fixes mantreads to have jump height again
+    if (g_bTF2AttributesIsRunning)
     {
-        TF2Attrib_SetByDefIndex(client, 58, 1.8);          //  "self dmg push force increased"
-    }
-    else
-    {
-        TF2Attrib_RemoveByDefIndex(client, 58);
+        if (IsValidEntity(FindPlayerBack(client, { 444 }, 1)))    //  Fixes mantreads to have jump height again
+        {
+            TF2Attrib_SetByDefIndex(client, 58, 1.8);             //  "self dmg push force increased"
+        }
+        else
+        {
+            TF2Attrib_RemoveByDefIndex(client, 58);
+        }
     }
 #endif
 
@@ -5126,6 +5173,69 @@ public Action:event_hurt(Handle:event, const String:name[], bool:dontBroadcast)
         HaleRage = RageDMG;
     return Plugin_Continue;
 }
+
+#if defined _rtd_included
+public Action:RTD_CanRollDice(iClient)
+{
+    if (g_bEnabled && iClient == Hale && !GetConVarBool(cvarCanBossRTD))
+    {
+        return Plugin_Handled; // Prevent boss from RTDing if setting is disabled.
+    }
+    return Plugin_Continue;
+}
+#endif
+
+#if defined _goomba_included_
+public Action:OnStomp(attacker, victim, &Float:damageMultiplier, &Float:damageAdd, &Float:JumpPower)
+{
+    if (!g_bEnabled) //  || !IsValidClient(attacker) || !IsValidClient(victim) || attacker == victim
+    {
+        return Plugin_Continue; // ... All of those checks are pointless.
+    }
+        
+    if (attacker == Hale)
+    {
+        if (!GetConVarBool(cvarCanBossGoombaStompPlayers))
+        {
+            return Plugin_Handled;
+        }
+
+        if (RemoveDemoShield(victim)) // If the demo had a shield to break
+        {
+            EmitSoundToClient(victim, "player/spy_shield_break.wav", _, _, _, SND_CHANGEVOL, 0.7);
+            EmitSoundToClient(attacker, "player/spy_shield_break.wav", _, _, _, SND_CHANGEVOL, 0.7);
+            EmitSoundToClient(victim, "player/crit_received3.wav", _, _, _, SND_CHANGEVOL, 0.7);
+            EmitSoundToClient(attacker, "player/crit_received3.wav", _, _, _, SND_CHANGEVOL, 0.7);
+
+            TF2_AddCondition(victim, TFCond_Bonked, 0.1);
+            TF2_AddCondition(victim, TFCond_SpeedBuffAlly, 1.0);
+            damageAdd = 0.0;
+            damageMultiplier = 0.0;
+            //JumpPower = 0.0;
+            return Plugin_Changed;
+        }
+        //PrintHintText(victim, "%t", "vsh_you_got_stomped");
+        //PrintHintText(attacker, "%t", "vsh_you_stomped_hale", victim);
+    }
+    else if (victim == Hale)
+    {
+        if (IsValidEntity(FindPlayerBack(attacker, { 444, 405, 608 }, 3)) && !GetConVarBool(cvarCanWeMantreadGoomba))
+        {
+            return Plugin_Handled; // Prevent goomba stomp for mantreads if being able to is disabled.
+        }
+
+        damageAdd = GetConVarFloat(cvarDmgAddFromBossGoomba);
+        damageMultiplier = GetConVarFloat(cvarDmgMultFromBossGoomba);
+        JumpPower = GetConVarFloat(cvarReboundFromBossGoomba);
+        //PrintHintText(victim, "%t", "vsh_you_got_stomped_hale", attacker);
+        //PrintHintText(attacker, "%t", "vsh_you_stomped");
+        //UpdateHealthBar();
+        return Plugin_Changed;
+    }
+    return Plugin_Continue;
+}
+#endif
+
 public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damagetype, &weapon, Float:damageForce[3], Float:damagePosition[3], damagecustom)
 {
     if (!g_bEnabled || !IsValidEdict(attacker) || ((attacker <= 0) && (client == Hale)) || TF2_IsPlayerInCondition(client, TFCond_Ubercharged))
@@ -5214,32 +5324,43 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
     {
         if (attacker <= MaxClients)
         {
-            new wepindex = (IsValidEntity(weapon) && weapon > MaxClients ? GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex") : -1);
-            if (inflictor == attacker || inflictor == weapon)
-            {
-                new iFlags = GetEntityFlags(Hale);
-                new bChanged = false;
+            new bChanged = false;
+            new iFlags = GetEntityFlags(Hale);
 
 #if defined _tf2attributes_included
-                if (!(damagetype & DMG_BLAST) && (iFlags & (FL_ONGROUND|FL_DUCKING)) == (FL_ONGROUND|FL_DUCKING))    //If Hale is ducking on the ground, it's harder to knock him back
+            if (g_bTF2AttributesIsRunning) // TODO: This probably isn't necessary at all!! The inflictor == weapon check below is why sentries never had DMG_PREVENT_PHYSICS_FORCE applied to it...
+            {
+                if ((iFlags & (FL_ONGROUND|FL_DUCKING)) == (FL_ONGROUND|FL_DUCKING))    //If Hale is ducking on the ground, it's harder to knock him back
                 {
                     TF2Attrib_SetByDefIndex(Hale, 252, 0.0);        // "damage force reduction"
                     //damagetype |= DMG_PREVENT_PHYSICS_FORCE;
-                    bChanged = true;
+                    //bChanged = true;
                 }
                 else
                 {
                     TF2Attrib_RemoveByDefIndex(Hale, 252);
                 }
-#else
+            }
+            else
+            {
                 // Does not protect against sentries or FaN, but does against miniguns and rockets
                 if ((iFlags & (FL_ONGROUND|FL_DUCKING)) == (FL_ONGROUND|FL_DUCKING))    
                 {
                     damagetype |= DMG_PREVENT_PHYSICS_FORCE;
                     bChanged = true;
                 }
+            }
+#else
+            if ((iFlags & (FL_ONGROUND|FL_DUCKING)) == (FL_ONGROUND|FL_DUCKING))    
+            {
+                damagetype |= DMG_PREVENT_PHYSICS_FORCE;
+                bChanged = true;
+            }
 #endif
 
+            new wepindex = (IsValidEntity(weapon) && weapon > MaxClients ? GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex") : -1);
+            if (inflictor == attacker || inflictor == weapon) // This prevents sentry damage and grenade/rocket damage from processing... not sure why this is here really.
+            {
                 if (damagecustom == TF_CUSTOM_BOOTS_STOMP)
                 {
                     damage = 1024.0;
@@ -6310,7 +6431,7 @@ FindVersionData(Handle:panel, versionindex)
 {
     switch (versionindex) // DrawPanelText(panel, "1) .");
     {
-        case 73: // 1.54
+        case 74: // 1.54
         {
             DrawPanelText(panel, "1) Soldier shotgun: 40% reduced self blast damage.");
             DrawPanelText(panel, "2) Rocket jumper now becomes a reskinned default rocket launcher that deals damage like normal.");
@@ -6319,13 +6440,17 @@ FindVersionData(Handle:panel, versionindex)
             DrawPanelText(panel, "5) Pain Train now acts like a stock weapon.");
             DrawPanelText(panel, "7) HHH Climb no longer slowers attack speed.");
         }
-        case 72: // 1.54
+        case 73: // 1.54
         {
             DrawPanelText(panel, "8) Diamondback revenge crits on stab reduced from 3 -> 2.");
             DrawPanelText(panel, "9) Diamondback revenge hits deal 200 dmg instead of 255.");
             DrawPanelText(panel, "10) Market garden formula now scales the same as backstabs - but does less than backstabs.");
             DrawPanelText(panel, "11) Fixed negative HaleHealth glitch, and 20k+ backstab glitch.");
             DrawPanelText(panel, "12) Fixed boss melee weapons on CBS/Vagineer/HHH not showing attack animations in first person.");
+        }
+        case 72: // 1.54
+        {
+            DrawPanelText(panel, "13) Integrated goomba stomp and RTD for server owners to use.");
         }
         case 71: // 1.53
         { 
@@ -6629,7 +6754,7 @@ FindVersionData(Handle:panel, versionindex)
             DrawPanelText(panel, "-- Translations updated");
             DrawPanelText(panel, "-- Added hale_spec_force_boss cvar");
             DrawPanelText(panel, "-- Now attempts to integrate tf2items config");
-            DrawPanelText(panel, "-- With SteamTools, changes game desc");
+            DrawPanelText(panel, "-- With steamtools, changes game desc");
             DrawPanelText(panel, "-- Plugin may warn if config is outdated");
             DrawPanelText(panel, "-- Jump/tele charge defines at top of code");
             DrawPanelText(panel, "17) For mapmakers:");
