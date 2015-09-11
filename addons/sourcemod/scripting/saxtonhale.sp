@@ -6310,19 +6310,22 @@ FindVersionData(Handle:panel, versionindex)
 {
     switch (versionindex) // DrawPanelText(panel, "1) .");
     {
-        case 72: // 1.54
+        case 73: // 1.54
         {
             DrawPanelText(panel, "1) Soldier shotgun: 40% reduced self blast damage.");
             DrawPanelText(panel, "2) Rocket jumper now becomes a reskinned default rocket launcher that deals damage like normal.");
             DrawPanelText(panel, "3) Removed quick-fix attribute from mediguns. .");
             DrawPanelText(panel, "4) Scorch shot now acts like Mega-Detonator.");
             DrawPanelText(panel, "5) Pain Train now acts like a stock weapon.");
-            DrawPanelText(panel, "6) Diamondback revenge crits on stab reduced from 3 -> 2.");
+            DrawPanelText(panel, "7) HHH Climb no longer slowers attack speed.");
         }
-        case 73: // 1.54
+        case 72: // 1.54
         {
-            DrawPanelText(panel, "7) Diamondback revenge hits deal 200 dmg instead of 255.");
-            DrawPanelText(panel, "8) Market garden formula now scales the same as backstabs - but does less than backstabs.");
+            DrawPanelText(panel, "8) Diamondback revenge crits on stab reduced from 3 -> 2.");
+            DrawPanelText(panel, "9) Diamondback revenge hits deal 200 dmg instead of 255.");
+            DrawPanelText(panel, "10) Market garden formula now scales the same as backstabs - but does less than backstabs.");
+            DrawPanelText(panel, "11) Fixed negative HaleHealth glitch, and 20k+ backstab glitch.");
+            DrawPanelText(panel, "12) Fixed boss melee weapons on CBS/Vagineer/HHH not showing attack animations in first person.");
         }
         case 71: // 1.53
         { 
