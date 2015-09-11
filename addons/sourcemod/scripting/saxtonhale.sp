@@ -5472,7 +5472,7 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                             HaleRage = RageDMG;
                     }
                 }*/
-                static bool:foundDmgCustom = false;
+                /*static bool:foundDmgCustom = false;  // This relic is probably no longer needed at all
                 static bool:dmgCustomInOTD = false;
                 if (!foundDmgCustom)
                 {
@@ -5494,8 +5494,8 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                     {
                         bIsBackstab = true;
                     }
-                }
-                if (bIsBackstab)
+                }*/
+                if (damagecustom == TF_CUSTOM_BACKSTAB)
                 {
                     /*
                      Rebalanced backstab formula.
@@ -5506,12 +5506,9 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
 
                     */
                     new Float:flHaleHealthMax = float(HaleHealthMax);
-                    flDamage = ( (Pow(flHaleHealthMax*0.0014, 2.0) + 899.0) - (flHaleHealthMax*g_flStabbed/100.0) )/3.0;
-
-
-                    damage = changedamage/3.0;            // You can level "damage dealt" with backstabs
-                    damagetype |= DMG_CRIT;
-
+                    damage = ( (Pow(flHaleHealthMax*0.0014, 2.0) + 899.0) - (flHaleHealthMax*g_flStabbed/100.0) )/3.0; // You can level "damage dealt" with backstabs
+          
+                    damagetype |= DMG_CRIT|DMG_PREVENT_PHYSICS_FORCE;
 
                     EmitSoundToClient(client, "player/spy_shield_break.wav", _, _, SNDLEVEL_TRAFFIC, SND_NOFLAGS, 0.7, 100, _, vPos, NULL_VECTOR, false, 0.0);
                     EmitSoundToClient(attacker, "player/spy_shield_break.wav", _, _, SNDLEVEL_TRAFFIC, SND_NOFLAGS, 0.7, 100, _, vPos, NULL_VECTOR, false, 0.0);
