@@ -5899,15 +5899,20 @@ SickleClimbWalls(client, weapon)     //Credit to Mecha the Slag
 
     SDKHooks_TakeDamage(client, client, client, 15.0, DMG_CLUB, GetPlayerWeaponSlot(client, TFWeaponSlot_Melee));
 
-    if (client != Hale) ClientCommand(client, "playgamesound \"%s\"", "player\\taunt_clip_spin.wav");
-
-    RequestFrame(Timer_NoAttacking, EntIndexToEntRef(weapon));
+    if (client != Hale)
+    {
+        ClientCommand(client, "playgamesound \"%s\"", "player\\taunt_clip_spin.wav");
+        RequestFrame(Timer_NoAttacking, EntIndexToEntRef(weapon));
+    }
 }
 
 public Timer_NoAttacking(any:ref)
 {
     new weapon = EntRefToEntIndex(ref);
-    SetNextAttack(weapon, 1.56);
+    if (weapon != -1)
+    {
+        SetNextAttack(weapon, 1.56);
+    }
 }
 
 public bool:TraceRayDontHitSelf(entity, mask, any:data)
