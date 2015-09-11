@@ -2594,38 +2594,32 @@ EquipSaxton(client)
         case VSHSpecial_Bunny:
         {
             SaxtonWeapon = SpawnWeapon(client, "tf_weapon_bottle", 1, 100, 5, "68 ; 2.0 ; 2 ; 3.0 ; 259 ; 1.0 ; 326 ; 1.3 ; 252 ; 0.6");
-            SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", SaxtonWeapon);
         }
         case VSHSpecial_Vagineer:
         {
             SaxtonWeapon = SpawnWeapon(client, "tf_weapon_wrench", 197, 100, 5, "68 ; 2.0 ; 2 ; 3.1 ; 259 ; 1.0 ; 436 ; 1.0");
-            SetEntProp(SaxtonWeapon, Prop_Send, "m_iWorldModelIndex", -1);
-            SetEntProp(SaxtonWeapon, Prop_Send, "m_nModelIndexOverrides", -1, _, 0);
-            SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", SaxtonWeapon);
+            SetEntPropFloat(SaxtonWeapon, Prop_Send, "m_flModelScale", 0.0001);
         }
         case VSHSpecial_HHH:
         {
             SaxtonWeapon = SpawnWeapon(client, "tf_weapon_sword", 266, 100, 5, "68 ; 2.0 ; 2 ; 3.1 ; 259 ; 1.0 ; 252 ; 0.6 ; 551 ; 1");
-            SetEntProp(SaxtonWeapon, Prop_Send, "m_iWorldModelIndex", -1);
-            SetEntProp(SaxtonWeapon, Prop_Send, "m_nModelIndexOverrides", -1, _, 0);
-            SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", SaxtonWeapon);
+            SetEntPropFloat(SaxtonWeapon, Prop_Send, "m_flModelScale", 0.0001);
             HaleCharge = -1000;
         }
         case VSHSpecial_CBS:
         {
             SaxtonWeapon = SpawnWeapon(client, "tf_weapon_club", 171, 100, 5, "68 ; 2.0 ; 2 ; 3.1 ; 259 ; 1.0");
-            SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", SaxtonWeapon);
-            SetEntProp(client, Prop_Send, "m_nBody", 0);
-            SetEntProp(SaxtonWeapon, Prop_Send, "m_nModelIndexOverrides", GetEntProp(SaxtonWeapon, Prop_Send, "m_iWorldModelIndex"), _, 0);
+            //SetEntProp(client, Prop_Send, "m_nBody", 0);
         }
         default:
         {
             decl String:attribs[64];
-            Format(attribs, sizeof(attribs), "68 ; 2.0 ; 2 ; 3.1 ; 259 ; 1.0 ; 252 ; 0.6 ; 214 ; %d", GetRandomInt(9999, 99999));
+            Format(attribs, sizeof(attribs), "68 ; 2.0 ; 2 ; 3.1 ; 259 ; 1.0 ; 252 ; 0.6 ; 551 ; %i ; 214 ; %d", !IsDate(Month_Oct, 15), GetRandomInt(9999, 99999));
             SaxtonWeapon = SpawnWeapon(client, "tf_weapon_shovel", 5, 100, 4, attribs);
-            SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", SaxtonWeapon);
         }
     }
+
+    SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", SaxtonWeapon);
 }
 public Action:MakeHale(Handle:hTimer)
 {
@@ -4777,8 +4771,7 @@ public Action:event_player_death(Handle:event, const String:name[], bool:dontBro
                         case 3: clubindex = 401;
                     }
                     weapon = SpawnWeapon(Hale, "tf_weapon_club", clubindex, 100, 5, "68 ; 2.0 ; 2 ; 3.1 ; 259 ; 1.0");
-                    SetEntPropEnt(Hale, Prop_Send, "m_hActiveWeapon", weapon);
-                    SetEntProp(weapon, Prop_Send, "m_nModelIndexOverrides", GetEntProp(weapon, Prop_Send, "m_iWorldModelIndex"), _, 0);
+                    SetEntPropEnt(Hale, Prop_Send, "m_hActiveWeapon", weapon); // Technically might be pointless, as SpawnWeapon already calls EquipPlayerWeapon
                 }
             }
         }
@@ -5512,19 +5505,14 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                      Weaker against high HP Hale (but still good).
 
                     */
-                    new Float:changedamage = ( (Pow(float(HaleHealthMax)*0.0014, 2.0) + 899.0) - (float(HaleHealthMax)*(g_flStabbed/100.0)) );
-                    //new iChangeDamage = RoundFloat(changedamage);
+                    new Float:flHaleHealthMax = float(HaleHealthMax);
+                    flDamage = ( (Pow(flHaleHealthMax*0.0014, 2.0) + 899.0) - (flHaleHealthMax*g_flStabbed/100.0) )/3.0;
 
-                    damage = changedamage/3;            // You can level "damage dealt" with backstabs
+
+                    damage = changedamage/3.0;            // You can level "damage dealt" with backstabs
                     damagetype |= DMG_CRIT;
 
-                    /*Damage[attacker] += iChangeDamage;
-                    if (HaleHealth > iChangeDamage) damage = 0.0;
-                    else damage = changedamage;
-                    HaleHealth -= iChangeDamage;
-                    HaleRage += iChangeDamage;
-                    if (HaleRage > RageDMG)
-                        HaleRage = RageDMG;*/
+
                     EmitSoundToClient(client, "player/spy_shield_break.wav", _, _, SNDLEVEL_TRAFFIC, SND_NOFLAGS, 0.7, 100, _, vPos, NULL_VECTOR, false, 0.0);
                     EmitSoundToClient(attacker, "player/spy_shield_break.wav", _, _, SNDLEVEL_TRAFFIC, SND_NOFLAGS, 0.7, 100, _, vPos, NULL_VECTOR, false, 0.0);
                     EmitSoundToClient(client, "player/crit_received3.wav", _, _, SNDLEVEL_TRAFFIC, SND_NOFLAGS, 0.7, 100, _, _, NULL_VECTOR, false, 0.0);
