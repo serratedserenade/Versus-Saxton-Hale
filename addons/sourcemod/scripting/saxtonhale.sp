@@ -9,7 +9,7 @@
     
     New plugin thread on AlliedMods: https://forums.alliedmods.net/showthread.php?p=2167912
 */
-#define PLUGIN_VERSION "1.54"
+#define PLUGIN_VERSION "1.55"
 #pragma semicolon 1
 #include <tf2_stocks>
 #include <tf2items>
@@ -128,6 +128,31 @@ enum
     TFWeapon_PistolEngie = 22
 }
 
+// TF2 Weapon qualities
+enum 
+{
+    TFQual_None = -1,       // Probably should never actually set an item's quality to this
+    TFQual_Normal = 0,
+    TFQual_NoInspect = 0,   // Players cannot see your attributes - NO LONGER WORKS due to Gunmettle update.
+    TFQual_Rarity1,
+    TFQual_Genuine = 1,
+    TFQual_Rarity2,
+    TFQual_Level = 2,       //  Same color as "Level # Weapon" text in description
+    TFQual_Vintage,
+    TFQual_Rarity3,         //  Is actually 4 - sort of brownish
+    TFQual_Rarity4,
+    TFQual_Unusual = 5,
+    TFQual_Unique,
+    TFQual_Community,
+    TFQual_Developer,
+    TFQual_Selfmade,
+    TFQual_Customized,
+    TFQual_Strange,
+    TFQual_Completed,
+    TFQual_Haunted,         //  13
+    TFQual_Collectors
+}
+
 // START FILE DEFINTIONS & ENUMS
 
 enum e_flNext
@@ -147,10 +172,25 @@ enum e_flNext2
 // Saxton Hale Files
 
 // Model
-#define HaleModel               "models/player/saxton_hale/saxton_hale.mdl"
+//#define HaleModel               "models/player/saxton_hale/saxton_hale.mdl"
+#define HaleModel               "models/player/saxton_test4/saxton_hale_test4.mdl"
 
 // Materials
-// Prepared Manually
+
+static const String:HaleMatsV2[][] = {
+    "materials/models/player/saxton_test4/eyeball_l.vmt",
+    "materials/models/player/saxton_test4/eyeball_r.vmt",
+    "materials/models/player/saxton_test4/halebody.vmt",
+    "materials/models/player/saxton_test4/halebody.vtf",
+    "materials/models/player/saxton_test4/halebodyexponent.vtf",
+    "materials/models/player/saxton_test4/halehead.vmt",
+    "materials/models/player/saxton_test4/halehead.vtf",
+    "materials/models/player/saxton_test4/haleheadexponent.vtf",
+    "materials/models/player/saxton_test4/halenormal.vtf",
+    "materials/models/player/saxton_test4/halephongmask.vtf",
+    "materials/models/player/saxton_test4/haleGibs.vmt",
+    "materials/models/player/saxton_test4/halegibs.vtf"
+};
 
 // SFX
 #define HaleYellName            "saxton_hale/saxton_hale_responce_1a.wav"
@@ -240,7 +280,7 @@ enum e_flNext2
 // Vagineer Files
 
 // Model
-#define VagineerModel           "models/player/saxton_hale/vagineer_v134.mdl"
+#define VagineerModel           "models/player/saxton_hale/vagineer_v150.mdl"
 
 // Materials
 // None! He uses Engineer's stuff
@@ -496,6 +536,7 @@ static const String:haleversiontitles[][] =     //the last line of this is what 
     "1.53",
     "1.53",
     "1.54",
+    "1.54",
     "1.54"
     ,PLUGIN_VERSION
 };
@@ -506,9 +547,10 @@ static const String:haleversiondates[][] =
     "25 Dec 2014", //  Merry Xmas
     "10 Sep 2015",
     "9 Mar 2015",  // This has to do with page ordering
-    "11 Sep 2015",
+    "11 Sep 2015", // This will appear as the final page of the 1.54 updates
     "10 Sep 2015",
-    "10 Sep 2015"
+    "10 Sep 2015",
+    "12 Sep 2015"  // 1.55 update
 };
 static const maxversion = (sizeof(haleversiontitles) - 1);
 new Handle:OnHaleJump;
@@ -1017,7 +1059,7 @@ AddToDownload()
 
     PrepareModel(HaleModel);
 
-    PrepareMaterial("materials/models/player/saxton_hale/eye");
+    PrepareMaterial("materials/models/player/saxton_hale/eye"); // Some of these materials are used by Christian Brutal Sniper
     PrepareMaterial("materials/models/player/saxton_hale/hale_head");
     PrepareMaterial("materials/models/player/saxton_hale/hale_body");
     PrepareMaterial("materials/models/player/saxton_hale/hale_misc");
@@ -1025,7 +1067,7 @@ AddToDownload()
     PrepareMaterial("materials/models/player/saxton_hale/sniper_lens");
 
     //Saxton Hale Materials
-    AddFileToDownloadsTable("materials/models/player/saxton_hale/sniper_head.vtf");
+    AddFileToDownloadsTable("materials/models/player/saxton_hale/sniper_head.vtf"); // So we're keeping ALL of them.
     AddFileToDownloadsTable("materials/models/player/saxton_hale/sniper_head_red.vmt");
     AddFileToDownloadsTable("materials/models/player/saxton_hale/hale_misc_normal.vtf");
     AddFileToDownloadsTable("materials/models/player/saxton_hale/hale_body_normal.vtf");
@@ -1033,6 +1075,8 @@ AddToDownload()
     AddFileToDownloadsTable("materials/models/player/saxton_hale/eyeball_r.vmt");
     AddFileToDownloadsTable("materials/models/player/saxton_hale/hale_egg.vtf");
     AddFileToDownloadsTable("materials/models/player/saxton_hale/hale_egg.vmt");
+
+    DownloadMaterialList(HaleMatsV2, sizeof(HaleMatsV2)); // New material files for Saxton Hale's new model.
 
     PrepareSound(HaleComicArmsFallSound);
     PrepareSound(HaleKSpree);
@@ -2637,29 +2681,28 @@ EquipSaxton(client)
     {
         case VSHSpecial_Bunny:
         {
-            SaxtonWeapon = SpawnWeapon(client, "tf_weapon_bottle", 1, 100, 5, "68 ; 2.0 ; 2 ; 3.0 ; 259 ; 1.0 ; 326 ; 1.3 ; 252 ; 0.6");
+            SaxtonWeapon = SpawnWeapon(client, "tf_weapon_bottle", 1, 100, TFQual_Unusual, "68 ; 2.0 ; 2 ; 3.0 ; 259 ; 1.0 ; 326 ; 1.3 ; 252 ; 0.6");
         }
         case VSHSpecial_Vagineer:
         {
-            SaxtonWeapon = SpawnWeapon(client, "tf_weapon_wrench", 197, 100, 5, "68 ; 2.0 ; 2 ; 3.1 ; 259 ; 1.0 ; 436 ; 1.0");
-            SetEntPropFloat(SaxtonWeapon, Prop_Send, "m_flModelScale", 0.0001);
+            SaxtonWeapon = SpawnWeapon(client, "tf_weapon_wrench", 7, 100, TFQual_Unusual, "68 ; 2.0 ; 2 ; 3.1 ; 259 ; 1.0 ; 436 ; 1.0");
         }
         case VSHSpecial_HHH:
         {
-            SaxtonWeapon = SpawnWeapon(client, "tf_weapon_sword", 266, 100, 5, "68 ; 2.0 ; 2 ; 3.1 ; 259 ; 1.0 ; 252 ; 0.6 ; 551 ; 1");
+            SaxtonWeapon = SpawnWeapon(client, "tf_weapon_sword", 266, 100, TFQual_Unusual, "68 ; 2.0 ; 2 ; 3.1 ; 259 ; 1.0 ; 252 ; 0.6 ; 551 ; 1");
             SetEntPropFloat(SaxtonWeapon, Prop_Send, "m_flModelScale", 0.0001);
             HaleCharge = -1000;
         }
         case VSHSpecial_CBS:
         {
-            SaxtonWeapon = SpawnWeapon(client, "tf_weapon_club", 171, 100, 5, "68 ; 2.0 ; 2 ; 3.1 ; 259 ; 1.0");
+            SaxtonWeapon = SpawnWeapon(client, "tf_weapon_club", 171, 100, TFQual_Unusual, "68 ; 2.0 ; 2 ; 3.1 ; 259 ; 1.0");
             //SetEntProp(client, Prop_Send, "m_nBody", 0);
         }
         default:
         {
             decl String:attribs[64];
             Format(attribs, sizeof(attribs), "68 ; 2.0 ; 2 ; 3.1 ; 259 ; 1.0 ; 252 ; 0.6 ; 551 ; %i ; 214 ; %d", !IsDate(Month_Oct, 15), GetRandomInt(9999, 99999));
-            SaxtonWeapon = SpawnWeapon(client, "tf_weapon_shovel", 5, 100, 4, attribs);
+            SaxtonWeapon = SpawnWeapon(client, "tf_weapon_shovel", 5, 100, TFQual_Strange, attribs);
         }
     }
 
@@ -4817,7 +4860,7 @@ public Action:event_player_death(Handle:event, const String:name[], bool:dontBro
                         case 2: clubindex = 232;
                         case 3: clubindex = 401;
                     }
-                    weapon = SpawnWeapon(Hale, "tf_weapon_club", clubindex, 100, 5, "68 ; 2.0 ; 2 ; 3.1 ; 259 ; 1.0");
+                    weapon = SpawnWeapon(Hale, "tf_weapon_club", clubindex, 100, TFQual_Unusual, "68 ; 2.0 ; 2 ; 3.1 ; 259 ; 1.0");
                     SetEntPropEnt(Hale, Prop_Send, "m_hActiveWeapon", weapon); // Technically might be pointless, as SpawnWeapon already calls EquipPlayerWeapon
                 }
             }
@@ -6431,6 +6474,11 @@ FindVersionData(Handle:panel, versionindex)
 {
     switch (versionindex) // DrawPanelText(panel, "1) .");
     {
+        case 75: // 1.55
+        {
+            DrawPanelText(panel, "1) Updated Saxton Hale's model to an HD version made by thePFA");
+            DrawPanelText(panel, "2) Vagineer can be properly headshotted now!");
+        }
         case 74: // 1.54
         {
             DrawPanelText(panel, "1) Soldier shotgun: 40% reduced self blast damage.");

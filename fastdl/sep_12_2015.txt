@@ -1,0 +1,7 @@
+--- Jan 1, 2015 ---
+Added HHH's theme
+
+--- Sep 12, 2015 ---
+Removed HHH's theme from download - it's part of TF2 again.
+Updated Vagineer model - now has a headshot hitbox.
+Updated Saxton Hale's model to a higher definition model.
