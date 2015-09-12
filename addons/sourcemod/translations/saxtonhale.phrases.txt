@@ -240,7 +240,7 @@
 	}
 	"vsh_help_eggineer"
 	{
-		"en"	"The Frontier Justice gains crits only while your sentry is targeting Hale.\nThe Pomson, Rescue Ranger and all pistols are critboosted.\nShort Circuit is replaced with the Wrangler.\nThe Eureka Effect is disabled by default for now."
+		"en"	"All ammo packs are replaced with small ones.\nThe Frontier Justice gains crits only while your sentry is targeting Hale.\nThe Pomson, Rescue Ranger and all pistols are critboosted.\nShort Circuit is replaced with the Wrangler.\nThe Eureka Effect is disabled by default for now."
 	}
 	"vsh_help_medic"
 	{
