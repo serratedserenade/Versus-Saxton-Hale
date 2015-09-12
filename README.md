@@ -11,9 +11,9 @@ The precursor to [FF2](https://github.com/50DKP/FF2-Official).
 Copy the `addons` folder to the server's `tf/` folder.  
 The `scripting` folder within is entirely unnecessary unless you are a modder or want to disable the easter boss.  
 
-###For people updating to 1.54
+###For people updating to the latest version
 Make sure you are updated to Sourcemod 1.6.3 or greater. v1.50+ is now incompatible with older versions.  
-Generally, with Team Fortress 2, Valve updates say you almost always have to use the latest SM snapshots anyway.  
+Generally, with Team Fortress 2, Valve updates say you almost always have to use the latest [SM snapshots](http://www.sourcemod.net/snapshots.php) anyway.  
 
 Also be sure to install [TF2Attributes](https://forums.alliedmods.net/showthread.php?t=210221).
 
@@ -26,6 +26,8 @@ The folders necessary to be updated or checked are:
 * `plugins/`
 * `translations/`
 * `configs/saxton_hale/saxton_spawn_teleport.cfg`
+* `tf/models/player/` - Added new Saxton Hale and Vagineer models.
+* `tf/materials/models/player/` - Added new materials for the new Saxton Hale model.
 
 configs/, scripting/, don't require updating.
 
