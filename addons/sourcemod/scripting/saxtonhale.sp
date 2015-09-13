@@ -2814,9 +2814,13 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
 
     switch (iItemDefinitionIndex)
     {
-        case 39, 351, 1081, 740: // Megadetonator
+        case 39, 351, 1081: // Mega Detonator
         {
-            hItemOverride = PrepareItemHandle(hItem, _, _, "25 ; 0.5 ; 207 ; 1.33 ; 144 ; 1.0 ; 58 ; 3.2", true);
+            hItemOverride = PrepareItemHandle(hItem, _, _, "551 ; 1 ; 25 ; 0.5 ; 207 ; 1.33 ; 144 ; 1 ; 58 ; 3.2", true);
+        }
+        case 740: // Mega Scorch shot
+        {
+            hItemOverride = PrepareItemHandle(hItem, _, _, "551 ; 1 ; 25 ; 0.5 ; 207 ; 1.33 ; 416 ; 3 ; 58 ; 2.08 ; 1 ; 0.65", true);
         }
         case 40, 1146: // Backburner
         {
@@ -6478,6 +6482,7 @@ FindVersionData(Handle:panel, versionindex)
         {
             DrawPanelText(panel, "1) Updated Saxton Hale's model to an HD version made by thePFA");
             DrawPanelText(panel, "2) Vagineer can be properly headshotted now!");
+            DrawPanelText(panel, "3) Scorch Shot's Mega Detonator gets Scorch Shot attributes instead of Detonation.");
         }
         case 74: // 1.54
         {
@@ -6503,7 +6508,6 @@ FindVersionData(Handle:panel, versionindex)
         case 71: // 1.53
         { 
             DrawPanelText(panel, "1) Undid 1.7 syntax. (Chdata)");
-            //DrawPanelText(panel, "2) Integrated RTD and Goomba overrides. (WildCard65)");    // I'll redo this one later - Chdata
             DrawPanelText(panel, "2) Shahanshah: 1.66x dmg if <50% hp, 0.5x dmg if >50% hp.");
             DrawPanelText(panel, "3) Big Earner provides 3 second speed boost on stab.");
             DrawPanelText(panel, "4) Shortstop provides passive effects even when not active.");
