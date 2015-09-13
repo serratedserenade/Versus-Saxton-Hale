@@ -224,7 +224,7 @@
 	}
 	"vsh_help_soldier"
 	{
-		"The Battalion's Backup will fill to 100pct on taking a hit from Hale. Its buff causes nearby teammates to take very little damage.\nThe Half-Zatoichi heals 35HP on hit and can overheal to +25. Honorbound is removed on hit.\nBoot weapons lessen fall damage by 90pct.\nAll shotguns minicrit midair bosses, and reduce self rocket jump damage by 40pct.\nDirect Hit crits where it would minicrit.\nReserve Shooter has faster weapon switch and slight damage buff.\nMantreads increase rocket jump velocity and deal 1024 stomp damage.\nAirstrike gains an extra clip every 200 damage dealt to Hale.\nMarket Gardens deal near backstab damage."
+		"en"    "The Battalion's Backup will fill to 100pct on taking a hit from Hale. Its buff causes nearby teammates to take very little damage.\nThe Half-Zatoichi heals 35HP on hit and can overheal to +25. Honorbound is removed on hit.\nBoot weapons lessen fall damage by 90pct.\nAll shotguns minicrit midair bosses, and reduce self rocket jump damage by 40pct.\nDirect Hit crits where it would minicrit.\nReserve Shooter has faster weapon switch and slight damage buff.\nMantreads increase rocket jump velocity and deal 1024 stomp damage.\nAirstrike gains an extra clip every 200 damage dealt to Hale.\nMarket Gardens deal near backstab damage."
 	}
 	"vsh_help_pyro"
 	{
