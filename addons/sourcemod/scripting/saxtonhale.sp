@@ -3297,25 +3297,29 @@ public Action:Timer_Lazor(Handle:hTimer, any:medigunid)
     {
         new client = GetEntPropEnt(medigun, Prop_Send, "m_hOwnerEntity");
         new Float:charge = GetEntPropFloat(medigun, Prop_Send, "m_flChargeLevel");
-        if (IsValidClient(client) && IsPlayerAlive(client) && GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon") == medigun) // IsValidClient(client, false)
+        if (IsValidClient(client)) // IsValidClient(client, false)
         {
-            new target = GetHealingTarget(client);
-            if (charge > 0.05)
+            if (IsPlayerAlive(client) && GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon") == medigun)
             {
-                TF2_AddCondition(client, TFCond_HalloweenCritCandy, 0.5);
-                if (IsValidClient(target) && IsPlayerAlive(target)) // IsValidClient(target, false)
+                new target = GetHealingTarget(client);
+                if (charge > 0.05)
                 {
-                    TF2_AddCondition(target, TFCond_HalloweenCritCandy, 0.5);
-                    uberTarget[client] = target;
+                    TF2_AddCondition(client, TFCond_HalloweenCritCandy, 0.5);
+                    if (IsValidClient(target) && IsPlayerAlive(target)) // IsValidClient(target, false)
+                    {
+                        TF2_AddCondition(target, TFCond_HalloweenCritCandy, 0.5);
+                        uberTarget[client] = target;
+                    }
+                    else uberTarget[client] = -1;
                 }
-                else uberTarget[client] = -1;
             }
-        }
-        if (charge <= 0.05)
-        {
-            CreateTimer(3.0, Timer_Lazor2, EntIndexToEntRef(medigun));
-            VSHFlags[client] &= ~VSHFLAG_UBERREADY;
-            return Plugin_Stop;
+            
+            if (charge <= 0.05)
+            {
+                CreateTimer(3.0, Timer_Lazor2, EntIndexToEntRef(medigun));
+                VSHFlags[client] &= ~VSHFLAG_UBERREADY;
+                return Plugin_Stop;
+            }
         }
     }
     else
