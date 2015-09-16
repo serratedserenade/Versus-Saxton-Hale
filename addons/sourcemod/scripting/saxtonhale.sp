@@ -4167,7 +4167,7 @@ public Action:HaleTimer(Handle:hTimer)
                         CreateTimer(bEnableSuperDuperJump ? 4.0:2.0, HHHTeleTimer, _, TIMER_FLAG_NO_MAPCHANGE);
                     }
 
-                    SetEntPropFloat(Hale, Prop_Send, "e_flNextAttack", GetGameTime() + (bEnableSuperDuperJump ? 4.0 : 2.0));
+                    SetEntPropFloat(Hale, Prop_Send, "m_flNextAttack", GetGameTime() + (bEnableSuperDuperJump ? 4.0 : 2.0));
                     SetEntProp(Hale, Prop_Send, "m_bGlowEnabled", 0);
                     GlowTimer = 0.0;
 
