@@ -3925,16 +3925,16 @@ public Action:ClientTimer(Handle:hTimer)
             {
                 /*case :
                 {
-                        addthecrit = true;
+                    addthecrit = true;
                 }*/
                 case 656: //Holiday Punch
                 {
                     addthecrit = true;
                     cond = TFCond_Buffed;
                 }
-                }
+            }
             if (validwep && weapon == GetPlayerWeaponSlot(client, TFWeaponSlot_Primary)) // Primary weapon crit list
-                {
+            {
                 if (strncmp(wepclassname, "tf_weapon_comp", 14, false) == 0 || // Sniper bows
                    strncmp(wepclassname, "tf_weapon_cros", 14, false) == 0 || // Medic crossbows
                    strncmp(wepclassname, "tf_weapon_shotgun_buil", 22, false) == 0 || // Engineer Rescue Ranger
@@ -3955,7 +3955,7 @@ public Action:ClientTimer(Handle:hTimer)
                     new flindex = GetIndexOfWeaponSlot(client, TFWeaponSlot_Primary);
 
                     if ((TF2_GetPlayerClass(client) == TFClass_Pyro && flindex == 594) || (IsValidEntity(FindPlayerBack(client, { 642 }, 1)))) // No crits if using Phlogistinator or Cozy Camper
-                addthecrit = false;
+                        addthecrit = false;
                     else
                         addthecrit = true;
                 }
