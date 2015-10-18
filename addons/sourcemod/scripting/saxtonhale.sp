@@ -3921,34 +3921,44 @@ public Action:ClientTimer(Handle:hTimer)
                 if (strcmp(wepclassname, "tf_weapon_knife", false) != 0 && index != 416)
                     addthecrit = true;
             }
-            switch (index)
+            switch (index) //Specific (mini)critlist
             {
-                case 305, 1079, 1081, 56, 16, 203,
-                     1149, 15001, 15022, 15032, 15037, 15058, // SMG
-                     58, 1083, 1105, 1100, 1005, 1092, 812, 833, 997, 39, 351, 740, 588, 595, 751: //Critlist
+                /*case :
                 {
-                    new flindex = GetIndexOfWeaponSlot(client, TFWeaponSlot_Primary);
-
-                    if (TF2_GetPlayerClass(client) == TFClass_Pyro && flindex == 594) // No crits if using phlog
-                        addthecrit = false;
-                    else
                         addthecrit = true;
-                }
-                case 22, 23, 160, 209, 294, 449, 773,          // Scout pistol minicrits - Engie crits
-                     15013, 15018, 15035, 15041, 15046, 15056: // Gunmettle
-                {
-                    addthecrit = true;
-                    if (class == TFClass_Scout && cond == TFCond_HalloweenCritCandy) cond = TFCond_Buffed;
-                }
-                case 656:
+                }*/
+                case 656: //Holiday Punch
                 {
                     addthecrit = true;
                     cond = TFCond_Buffed;
                 }
+                }
+            if (validwep && weapon == GetPlayerWeaponSlot(client, TFWeaponSlot_Primary)) // Primary weapon crit list
+                {
+                if (strncmp(wepclassname, "tf_weapon_comp", 14, false) == 0 || // Sniper bows
+                   strncmp(wepclassname, "tf_weapon_cros", 14, false) == 0 || // Medic crossbows
+                   strncmp(wepclassname, "tf_weapon_shotgun_buil", 22, false) == 0 || // Engineer Rescue Ranger
+                   strncmp(wepclassname, "tf_weapon_drg_pom", 17, false) == 0) // Engineer Pomson
+                    addthecrit = true;
             }
-            if (index == 16 && addthecrit && IsValidEntity(FindPlayerBack(client, { 642 }, 1)))
+            if (validwep && weapon == GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary)) // Secondary weapon crit list
             {
+                if (strncmp(wepclassname, "tf_weapon_pis", 13, false) == 0 || // Engineer/Scout pistols
+                   strncmp(wepclassname, "tf_weapon_han", 13, false) == 0 || // Scout pistols
+                   strncmp(wepclassname, "tf_weapon_flar", 14, false) == 0 || // Flare guns
+                   strncmp(wepclassname, "tf_weapon_smg", 13, false) == 0 || // Sniper SMGs
+                   strncmp(wepclassname, "tf_weapon_jar", 13, false) == 0 || // Throwables (Jarate, Mad Milk)
+                   strncmp(wepclassname, "tf_weapon_clea", 14, false) == 0) // Throwables (Flying Guillotine)
+                {
+                    if (class == TFClass_Scout && cond == TFCond_HalloweenCritCandy) cond = TFCond_Buffed;
+
+                    new flindex = GetIndexOfWeaponSlot(client, TFWeaponSlot_Primary);
+
+                    if ((TF2_GetPlayerClass(client) == TFClass_Pyro && flindex == 594) || (IsValidEntity(FindPlayerBack(client, { 642 }, 1)))) // No crits if using Phlogistinator or Cozy Camper
                 addthecrit = false;
+                    else
+                        addthecrit = true;
+                }
             }
             if (class == TFClass_DemoMan && !IsValidEntity(GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary)))
             {
