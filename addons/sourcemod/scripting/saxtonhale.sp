@@ -187,9 +187,9 @@ static const String:HaleMatsV2[][] = {
     "materials/models/player/saxton_test4/halehead.vtf",
     "materials/models/player/saxton_test4/haleheadexponent.vtf",
     "materials/models/player/saxton_test4/halenormal.vtf",
-    "materials/models/player/saxton_test4/halephongmask.vtf",
-    "materials/models/player/saxton_test4/haleGibs.vmt",
-    "materials/models/player/saxton_test4/halegibs.vtf"
+    "materials/models/player/saxton_test4/halephongmask.vtf"
+    //"materials/models/player/saxton_test4/halegibs.vmt",
+    //"materials/models/player/saxton_test4/halegibs.vtf"
 };
 
 // SFX
