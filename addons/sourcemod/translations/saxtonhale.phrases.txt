@@ -220,15 +220,15 @@
 	}
 	"vsh_help_scout"
 	{
-		"en"	"The Crit-a-Cola grants criticals instead of minicrits.\nThe Fan O' War removes 5pct rage on hit.\nPistols gain minicrits.\nCleaver gains crits.\nCandycane drops a mini health pack on hit.\nSoda Popper and BFB are replaced with Scatterguns, Bonk! is replaced with Crit-a-Cola.\nWrap Assassin has 2 ornaments."
+		"en"	"The Crit-a-Cola grants criticals instead of minicrits.\nThe Fan O' War removes 5%% rage on hit.\nPistols gain minicrits.\nCleaver gains crits.\nCandycane drops a mini health pack on hit.\nSoda Popper and BFB are replaced with Scatterguns, Bonk! is replaced with Crit-a-Cola.\nWrap Assassin has 2 ornaments."
 	}
 	"vsh_help_soldier"
 	{
-		"en"    "The Battalion's Backup will fill to 100pct on taking a hit from boss.\nThe Half-Zatoichi heals 35HP on hit and can overheal to +25. Honorbound is removed on hit.\nBoot weapons lessen fall damage by 90pct.\nAll shotguns minicrit midair bosses, and reduce self rocket jump damage by 40pct.\nDirect Hit crits instead of minicrit.\nMantreads boost rocket jumps and deal 1024 stomp damage.\nAirstrike gains an extra clip every 200 damage dealt to Hale.\nMarket Gardens deal massive damage."
+		"en"    "The Battalion's Backup will fill to 100%% on taking a hit from boss.\nThe Half-Zatoichi heals 35HP on hit and can overheal to +25. Honorbound is removed on hit.\nBoot weapons lessen fall damage by 90%%.\nAll shotguns minicrit midair bosses, and reduce self rocket jump damage by 40%%.\nDirect Hit crits instead of minicrit.\nMantreads boost rocket jumps and deal 1024 stomp damage.\nAirstrike gains an extra clip every 200 damage dealt to Hale.\nMarket Gardens deal massive damage."
 	}
 	"vsh_help_pyro"
 	{
-		"en"	"The Axtinguisher acts like the Fire Axe.\nFlare Gun, Detonator, and Scorch Shot are replaced by the MegaDetonator.\nAirblasting the boss builds rage and lengthens the Vagineer's uber.\nThird Degree gains 10pct uber for medics on hit.\nPhlog is invincible during activation, and has a 75pct defence buff during Crit Mmmph,\nbut disables flare crits at all times, and has a 50pct damage penalty when Mmmph isn't active."
+		"en"	"The Axtinguisher acts like the Fire Axe.\nFlare Gun, Detonator, and Scorch Shot are replaced by the MegaDetonator.\nAirblasting the boss builds rage and lengthens the Vagineer's uber.\nThird Degree gains 10%% uber for medics on hit.\nPhlog is invincible during activation, and has a 75%% defence buff during Crit Mmmph,\nbut disables flare crits at all times, and has a 50%% damage penalty when Mmmph isn't active."
 	}
 	"vsh_help_demo"
 	{
@@ -244,15 +244,15 @@
 	}
 	"vsh_help_medic"
 	{
-		"en"	"All Mediguns are identical: +25pct Ubercharge rate, +25pct Faster weapon switch, follow heal target like the Quickfix.\nUbercharge: Kritz+Uber+Quickfix. Charge starts at 41pct at the start of the round, then 31pct after each activation.\nCharge is increased to 150pct after activation.\nSyringe Guns: on hit: +5pct to ubercharge, Overdose speed effect.\nCrossbow: critboosted, 1.45x damage, +15pct uber on hit."
+		"en"	"All Mediguns are identical: +25%% Ubercharge rate, +25%% Faster weapon switch, follow heal target like the Quickfix.\nUbercharge: Kritz+Uber+Quickfix. Charge starts at 41%% at the start of the round, then 31%% after each activation.\nCharge is increased to 150%% after activation.\nSyringe Guns: on hit: +5%% to ubercharge, Overdose speed effect.\nCrossbow: critboosted, 1.45x damage, +15%% uber on hit."
 	}
 	"vsh_help_sniper"
 	{
-		"en"	"Jarate removes 8pct rage.\nAll SMGs are critboosted.\nRazorback is replaced with SMG.\nAll rifles deal 3x damage on non-crits.\nSniper Rifle causes the boss to glow. Glow time scales with charge.\nHitman's Heatmaker gains focus based on damage dealt.\nSydney Sleeper doesn't apply jarate to the boss, but adds only half its damage to the boss's rage meter.\nBazaar Bargain is disabled.\nAll sniper melees climbs walls, but blocks healing while in use.\nCozy Camper grants a bonus SMG that deals -15pct damage, 1.5s bleed on hit and is not critboosted."
+		"en"	"Jarate removes 8%% rage.\nSMGs have crits.\nRazorback is replaced with SMG.\nAll rifles do 3x dmg bodyshots.\nSniper Rifle causes the boss to glow. Glow time scales with charge.\nHitman's Heatmaker gains focus from dmg dealt.\nSydney Sleeper doesn't apply jarate to the boss, but adds only half its dmg to the boss's rage meter.\nBazaar Bargain is disabled.\nAll sniper melees climbs walls, but block healing while in use.\nCozy Camper has an SMG that deals -15%% damage, 1.5s bleed on hit and has no crits."
 	}
 	"vsh_help_spie"
 	{
-		"en"	"Backstab does great damage vs the boss.\nCloaknDagger replaced with normal watch.\nAll revolvers minicrit.\nYour Eternal Reward has silent decloak and no disguises.\nKunai backstabs give +180hp, up to a max of 270, but start you with 65hp.\nAmbassador headshots do 2.5x damage.\nBig Earner gains full cloak on backstab and a 3s speed boost.\nDiamondback gains 2 revenge crits on backstab that do 2x damage.\nSpeed buff on cloak has been removed.\nAll spy watches reduce damage by 90pct.\nDeadringer reduces melee and arrow damage to 62, but not mantread stomps.\nNormal watch reduces to 85."
+		"en"	"Backstabs do great dmg.\nCloaknDagger is blocked.\nRevolvers minicrit.\nYER has silent decloak and no disguises.\nKunai backstabs give +180hp, up to 270. Spawn with 65hp.\nAmbassador headshots do 255 damage.\nBig Earner backstab gains full cloak + 3s speed boost.\nDiamondback backstab gains 2 revenge crits for 200dmg each.\nCloak doesn't speed buff.\nCloaks reduce dmg by 90%%.\nDeadringer reduces melee and arrow damage to 62, but not mantread stomps.\nNormal watch reduces to 85."
 	}
 	"vsh_help_melee"
 	{
