@@ -6079,7 +6079,7 @@ SickleClimbWalls(client, weapon)     //Credit to Mecha the Slag
 
     TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, fVelocity);
 
-    SDKHooks_TakeDamage(client, client, client, 15.0, DMG_CLUB, GetPlayerWeaponSlot(client, TFWeaponSlot_Melee));
+    SDKHooks_TakeDamage(client, client, client, 15.0, DMG_CLUB, 0);
 
     if (client != Hale)
     {
