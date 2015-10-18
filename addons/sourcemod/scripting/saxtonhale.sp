@@ -2928,7 +2928,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
                 }
                 else
                 {
-                    hItemOverride = PrepareItemHandle(hItem, _, _, "265 ; 99999.0 ; 488 ; 1", (iItemDefinitionIndex == 237)); // Rocket jumper
+                    hItemOverride = PrepareItemHandle(hItem, _, _, "265 ; 99999.0", (iItemDefinitionIndex == 237)); // Rocket jumper
                 }
             }
         }
