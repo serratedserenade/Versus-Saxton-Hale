@@ -224,11 +224,11 @@
 	}
 	"vsh_help_soldier"
 	{
-		"en"    "The Battalion's Backup will fill to 100pct on taking a hit from Hale. Its buff causes nearby teammates to take very little damage.\nThe Half-Zatoichi heals 35HP on hit and can overheal to +25. Honorbound is removed on hit.\nBoot weapons lessen fall damage by 90pct.\nAll shotguns minicrit midair bosses, and reduce self rocket jump damage by 40pct.\nDirect Hit crits where it would minicrit.\nReserve Shooter has faster weapon switch and slight damage buff.\nMantreads increase rocket jump velocity and deal 1024 stomp damage.\nAirstrike gains an extra clip every 200 damage dealt to Hale.\nMarket Gardens deal near backstab damage."
+		"en"    "The Battalion's Backup will fill to 100pct on taking a hit from boss.\nThe Half-Zatoichi heals 35HP on hit and can overheal to +25. Honorbound is removed on hit.\nBoot weapons lessen fall damage by 90pct.\nAll shotguns minicrit midair bosses, and reduce self rocket jump damage by 40pct.\nDirect Hit crits instead of minicrit.\nMantreads boost rocket jumps and deal 1024 stomp damage.\nAirstrike gains an extra clip every 200 damage dealt to Hale.\nMarket Gardens deal massive damage."
 	}
 	"vsh_help_pyro"
 	{
-		"en"	"The Axtinguisher acts like the Fire Axe.\nThe Flare Gun, Detonator, and Scorch Shot are replaced by the MegaDetonator, all Flare guns are critboosted.\nAirblasting the boss builds rage and lengthens the Vagineer's uber.\nThird Degree gains 10pct uber for healers on hit.\nPhlog will grant invulnerability while activating Mmmph, and has a defence buff during Crit Mmmph,\nbut disables flare crits at all time, and has a 50pct damage penalty when Mmmph isn't active."
+		"en"	"The Axtinguisher acts like the Fire Axe.\nFlare Gun, Detonator, and Scorch Shot are replaced by the MegaDetonator.\nAirblasting the boss builds rage and lengthens the Vagineer's uber.\nThird Degree gains 10pct uber for medics on hit.\nPhlog is invincible during activation, and has a 75pct defence buff during Crit Mmmph,\nbut disables flare crits at all times, and has a 50pct damage penalty when Mmmph isn't active."
 	}
 	"vsh_help_demo"
 	{
