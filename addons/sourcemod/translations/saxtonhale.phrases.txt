@@ -236,7 +236,7 @@
 	}
 	"vsh_help_heavy"
 	{
-		"en"	"Natascha, the KGB, and the Fists of Steel are replaced with the\nMinigun, Gloves of Running, and Fists, respectively.\nThe Gloves of Running are quite quick but cause you to lose more health.\nThe Holiday Punch will remove any stun on you if you hit Hale while stunned, they are only minicrit boosted.."
+		"en"	"Natascha, the KGB, and the Fists of Steel are replaced with the\nMinigun, Gloves of Running, and Fists, respectively.\nThe Gloves of Running are quite quick but cause you to lose more health.\nThe Holiday Punch will remove any stun on you if you hit Hale while stunned, they are only minicrit boosted."
 	}
 	"vsh_help_eggineer"
 	{
