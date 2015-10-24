@@ -9,7 +9,7 @@
     
     New plugin thread on AlliedMods: https://forums.alliedmods.net/showthread.php?p=2167912
 */
-#define PLUGIN_VERSION "1.55"
+#define PLUGIN_VERSION "1.55s"
 #pragma semicolon 1
 #include <tf2_stocks>
 #include <tf2items>
@@ -551,6 +551,7 @@ static const String:haleversiondates[][] =
     "10 Sep 2015",
     "10 Sep 2015",
     "12 Sep 2015"  // 1.55 update
+    "25 Oct 2015"  // 1.55s update
 };
 static const maxversion = (sizeof(haleversiontitles) - 1);
 new Handle:OnHaleJump;
@@ -575,8 +576,8 @@ new Handle:OnGetRoundState;*/
 //new bool:ACH_Enabled;
 public Plugin:myinfo = {
     name = "Versus Saxton Hale",
-    author = "Rainbolt Dash, FlaminSarge, Chdata, nergal, fiagram",
-    description = "RUUUUNN!! COWAAAARRDSS!",
+    author = "Rainbolt Dash, FlaminSarge, Chdata, nergal, fiagram, Starblaster64",
+    description = "The 's' stands for Star!",
     version = PLUGIN_VERSION,
     url = "https://forums.alliedmods.net/showthread.php?p=2167912",
 };
@@ -1381,7 +1382,7 @@ public Action:Timer_Announce(Handle:hTimer)
             }
             case 3:
             {
-                CPrintToChatAll("{default}VSH v%s by {olive}Rainbolt Dash{default}, {olive}FlaminSarge{default}, & {lightsteelblue}Chdata{default}.", haleversiontitles[maxversion]);
+                CPrintToChatAll("{default}VSH v%s by {olive}Rainbolt Dash{default}, {olive}FlaminSarge{default}, {lightsteelblue}Chdata{default}, & {yellow}Starblaster64{default}.", haleversiontitles[maxversion]);
             }
             case 5:
             {
@@ -6504,6 +6505,16 @@ FindVersionData(Handle:panel, versionindex)
 {
     switch (versionindex) // DrawPanelText(panel, "1) .");
     {
+        case 76: //1.55s
+        {
+            DrawPanelText(panel, "1) All Mediguns now start with 15% Uber instead of 41%.");
+            DrawPanelText(panel, "2) All Mediguns will no longer receive any bonus Ubercharge after an Uber has faded.");
+            DrawPanelText(panel, "3) All Mediguns except Kritzkrieg have +81% Ubercharge rate.");
+            DrawPanelText(panel, "4) Kritzkrieg is now functionally different from other Mediguns:");
+            DrawPanelText(panel, "--) +126% Ubercharge rate");
+            DrawPanelText(panel, "--) Heal target is granted mini-crits (except for Wrangler Engineers)");
+            DrawPanelText(panel, "--) Uber is ONLY 100% crit chance");
+        }
         case 75: // 1.55
         {
             DrawPanelText(panel, "1) Updated Saxton Hale's model to an HD version made by thePFA");
