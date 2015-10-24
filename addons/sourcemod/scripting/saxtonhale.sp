@@ -2942,7 +2942,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
             }
             else
             {
-                hItemOverride = PrepareItemHandle(hItem, _, _, "10 ; 1.81 ; 178 ; 0.75", false); //Kritzkrieg
+                hItemOverride = PrepareItemHandle(hItem, _, _, "10 ; 2.0 ; 178 ; 0.75", false); //Kritzkrieg
             }
         }
 #endif
