@@ -2936,9 +2936,13 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         case TFClass_Medic:
         {
             //Medic mediguns
-            if (StrStarts(classname, "tf_weapon_medigun", false) || GunmettleToIndex(iItemDefinitionIndex) == TFWeapon_Medigun)
+            if ((StrStarts(classname, "tf_weapon_medigun", false) || GunmettleToIndex(iItemDefinitionIndex) == TFWeapon_Medigun) && iItemDefinitionIndex != 35)
             {
                 hItemOverride = PrepareItemHandle(hItem, _, _, "10 ; 1.81 ; 178 ; 0.75 ; 18 ; 0", true);
+            }
+            else
+            {
+                hItemOverride = PrepareItemHandle(hItem, _, _, "10 ; 1.81 ; 178 ; 0.75", false); //Kritzkrieg
             }
         }
 #endif
@@ -3859,6 +3863,11 @@ public Action:ClientTimer(Handle:hTimer)
                     if (IsValidClient(healtarget) && TF2_GetPlayerClass(healtarget) == TFClass_Scout)
                     {
                         TF2_AddCondition(client, TFCond_SpeedBuffAlly, 0.3);
+                    }
+                    if (IsValidClient(healtarget) && TF2_GetPlayerClass(healtarget) != TFClass_Engineer && GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex") == 35)
+                    {
+                        TF2_AddCondition(client, TFCond_Buffed, 0.3);
+                        TF2_AddCondition(healtarget, TFCond_Buffed, 0.3);
                     }
                 }
             }
