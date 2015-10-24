@@ -537,7 +537,8 @@ static const String:haleversiontitles[][] =     //the last line of this is what 
     "1.53",
     "1.54",
     "1.54",
-    "1.54"
+    "1.54",
+    "1.55"
     ,PLUGIN_VERSION
 };
 static const String:haleversiondates[][] =
