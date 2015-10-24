@@ -2938,7 +2938,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
             //Medic mediguns
             if (StrStarts(classname, "tf_weapon_medigun", false) || GunmettleToIndex(iItemDefinitionIndex) == TFWeapon_Medigun)
             {
-                hItemOverride = PrepareItemHandle(hItem, _, _, "10 ; 1.25 ; 178 ; 0.75 ; 18 ; 0", true);
+                hItemOverride = PrepareItemHandle(hItem, _, _, "10 ; 1.81 ; 178 ; 0.75 ; 18 ; 0", true);
             }
         }
 #endif
@@ -3175,20 +3175,20 @@ public Action:MakeNoHale(Handle:hTimer, any:clientid)
     {
         weapon = GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary);
 #if defined OVERRIDE_MEDIGUNS_ON
-        if (GetEntPropFloat(weapon, Prop_Send, "m_flChargeLevel") < 0.41)
-            SetEntPropFloat(weapon, Prop_Send, "m_flChargeLevel", 0.41);
+        if (GetEntPropFloat(weapon, Prop_Send, "m_flChargeLevel") < 0.15)
+            SetEntPropFloat(weapon, Prop_Send, "m_flChargeLevel", 0.15);
 #else
         new mediquality = (weapon > MaxClients && IsValidEdict(weapon) ? GetEntProp(weapon, Prop_Send, "m_iEntityQuality") : -1);
         if (mediquality != 10)
         {
             TF2_RemoveWeaponSlot(client, TFWeaponSlot_Secondary);
-            weapon = SpawnWeapon(client, "tf_weapon_medigun", 35, 5, 10, "18 ; 0.0 ; 10 ; 1.25 ; 178 ; 0.75");  //200 ; 1 for area of effect healing    // ; 178 ; 0.75 ; 128 ; 1.0 Faster switch-to
+            weapon = SpawnWeapon(client, "tf_weapon_medigun", 35, 5, 10, "18 ; 0.0 ; 10 ; 1.81 ; 178 ; 0.75");  //200 ; 1 for area of effect healing    // ; 178 ; 0.75 ; 128 ; 1.0 Faster switch-to
             if (GetIndexOfWeaponSlot(client, TFWeaponSlot_Melee) == 142)
             {
                 SetEntityRenderMode(weapon, RENDER_TRANSCOLOR);
                 SetEntityRenderColor(weapon, 255, 255, 255, 75); // What is the point of making gunslinger translucent? When will a medic ever even have a gunslinger equipped???  According to FlaminSarge: Randomizer Hale
             }
-            SetEntPropFloat(weapon, Prop_Send, "m_flChargeLevel", 0.41);
+            SetEntPropFloat(weapon, Prop_Send, "m_flChargeLevel", 0.15);
         }
 #endif
     }
@@ -3316,7 +3316,7 @@ public Action:Timer_Lazor(Handle:hTimer, any:medigunid)
             
             if (charge <= 0.05)
             {
-                CreateTimer(3.0, Timer_Lazor2, EntIndexToEntRef(medigun));
+                //CreateTimer(3.0, Timer_Lazor2, EntIndexToEntRef(medigun));
                 VSHFlags[client] &= ~VSHFLAG_UBERREADY;
                 return Plugin_Stop;
             }
@@ -3326,13 +3326,13 @@ public Action:Timer_Lazor(Handle:hTimer, any:medigunid)
         return Plugin_Stop;
     return Plugin_Continue;
 }
-public Action:Timer_Lazor2(Handle:hTimer, any:medigunid)
+/*public Action:Timer_Lazor2(Handle:hTimer, any:medigunid)
 {
     new medigun = EntRefToEntIndex(medigunid);
     if (IsValidEntity(medigun))
         SetEntPropFloat(medigun, Prop_Send, "m_flChargeLevel", GetEntPropFloat(medigun, Prop_Send, "m_flChargeLevel")+0.31);
     return Plugin_Continue;
-}
+}*/
 public Action:Command_GetHPCmd(client, args)
 {
     if (!client) return Plugin_Handled;
