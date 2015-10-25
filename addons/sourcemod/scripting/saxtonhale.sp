@@ -3946,9 +3946,7 @@ public Action:ClientTimer(Handle:hTimer)
                 if (strncmp(wepclassname, "tf_weapon_pis", 13, false) == 0 || // Engineer/Scout pistols
                    strncmp(wepclassname, "tf_weapon_han", 13, false) == 0 || // Scout pistols
                    strncmp(wepclassname, "tf_weapon_flar", 14, false) == 0 || // Flare guns
-                   strncmp(wepclassname, "tf_weapon_smg", 13, false) == 0 || // Sniper SMGs
-                   strncmp(wepclassname, "tf_weapon_jar", 13, false) == 0 || // Throwables (Jarate, Mad Milk)
-                   strncmp(wepclassname, "tf_weapon_clea", 14, false) == 0) // Throwables (Flying Guillotine)
+                   strncmp(wepclassname, "tf_weapon_smg", 13, false) == 0) // Sniper SMGs
                 {
                     if (class == TFClass_Scout && cond == TFCond_HalloweenCritCandy) cond = TFCond_Buffed;
 
@@ -3959,6 +3957,9 @@ public Action:ClientTimer(Handle:hTimer)
                     else
                         addthecrit = true;
                 }
+                if (strncmp(wepclassname, "tf_weapon_jar", 13, false) == 0 || // Throwables (Jarate, Mad Milk)
+                   strncmp(wepclassname, "tf_weapon_clea", 14, false) == 0) // Throwables (Flying Guillotine)
+                    addthecrit = true;
             }
             if (class == TFClass_DemoMan && !IsValidEntity(GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary)))
             {
