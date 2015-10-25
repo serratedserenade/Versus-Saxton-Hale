@@ -551,7 +551,7 @@ static const String:haleversiondates[][] =
     "11 Sep 2015", // This will appear as the final page of the 1.54 updates
     "10 Sep 2015",
     "10 Sep 2015",
-    "12 Sep 2015"  // 1.55 update
+    "12 Sep 2015",  // 1.55 update
     "25 Oct 2015"  // 1.55s update
 };
 static const maxversion = (sizeof(haleversiontitles) - 1);
