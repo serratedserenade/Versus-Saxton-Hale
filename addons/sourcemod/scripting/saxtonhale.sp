@@ -3958,7 +3958,7 @@ public Action:ClientTimer(Handle:hTimer)
                         addthecrit = true;
                 }
                 if (strncmp(wepclassname, "tf_weapon_jar", 13, false) == 0 || // Throwables (Jarate, Mad Milk)
-                    strncmp(wepclassname, "tf_weapon_clea", 14, false) == 0) // Flying Guillotine
+                   strncmp(wepclassname, "tf_weapon_clea", 14, false) == 0) // Flying Guillotine
                     addthecrit = true;
             }
             if (class == TFClass_DemoMan && !IsValidEntity(GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary)))
