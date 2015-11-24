@@ -2938,7 +2938,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
             //Medic mediguns
             if (StrStarts(classname, "tf_weapon_medigun", false) || GunmettleToIndex(iItemDefinitionIndex) == TFWeapon_Medigun)
             {
-                hItemOverride = PrepareItemHandle(hItem, _, _, "10 ; 1.25 ; 178 ; 0.75 ; 18 ; 0", true);
+                hItemOverride = PrepareItemHandle(hItem, _, _, "10 ; 1.25 ; 178 ; 0.75 ; 18 ; 0 ; 314 ; 4.0", true);
             }
         }
 #endif
@@ -3182,7 +3182,7 @@ public Action:MakeNoHale(Handle:hTimer, any:clientid)
         if (mediquality != 10)
         {
             TF2_RemoveWeaponSlot(client, TFWeaponSlot_Secondary);
-            weapon = SpawnWeapon(client, "tf_weapon_medigun", 35, 5, 10, "18 ; 0.0 ; 10 ; 1.25 ; 178 ; 0.75");  //200 ; 1 for area of effect healing    // ; 178 ; 0.75 ; 128 ; 1.0 Faster switch-to
+            weapon = SpawnWeapon(client, "tf_weapon_medigun", 35, 5, 10, "18 ; 0.0 ; 10 ; 1.25 ; 178 ; 0.75 ; 314 ; 4.0");  //200 ; 1 for area of effect healing    // ; 178 ; 0.75 ; 128 ; 1.0 Faster switch-to
             if (GetIndexOfWeaponSlot(client, TFWeaponSlot_Melee) == 142)
             {
                 SetEntityRenderMode(weapon, RENDER_TRANSCOLOR);
@@ -3283,7 +3283,7 @@ public Action:event_uberdeployed(Handle:event, const String:name[], bool:dontBro
                     uberTarget[client] = target;
                 }
                 else uberTarget[client] = -1;
-                SetEntPropFloat(medigun, Prop_Send, "m_flChargeLevel", 1.51);
+                //SetEntPropFloat(medigun, Prop_Send, "m_flChargeLevel", 1.51);
                 CreateTimer(0.4, Timer_Lazor, EntIndexToEntRef(medigun), TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
             }
         }
@@ -5478,7 +5478,7 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                                     {
                                         new Float:uber = GetEntPropFloat(medigun, Prop_Send, "m_flChargeLevel") + (0.1 / healercount);
                                         new Float:max = 1.0;
-                                        if (GetEntProp(medigun, Prop_Send, "m_bChargeRelease")) max = 1.5;
+                                        if (GetEntProp(medigun, Prop_Send, "m_bChargeRelease")) max = 1.0;
                                         if (uber > max) uber = max;
                                         SetEntPropFloat(medigun, Prop_Send, "m_flChargeLevel", uber);
                                     }
