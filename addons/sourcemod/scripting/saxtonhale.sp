@@ -9,7 +9,7 @@
     
     New plugin thread on AlliedMods: https://forums.alliedmods.net/showthread.php?p=2167912
 */
-#define PLUGIN_VERSION "1.55"
+#define PLUGIN_VERSION "1.55b"
 #pragma semicolon 1
 #include <tf2_stocks>
 #include <tf2items>
@@ -522,6 +522,7 @@ static bool:PointReady;
 static tf_arena_use_queue;
 static mp_teams_unbalance_limit;
 static tf_arena_first_blood;
+static tf_spec_xray;
 static mp_forcecamera;
 static Float:tf_scout_hype_pep_max;
 static tf_dropped_weapon_lifetime;
@@ -537,7 +538,8 @@ static const String:haleversiontitles[][] =     //the last line of this is what 
     "1.53",
     "1.54",
     "1.54",
-    "1.54"
+    "1.54",
+    "1.55"
     ,PLUGIN_VERSION
 };
 static const String:haleversiondates[][] =
@@ -550,7 +552,8 @@ static const String:haleversiondates[][] =
     "11 Sep 2015", // This will appear as the final page of the 1.54 updates
     "10 Sep 2015",
     "10 Sep 2015",
-    "12 Sep 2015"  // 1.55 update
+    "12 Sep 2015",  // 1.55 update
+    "24 Nov 2015",  // 1.55b update
 };
 static const maxversion = (sizeof(haleversiontitles) - 1);
 new Handle:OnHaleJump;
@@ -752,6 +755,7 @@ public OnPluginStart()
     HookConVarChange(FindConVar("tf_bot_count"), HideCvarNotify);
     HookConVarChange(FindConVar("tf_arena_use_queue"), HideCvarNotify);
     HookConVarChange(FindConVar("tf_arena_first_blood"), HideCvarNotify);
+    HookConVarChange(FindConVar("tf_spec_xray"), HideCvarNotify);
     HookConVarChange(FindConVar("mp_friendlyfire"), HideCvarNotify);
     HookConVarChange(FindConVar("tf_dropped_weapon_lifetime"), HideCvarNotify);
     HookConVarChange(FindConVar("tf_feign_death_activate_damage_scale"), HideCvarNotify);
@@ -916,6 +920,7 @@ public OnConfigsExecuted()
         tf_arena_use_queue = GetConVarInt(FindConVar("tf_arena_use_queue"));
         mp_teams_unbalance_limit = GetConVarInt(FindConVar("mp_teams_unbalance_limit"));
         tf_arena_first_blood = GetConVarInt(FindConVar("tf_arena_first_blood"));
+        tf_spec_xray = GetConVarInt(FindConVar("tf_spec_xray"));
         mp_forcecamera = GetConVarInt(FindConVar("mp_forcecamera"));
         tf_scout_hype_pep_max = GetConVarFloat(FindConVar("tf_scout_hype_pep_max"));
         tf_dropped_weapon_lifetime = GetConVarInt(FindConVar("tf_dropped_weapon_lifetime"));
@@ -929,6 +934,7 @@ public OnConfigsExecuted()
         SetConVarInt(FindConVar("mp_teams_unbalance_limit"), TF2_GetRoundWinCount() ? 0 : 1); // s_bLateLoad ? 0 : 
         //SetConVarInt(FindConVar("mp_teams_unbalance_limit"), GetConVarBool(cvarFirstRound)?0:1);
         SetConVarInt(FindConVar("tf_arena_first_blood"), 0);
+        SetConVarInt(FindConVar("tf_spec_xray"), 2);
         SetConVarInt(FindConVar("mp_forcecamera"), 0);
         SetConVarFloat(FindConVar("tf_scout_hype_pep_max"), 100.0);
         SetConVarInt(FindConVar("tf_damage_disablespread"), 1);
@@ -991,6 +997,7 @@ public OnMapEnd()
         SetConVarInt(FindConVar("tf_arena_use_queue"), tf_arena_use_queue);
         SetConVarInt(FindConVar("mp_teams_unbalance_limit"), mp_teams_unbalance_limit);
         SetConVarInt(FindConVar("tf_arena_first_blood"), tf_arena_first_blood);
+        SetConVarInt(FindConVar("tf_spec_xray"), tf_spec_xray);
         SetConVarInt(FindConVar("mp_forcecamera"), mp_forcecamera);
         SetConVarFloat(FindConVar("tf_scout_hype_pep_max"), tf_scout_hype_pep_max);
         SetConVarInt(FindConVar("tf_dropped_weapon_lifetime"), tf_dropped_weapon_lifetime);
@@ -2820,7 +2827,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         }
         case 740: // Mega Scorch shot
         {
-            hItemOverride = PrepareItemHandle(hItem, _, _, "551 ; 1 ; 25 ; 0.5 ; 207 ; 1.33 ; 416 ; 3 ; 58 ; 2.08 ; 1 ; 0.65", true);
+            hItemOverride = PrepareItemHandle(hItem, _, _, "551 ; 1 ; 25 ; 0.5 ; 207 ; 1.33 ; 416 ; 3 ; 58 ; 2.08 ; 1 ; 0.65 ; 209 ; 1.0", true);
         }
         case 40, 1146: // Backburner
         {
@@ -6493,7 +6500,17 @@ FindVersionData(Handle:panel, versionindex)
 {
     switch (versionindex) // DrawPanelText(panel, "1) .");
     {
-        case 75: // 1.55
+        case 76: // 1.55b
+        {
+            DrawPanelText(panel, "1) Fixed throwable weapons not being crit boosted.");
+            DrawPanelText(panel, "2) Re-worked Ubercharge to fix Uber ending too early on Medics.");
+            DrawPanelText(panel, "--) Medics are no longer granted 150% Uber on an Ubercharge.");
+            DrawPanelText(panel, "--) Ubercharge meter drains 33% slower. Still lasts 12 seconds as before.");
+            DrawPanelText(panel, "3) 'tf_spec_xray' is set to 2 by default (Spectators can see outlines on all players).");
+            DrawPanelText(panel, "4) Added missing attribute to Scorch Shot (Mini-crits on burning players).");
+            DrawPanelText(panel, "---) Unoffical pre-update of 1.56 by Starblaster64.");
+        }
+		case 75: // 1.55
         {
             DrawPanelText(panel, "1) Updated Saxton Hale's model to an HD version made by thePFA");
             DrawPanelText(panel, "2) Vagineer can be properly headshotted now!");
