@@ -6510,7 +6510,7 @@ FindVersionData(Handle:panel, versionindex)
             DrawPanelText(panel, "4) Added missing attribute to Scorch Shot (Mini-crits on burning players).");
             DrawPanelText(panel, "---) Unoffical pre-update of 1.56 by Starblaster64.");
         }
-		case 75: // 1.55
+        case 75: // 1.55
         {
             DrawPanelText(panel, "1) Updated Saxton Hale's model to an HD version made by thePFA");
             DrawPanelText(panel, "2) Vagineer can be properly headshotted now!");
