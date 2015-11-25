@@ -525,6 +525,7 @@ static tf_arena_first_blood;
 static tf_spec_xray;
 static mp_forcecamera;
 static Float:tf_scout_hype_pep_max;
+static Float:weapon_medigun_chargerelease_rate;
 static tf_dropped_weapon_lifetime;
 static Float:tf_feign_death_activate_damage_scale, Float:tf_feign_death_damage_scale, Float:tf_stealth_damage_reduction, Float:tf_feign_death_duration, Float:tf_feign_death_speed_duration; // Cloak damage fixes
 static defaulttakedamagetype;
@@ -923,6 +924,7 @@ public OnConfigsExecuted()
         tf_spec_xray = GetConVarInt(FindConVar("tf_spec_xray"));
         mp_forcecamera = GetConVarInt(FindConVar("mp_forcecamera"));
         tf_scout_hype_pep_max = GetConVarFloat(FindConVar("tf_scout_hype_pep_max"));
+        weapon_medigun_chargerelease_rate = GetConVarFloat(FindConVar("weapon_medigun_chargerelease_rate"));
         tf_dropped_weapon_lifetime = GetConVarInt(FindConVar("tf_dropped_weapon_lifetime"));
         tf_feign_death_activate_damage_scale = GetConVarFloat(FindConVar("tf_feign_death_activate_damage_scale"));
         tf_feign_death_damage_scale = GetConVarFloat(FindConVar("tf_feign_death_damage_scale"));
@@ -937,6 +939,7 @@ public OnConfigsExecuted()
         SetConVarInt(FindConVar("tf_spec_xray"), 2);
         SetConVarInt(FindConVar("mp_forcecamera"), 0);
         SetConVarFloat(FindConVar("tf_scout_hype_pep_max"), 100.0);
+        SetConVarFloat(FindConVar("weapon_medigun_chargerelease_rate"), 12.0);
         SetConVarInt(FindConVar("tf_damage_disablespread"), 1);
         SetConVarInt(FindConVar("tf_dropped_weapon_lifetime"), 0);
 
@@ -1000,6 +1003,7 @@ public OnMapEnd()
         SetConVarInt(FindConVar("tf_spec_xray"), tf_spec_xray);
         SetConVarInt(FindConVar("mp_forcecamera"), mp_forcecamera);
         SetConVarFloat(FindConVar("tf_scout_hype_pep_max"), tf_scout_hype_pep_max);
+        SetConVarFloat(FindConVar("weapon_medigun_chargerelease_rate"), weapon_medigun_chargerelease_rate);
         SetConVarInt(FindConVar("tf_dropped_weapon_lifetime"), tf_dropped_weapon_lifetime);
 
         SetConVarFloat(FindConVar("tf_feign_death_activate_damage_scale"), tf_feign_death_activate_damage_scale);
@@ -2945,7 +2949,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
             //Medic mediguns
             if (StrStarts(classname, "tf_weapon_medigun", false) || GunmettleToIndex(iItemDefinitionIndex) == TFWeapon_Medigun)
             {
-                hItemOverride = PrepareItemHandle(hItem, _, _, "10 ; 1.25 ; 178 ; 0.75 ; 18 ; 0 ; 314 ; 4.0", true);
+                hItemOverride = PrepareItemHandle(hItem, _, _, "10 ; 1.25 ; 178 ; 0.75 ; 18 ; 0", true);
             }
         }
 #endif
@@ -3189,7 +3193,7 @@ public Action:MakeNoHale(Handle:hTimer, any:clientid)
         if (mediquality != 10)
         {
             TF2_RemoveWeaponSlot(client, TFWeaponSlot_Secondary);
-            weapon = SpawnWeapon(client, "tf_weapon_medigun", 35, 5, 10, "18 ; 0.0 ; 10 ; 1.25 ; 178 ; 0.75 ; 314 ; 4.0");  //200 ; 1 for area of effect healing    // ; 178 ; 0.75 ; 128 ; 1.0 Faster switch-to
+            weapon = SpawnWeapon(client, "tf_weapon_medigun", 35, 5, 10, "18 ; 0.0 ; 10 ; 1.25 ; 178 ; 0.75");  //200 ; 1 for area of effect healing    // ; 178 ; 0.75 ; 128 ; 1.0 Faster switch-to
             if (GetIndexOfWeaponSlot(client, TFWeaponSlot_Melee) == 142)
             {
                 SetEntityRenderMode(weapon, RENDER_TRANSCOLOR);
