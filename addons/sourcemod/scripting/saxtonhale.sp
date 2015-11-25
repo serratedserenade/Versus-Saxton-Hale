@@ -6512,7 +6512,6 @@ FindVersionData(Handle:panel, versionindex)
             DrawPanelText(panel, "--) Ubercharge meter drains 33% slower. Still lasts 12 seconds as before.");
             DrawPanelText(panel, "3) 'tf_spec_xray' is set to 2 by default (Spectators can see outlines on all players).");
             DrawPanelText(panel, "4) Added missing attribute to Scorch Shot (Mini-crits on burning players).");
-            DrawPanelText(panel, "---) Unoffical pre-update of 1.56 by Starblaster64.");
         }
         case 75: // 1.55
         {
