@@ -5480,9 +5480,9 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                                     if (StrEqual(s, "tf_weapon_medigun", false))
                                     {
                                         new Float:uber = GetEntPropFloat(medigun, Prop_Send, "m_flChargeLevel") + (0.1 / healercount);
-                                        new Float:max = 1.0;
-                                        if (GetEntProp(medigun, Prop_Send, "m_bChargeRelease")) max = 1.0;
-                                        if (uber > max) uber = max;
+                                        //new Float:max = 1.0;
+                                        //if (GetEntProp(medigun, Prop_Send, "m_bChargeRelease")) max = 1.0;
+                                        if (uber > 1.0) uber = 1.0;
                                         SetEntPropFloat(medigun, Prop_Send, "m_flChargeLevel", uber);
                                     }
                                 }
