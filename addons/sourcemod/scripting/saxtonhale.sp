@@ -554,7 +554,7 @@ static const String:haleversiondates[][] =
     "10 Sep 2015",
     "10 Sep 2015",
     "12 Sep 2015",  // 1.55 update
-    "24 Nov 2015",  // 1.55b update
+    "24 Nov 2015"  // 1.55b update
 };
 static const maxversion = (sizeof(haleversiontitles) - 1);
 new Handle:OnHaleJump;
