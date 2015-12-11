@@ -2838,10 +2838,10 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         {
             hItemOverride = PrepareItemHandle(hItem, _, _, "155 ; 1 ; 160 ; 1", true);
         }
-        case 232, 401: // Bushwacka + Shahanshah
+        /*case 232, 401: // Bushwacka + Shahanshah
         {
             hItemOverride = PrepareItemHandle(hItem, _, _, "236 ; 1");
-        }
+        }*/
         case 356: // Kunai
         {
             hItemOverride = PrepareItemHandle(hItem, _, _, "125 ; -60");
