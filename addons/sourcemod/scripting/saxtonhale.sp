@@ -2882,7 +2882,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
             }
             else
             {
-                hItemOverride = PrepareItemHandle(hItem, _, _,             "179 ; 1 ; 265 ; 99999.0 ; 178 ; 0.6 ; 3 ; 0.67 ; 551 ; 1 ; 5 ; 1.15", true); //  ; 2 ; 1.1
+                hItemOverride = PrepareItemHandle(hItem, _, _, "179 ; 1 ; 265 ; 99999.0 ; 178 ; 0.6 ; 3 ; 0.67 ; 551 ; 1 ; 5 ; 1.15", true); //  ; 2 ; 1.1
             }
         
         }
