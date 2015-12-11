@@ -3073,12 +3073,12 @@ public Action:MakeNoHale(Handle:hTimer, any:clientid)
                 TF2_RemoveWeaponSlot(client, TFWeaponSlot_Primary);
                 SpawnWeapon(client, "tf_weapon_scattergun", 13, 1, 0, "");
             }
-            case 237:
+            /*case 237:
             {
                 TF2_RemoveWeaponSlot(client, TFWeaponSlot_Primary);
                 SpawnWeapon(client, "tf_weapon_rocketlauncher", 18, 1, 0, "265 ; 99999.0");
                 SetAmmo(client, 0, 20);
-            }
+            }*/
             case 17, 204, 36, 412:
             {
                 if (GetEntProp(weapon, Prop_Send, "m_iEntityQuality") != 10)
