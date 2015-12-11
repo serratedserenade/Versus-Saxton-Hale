@@ -2920,7 +2920,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
             {
                 hItemOverride = PrepareItemHandle(hItem, _, _, "135 ; 0.6 ; 265 ; 99999.0"); // Soldier shotguns get 40% rocket jump dmg reduction     ; 265 ; 99999.0
             }
-            else if (StrStarts(classname, "tf_weapon_rocketlauncher", false)  || (StrStarts(classname, "tf_weapon_particle_cannon", false) || GunmettleToIndex(iItemDefinitionIndex) == TFWeapon_RocketLauncher)
+            else if (StrStarts(classname, "tf_weapon_rocketlauncher", false)  || StrStarts(classname, "tf_weapon_particle_cannon", false) || GunmettleToIndex(iItemDefinitionIndex) == TFWeapon_RocketLauncher)
             {
                 if (iItemDefinitionIndex == 127) // Direct hit
                 {
