@@ -524,7 +524,6 @@ static mp_teams_unbalance_limit;
 static tf_arena_first_blood;
 static mp_forcecamera;
 static Float:tf_scout_hype_pep_max;
-static Float:weapon_medigun_chargerelease_rate;
 static tf_dropped_weapon_lifetime;
 static Float:tf_feign_death_activate_damage_scale, Float:tf_feign_death_damage_scale, Float:tf_stealth_damage_reduction, Float:tf_feign_death_duration, Float:tf_feign_death_speed_duration; // Cloak damage fixes
 static defaulttakedamagetype;
@@ -919,7 +918,6 @@ public OnConfigsExecuted()
         tf_arena_first_blood = GetConVarInt(FindConVar("tf_arena_first_blood"));
         mp_forcecamera = GetConVarInt(FindConVar("mp_forcecamera"));
         tf_scout_hype_pep_max = GetConVarFloat(FindConVar("tf_scout_hype_pep_max"));
-        weapon_medigun_chargerelease_rate = GetConVarFloat(FindConVar("weapon_medigun_chargerelease_rate"));
         tf_dropped_weapon_lifetime = GetConVarInt(FindConVar("tf_dropped_weapon_lifetime"));
         tf_feign_death_activate_damage_scale = GetConVarFloat(FindConVar("tf_feign_death_activate_damage_scale"));
         tf_feign_death_damage_scale = GetConVarFloat(FindConVar("tf_feign_death_damage_scale"));
@@ -933,7 +931,6 @@ public OnConfigsExecuted()
         SetConVarInt(FindConVar("tf_arena_first_blood"), 0);
         SetConVarInt(FindConVar("mp_forcecamera"), 0);
         SetConVarFloat(FindConVar("tf_scout_hype_pep_max"), 100.0);
-        SetConVarFloat(FindConVar("weapon_medigun_chargerelease_rate"), 12.0);
         SetConVarInt(FindConVar("tf_damage_disablespread"), 1);
         SetConVarInt(FindConVar("tf_dropped_weapon_lifetime"), 0);
 
@@ -996,7 +993,6 @@ public OnMapEnd()
         SetConVarInt(FindConVar("tf_arena_first_blood"), tf_arena_first_blood);
         SetConVarInt(FindConVar("mp_forcecamera"), mp_forcecamera);
         SetConVarFloat(FindConVar("tf_scout_hype_pep_max"), tf_scout_hype_pep_max);
-        SetConVarFloat(FindConVar("weapon_medigun_chargerelease_rate"), weapon_medigun_chargerelease_rate);
         SetConVarInt(FindConVar("tf_dropped_weapon_lifetime"), tf_dropped_weapon_lifetime);
 
         SetConVarFloat(FindConVar("tf_feign_death_activate_damage_scale"), tf_feign_death_activate_damage_scale);
@@ -3287,7 +3283,7 @@ public Action:event_uberdeployed(Handle:event, const String:name[], bool:dontBro
                     uberTarget[client] = target;
                 }
                 else uberTarget[client] = -1;
-                //SetEntPropFloat(medigun, Prop_Send, "m_flChargeLevel", 1.51);
+                SetEntPropFloat(medigun, Prop_Send, "m_flChargeLevel", 1.51);
                 CreateTimer(0.4, Timer_Lazor, EntIndexToEntRef(medigun), TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
             }
         }
@@ -3864,6 +3860,10 @@ public Action:ClientTimer(Handle:hTimer)
                     {
                         TF2_AddCondition(client, TFCond_SpeedBuffAlly, 0.3);
                     }
+					if (GetEntProp(medigun, Prop_Send, "m_bChargeRelease") && GetEntPropFloat(medigun, Prop_Send, "m_flChargeLevel") > 0.0)
+					{
+						TF2_AddCondition(client, TFCond_Ubercharged, TFCondDuration_Infinite);
+					}
                 }
             }
 
@@ -5480,9 +5480,9 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                                     if (StrEqual(s, "tf_weapon_medigun", false))
                                     {
                                         new Float:uber = GetEntPropFloat(medigun, Prop_Send, "m_flChargeLevel") + (0.1 / healercount);
-                                        //new Float:max = 1.0;
-                                        //if (GetEntProp(medigun, Prop_Send, "m_bChargeRelease")) max = 1.0;
-                                        if (uber > 1.0) uber = 1.0;
+                                        new Float:max = 1.0;
+                                        if (GetEntProp(medigun, Prop_Send, "m_bChargeRelease")) max = 1.5;
+                                        if (uber > max) uber = max;
                                         SetEntPropFloat(medigun, Prop_Send, "m_flChargeLevel", uber);
                                     }
                                 }
