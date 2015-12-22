@@ -5658,7 +5658,7 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                     }
                     if (!(damagetype & DMG_CRIT))
                     {
-                        new bool:ministatus = (TF2_IsPlayerInCondition(attacker, TFCond_CritCola) || TF2_IsPlayerInCondition(attacker, TFCond_Buffed) || TF2_IsPlayerInCondition(attacker, TFCond_CritHype));
+                        new bool:ministatus = (TF2_IsPlayerInCondition(attacker, TFCond_CritCola) || TF2_IsPlayerInCondition(attacker, TFCond_Buffed));
 
                         damage *= (ministatus) ? 2.222222 : 3.0;
 
