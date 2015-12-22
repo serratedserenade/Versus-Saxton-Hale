@@ -5636,7 +5636,7 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                 if (strncmp(wepclassname, "tf_weapon_sniperrifle", 21, false) == 0)
                 {
                     if (strncmp(wepclassname, "tf_weapon_sniperrifle_", 22, false) < 0 && 
-					    (wepindex != 230 && wepindex != 526 && wepindex != 752 && wepindex != 30665))
+                        (wepindex != 230 && wepindex != 526 && wepindex != 752 && wepindex != 30665))
                     {
                         if (VSHRoundState != VSHRState_End)
                         {
