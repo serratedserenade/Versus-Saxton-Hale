@@ -2852,7 +2852,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         }
         case 307: //Caber
         {
-            hItemOverride = PrepareItemHandle(hItem, _, _, "773 ; 1.0");
+            hItemOverride = PrepareItemHandle(hItem, _, _, "15 ; 0.0", true);
         }
         case 220: // Shortstop - Effects are no longer 'only while active'. Otherwise acts like post-gunmettle shortstop.
         {
