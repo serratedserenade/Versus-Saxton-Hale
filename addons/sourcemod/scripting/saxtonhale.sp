@@ -2852,7 +2852,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         }
         case 220: // Shortstop - Effects are no longer 'only while active'. Otherwise acts like post-gunmettle shortstop.
         {
-            hItemOverride = PrepareItemHandle(hItem, _, _, "525 ; 1 ; 526 ; 1.2 ; 533 ; 1.4 ; 534 ; 1.4 ; 328 ; 1 ; 241 ; 1.5", true);
+            hItemOverride = PrepareItemHandle(hItem, _, _, "526 ; 1.2 ; 534 ; 1.4 ; 535 ; 1.4 ; 536 ; 1.0 ; 328 ; 1 ; 241 ; 1.5", true);
         }
         case 226: // The Battalion's Backup
         {
