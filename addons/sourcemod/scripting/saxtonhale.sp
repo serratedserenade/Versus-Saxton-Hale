@@ -5600,6 +5600,12 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                         RemoveCond(attacker, TFCond_OnFire);
                         return Plugin_Changed;
                     }
+                    case 310: // Warrior's Spirit
+                    {
+                        AddPlayerHealth(attacker, 50, 150);
+                        RemoveCond(attacker, TFCond_OnFire);
+                        return Plugin_Changed;
+                    }
                     case 594: // Phlog
                     {
                         if (!TF2_IsPlayerInCondition(attacker, TFCond_CritMmmph))
