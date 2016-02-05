@@ -2897,11 +2897,11 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         {
             if (iClass == TFClass_Soldier) // Soldier shotguns get 40% rocket jump
             {
-                hItemOverride = PrepareItemHandle(hItem, _, _, "135 ; 0.6 ; 179 ; 1 ; 265 ; 99999.0 ; 178 ; 0.6 ; 3 ; 0.67 ; 551 ; 1 ; 5 ; 1.15", true);
+                hItemOverride = PrepareItemHandle(hItem, _, _, "135 ; 0.6 ; 179 ; 1 ; 114 ; 1.0 ; 178 ; 0.6 ; 3 ; 0.67 ; 551 ; 1 ; 5 ; 1.15", true);
             }
             else
             {
-                hItemOverride = PrepareItemHandle(hItem, _, _, "179 ; 1 ; 265 ; 99999.0 ; 178 ; 0.6 ; 3 ; 0.67 ; 551 ; 1 ; 5 ; 1.15", true); //  ; 2 ; 1.1
+                hItemOverride = PrepareItemHandle(hItem, _, _, "179 ; 1 ; 114 ; 1.0 ; 178 ; 0.6 ; 3 ; 0.67 ; 551 ; 1 ; 5 ; 1.15", true); //  ; 2 ; 1.1
             }
         
         }
@@ -2948,17 +2948,17 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
             }
             if (StrStarts(classname, "tf_weapon_shotgun", false) || GunmettleToIndex(iItemDefinitionIndex) == TFWeapon_Shotgun)
             {
-                hItemOverride = PrepareItemHandle(hItem, _, _, "135 ; 0.6 ; 265 ; 99999.0"); // Soldier shotguns get 40% rocket jump dmg reduction     ; 265 ; 99999.0
+                hItemOverride = PrepareItemHandle(hItem, _, _, "135 ; 0.6 ; 114 ; 1.0"); // Soldier shotguns get 40% rocket jump dmg reduction     ; 265 ; 99999.0
             }
             else if (StrStarts(classname, "tf_weapon_rocketlauncher", false)  || StrStarts(classname, "tf_weapon_particle_cannon", false) || GunmettleToIndex(iItemDefinitionIndex) == TFWeapon_RocketLauncher)
             {
                 if (iItemDefinitionIndex == 127) // Direct hit
                 {
-                    hItemOverride = PrepareItemHandle(hItem, _, _, "265 ; 99999.0 ; 179 ; 1"); //  ; 215 ; 300.0
+                    hItemOverride = PrepareItemHandle(hItem, _, _, "179 ; 1"); //  ; 215 ; 300.0
                 }
                 else
                 {
-                    hItemOverride = PrepareItemHandle(hItem, _, _, "265 ; 99999.0", (iItemDefinitionIndex == 237)); // Rocket jumper
+                    hItemOverride = PrepareItemHandle(hItem, _, _, "114 ; 1.0", (iItemDefinitionIndex == 237)); // Rocket jumper
                 }
             }
         }
@@ -4089,6 +4089,7 @@ public Action:HaleTimer(Handle:hTimer)
         TF2_RemoveCondition(Hale, TFCond_Disguised);
     if (TF2_IsPlayerInCondition(Hale, TFCond:42) && TF2_IsPlayerInCondition(Hale, TFCond_Dazed))
         TF2_RemoveCondition(Hale, TFCond_Dazed);
+    TF2_AddCondition(Hale, TFCond:99, 0.3);
     new Float:speed = HaleSpeed + 0.7 * (100 - HaleHealth * 100 / HaleHealthMax);
     SetEntPropFloat(Hale, Prop_Send, "m_flMaxspeed", speed);
     if (HaleHealth <= 0 && IsPlayerAlive(Hale)) HaleHealth = 1;
