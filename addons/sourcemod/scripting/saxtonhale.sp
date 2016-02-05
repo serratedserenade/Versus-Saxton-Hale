@@ -2863,6 +2863,10 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         {
             hItemOverride = PrepareItemHandle(hItem, _, _, "259 ; 1 ; 252 ; 0.25");
         }
+        case 1150: //Quickiebomb Launcher
+        {
+            hItemOverride = PrepareItemHandle(hItem, _, _, "114 ; 1.0");
+        }
         case 307: //Caber
         {
             hItemOverride = PrepareItemHandle(hItem, _, _, "15 ; 0.0", true);
