@@ -2974,7 +2974,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
             //Medic mediguns
             if (StrStarts(classname, "tf_weapon_medigun", false) || GunmettleToIndex(iItemDefinitionIndex) == TFWeapon_Medigun)
             {
-                hItemOverride = PrepareItemHandle(hItem, _, _, "10 ; 1.25 ; 18 ; 0", true);
+                hItemOverride = PrepareItemHandle(hItem, _, _, "10 ; 1.25 ; 18 ; 0 ; 144 ; 2", true);
             }
         }
 #endif
@@ -3218,7 +3218,7 @@ public Action:MakeNoHale(Handle:hTimer, any:clientid)
         if (mediquality != 10)
         {
             TF2_RemoveWeaponSlot(client, TFWeaponSlot_Secondary);
-            weapon = SpawnWeapon(client, "tf_weapon_medigun", 35, 5, 10, "18 ; 0.0 ; 10 ; 1.25");  //200 ; 1 for area of effect healing    // ; 178 ; 0.75 ; 128 ; 1.0 Faster switch-to
+            weapon = SpawnWeapon(client, "tf_weapon_medigun", 35, 5, 10, "18 ; 0.0 ; 10 ; 1.25 ; 144 ; 2");  //200 ; 1 for area of effect healing    // ; 178 ; 0.75 ; 128 ; 1.0 Faster switch-to
             if (GetIndexOfWeaponSlot(client, TFWeaponSlot_Melee) == 142)
             {
                 SetEntityRenderMode(weapon, RENDER_TRANSCOLOR);
