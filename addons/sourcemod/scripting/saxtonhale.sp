@@ -5795,11 +5795,10 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                     if (vm > MaxClients && IsValidEntity(vm) && TF2_GetPlayerClass(attacker) == TFClass_Spy)
                     {
                         new melee = GetIndexOfWeaponSlot(attacker, TFWeaponSlot_Melee);
-                        new anim = 15;
+                        new anim = 41;
                         switch (melee)
                         {
-                            case 727: anim = 41;
-                            case 4, 194, 665, 794, 803, 883, 892, 901, 910: anim = 10;
+                            case 225, 356, 423, 461, 574, 649, 1071: anim = 15;
                             case 638: anim = 31;
                         }
                         SetEntProp(vm, Prop_Send, "m_nSequence", anim);
