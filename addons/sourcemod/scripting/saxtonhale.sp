@@ -3749,6 +3749,7 @@ public Action:event_player_spawn(Handle:event, const String:name[], bool:dontBro
             RemovePlayerBack(client, { 57, 133, 231, 405, 444, 608, 642 }, 7);
             RemoveDemoShield(client);
             TF2_RemoveAllWeapons(client);
+            TF2Attrib_RemoveByDefIndex(client, 54);
             TF2_RegeneratePlayer(client);
             CreateTimer(0.1, Timer_RegenPlayer, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
         }
@@ -8370,6 +8371,13 @@ stock IncrementHeadCount(iClient)
     InsertCond(iClient, TFCond_DemoBuff);
     SetEntProp(iClient, Prop_Send, "m_iDecapitations", GetEntProp(iClient, Prop_Send, "m_iDecapitations") + 1);
     AddPlayerHealth(iClient, 15, 300, true);             //  The old version of this allowed infinite health gain... so ;v
+    if (IsValidEntity(FindPlayerBack(iClient, { 405, 608 }, 2)) && TF2_GetPlayerClass(iClient) == TFClass_DemoMan && GetEntProp(iClient, Prop_Send, "m_iDecapitations") >= 3)
+    {
+        if (GetEntProp(iClient, Prop_Send, "m_iDecapitations") == 3)
+            TF2Attrib_SetByDefIndex(iClient, 54, 0.95);
+        if (GetEntProp(iClient, Prop_Send, "m_iDecapitations") >= 4)
+            TF2Attrib_SetByDefIndex(iClient, 54, 0.91); //Prevents sanic speed Demomen
+    }
     TF2_AddCondition(iClient, TFCond_SpeedBuffAlly, 0.01);  //  Recalculate their speed
 }
 
