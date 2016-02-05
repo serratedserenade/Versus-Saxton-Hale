@@ -9,7 +9,7 @@
     
     New plugin thread on AlliedMods: https://forums.alliedmods.net/showthread.php?p=2167912
 */
-#define PLUGIN_VERSION "1.55b"
+#define PLUGIN_VERSION "1.55c"
 #pragma semicolon 1
 #include <tf2_stocks>
 #include <tf2items>
@@ -540,7 +540,10 @@ static const String:haleversiontitles[][] =     //the last line of this is what 
     "1.54",
     "1.54",
     "1.54",
-    "1.55"
+    "1.55",
+    "1.55b",
+    "1.55c",
+    "1.55c"
     ,PLUGIN_VERSION
 };
 static const String:haleversiondates[][] =
@@ -554,7 +557,10 @@ static const String:haleversiondates[][] =
     "10 Sep 2015",
     "10 Sep 2015",
     "12 Sep 2015",  // 1.55 update
-    "24 Nov 2015"  // 1.55b update
+    "24 Nov 2015",  // 1.55b update
+    "6 Feb 2016",  // 1.55c update
+    "6 Feb 2016",  // 1.55c update
+    "6 Feb 2016"  // 1.55c update
 };
 static const maxversion = (sizeof(haleversiontitles) - 1);
 new Handle:OnHaleJump;
@@ -2935,7 +2941,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         }
         case TFClass_DemoMan:
         {
-            if (StrStarts(classname, "tf_weapon_sword", false) || StrStarts(classname, "tf_weapon_katana", false)) //poop
+            if (StrStarts(classname, "tf_weapon_sword", false) || StrStarts(classname, "tf_weapon_katana", false))
             {
                 hItemOverride = PrepareItemHandle(hItem, _, _, "547 ; 0.75 ; 199 ; 0.75"); // All Sword weapons are returned (close) to the old default switch time of 0.67s
             }
@@ -3890,10 +3896,10 @@ public Action:ClientTimer(Handle:hTimer)
                     {
                         TF2_AddCondition(client, TFCond_SpeedBuffAlly, 0.3);
                     }
-					if (GetEntProp(medigun, Prop_Send, "m_bChargeRelease") && GetEntPropFloat(medigun, Prop_Send, "m_flChargeLevel") > 0.0)
-					{
-						TF2_AddCondition(client, TFCond_Ubercharged, TFCondDuration_Infinite);
-					}
+                    if (GetEntProp(medigun, Prop_Send, "m_bChargeRelease") && GetEntPropFloat(medigun, Prop_Send, "m_flChargeLevel") > 0.0)
+                    {
+                        TF2_AddCondition(client, TFCond_Ubercharged, TFCondDuration_Infinite);
+                    }
                 }
             }
 
@@ -6583,6 +6589,33 @@ FindVersionData(Handle:panel, versionindex)
 {
     switch (versionindex) // DrawPanelText(panel, "1) .");
     {
+        case 79: //1.55c
+        {
+            DrawPanelText(panel, "1) Fixed weapons not mini-critting airborne targets when they should.");
+            DrawPanelText(panel, "2) Rocket Jumper now has its attributes properly overriden.");
+            DrawPanelText(panel, "3) Cow Mangler 5000 now minicrits airborne targets.");
+            DrawPanelText(panel, "4) Removed bonus switch speed on Mediguns.");
+            DrawPanelText(panel, "--) Actual switch speed is virtually the same as pre Tough-Break. (0.5 vs 0.5025");
+            DrawPanelText(panel, "5) Fixed backstab animations.");
+        }
+        case 78: //1.55c
+        {
+            DrawPanelText(panel, "6) Updated Wallclimb ability. Should no longer work on invisible walls.");
+            DrawPanelText(panel, "7) Ubercharge reverted to previous behaviour, alternative fix used instead.");
+            DrawPanelText(panel, "8) Future-proofed Sniper Rifles, mostly. Also fixed Shooting Star damage.");
+            DrawPanelText(panel, "9) Fixed Shahanshah not receiving proper attributes.");
+            DrawPanelText(panel, "10) Fixed Shortstop not receiving proper attributes.");
+            DrawPanelText(panel, "11) All sword weapons have +25% faster switch-to/from speed. (Around 0.675s)");
+        }
+        case 77: //1.55c
+        {
+            DrawPanelText(panel, "12) Re-added Quick-Fix match heal target speed attribute to Mediguns.");
+            DrawPanelText(panel, "13) Claidheamh Mòr reverted to old attributes. (0.5s longer charge duration, -15HP)");
+            DrawPanelText(panel, "14) Ullapool Caber penalties removed.");
+            DrawPanelText(panel, "15) Phlogistinator fully heals on MMMPH activation again.");
+            DrawPanelText(panel, "16) Weapon switch speed nerfs were reverted/modified, with the exception of the Degreaser.");
+            DrawPanelText(panel, "---) Unofficial 1.55 sub-versions by Starblaster64.");
+        }
         case 76: // 1.55b
         {
             DrawPanelText(panel, "1) Fixed throwable weapons not being crit boosted.");
