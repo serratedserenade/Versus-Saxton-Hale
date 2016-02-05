@@ -6599,8 +6599,8 @@ FindVersionData(Handle:panel, versionindex)
             DrawPanelText(panel, "6) Updated Wallclimb ability. Should no longer work on invisible walls.");
             DrawPanelText(panel, "7) Ubercharge reverted to previous behaviour, alternative fix used instead.");
             DrawPanelText(panel, "8) Future-proofed Sniper Rifles, mostly. Also fixed Shooting Star damage.");
-            DrawPanelText(panel, "9) Fixed Shahanshah not receiving proper attributes.");
-            DrawPanelText(panel, "10) Fixed Shortstop not receiving proper attributes.");
+            DrawPanelText(panel, "9) Fixed Shahanshah and Shortstop not receiving proper attributes.");
+            DrawPanelText(panel, "10) Warrior's Spirit now has +50HP on hit with overheal up to 450HP.");
             DrawPanelText(panel, "11) All sword weapons have +25% faster switch-to/from speed. (Around 0.675s)");
         }
         case 77: //1.55c
