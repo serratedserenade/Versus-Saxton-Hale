@@ -2924,7 +2924,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         }
         case TFClass_DemoMan:
         {
-            if (StrStarts(classname, "tf_weapon_sword", false) || StrStarts(classname, "tf_weapon_katana", false)) //poop
+            if (StrStarts(classname, "tf_weapon_sword", false) || StrStarts(classname, "tf_weapon_katana", false))
             {
                 hItemOverride = PrepareItemHandle(hItem, _, _, "547 ; 0.75 ; 199 ; 0.75"); // All Sword weapons are returned (close) to the old default switch time of 0.67s
             }
