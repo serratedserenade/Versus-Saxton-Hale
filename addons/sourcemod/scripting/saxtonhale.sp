@@ -4421,6 +4421,10 @@ public TF2_OnConditionAdded(client, TFCond:cond)
                     TF2_RemoveCondition(client, cond);
                 }
             }
+            case TFCond_CritMmmph: //Phlogistinator Activation
+            {
+                AddPlayerHealth(client, 175);
+            }
         }
     }
 }
