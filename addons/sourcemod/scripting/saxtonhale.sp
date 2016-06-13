@@ -1891,6 +1891,7 @@ SpawnRandomAmmo()
         DispatchSpawn(iEnt2);
         SetEntProp(iEnt2, Prop_Send, "m_iTeamNum", g_bEnabled?OtherTeam:0, 4);
     }
+	SearchForItemPacks();
 }
 
 SpawnRandomHealth()
@@ -1914,6 +1915,7 @@ SpawnRandomHealth()
         DispatchSpawn(iEnt2);
         SetEntProp(iEnt2, Prop_Send, "m_iTeamNum", g_bEnabled?OtherTeam:0, 4);
     }
+	SearchForItemPacks();
 }
 
 public Action:Timer_EnableCap(Handle:timer)
