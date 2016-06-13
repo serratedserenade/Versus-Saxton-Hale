@@ -5632,8 +5632,8 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                     }
                 }
                 new String:wepclassname[32];
-                GetEdictClassname(weapon, wepclassname, sizeof(wepclassname));
-                if (strncmp(wepclassname, "tf_weapon_sniperrifle", 21, false) == 0)
+                if (IsValidEdict(weapon)
+                    GetEdictClassname(weapon, wepclassname, sizeof(wepclassname));
                 if (StrStarts(wepclassname, "tf_weapon_sniperrifle"))
                 {
                     if (!StrStarts(wepclassname, "tf_weapon_sniperrifle_") && 
