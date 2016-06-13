@@ -5634,8 +5634,9 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                 new String:wepclassname[32];
                 GetEdictClassname(weapon, wepclassname, sizeof(wepclassname));
                 if (strncmp(wepclassname, "tf_weapon_sniperrifle", 21, false) == 0)
+                if (StrStarts(wepclassname, "tf_weapon_sniperrifle"))
                 {
-                    if (strncmp(wepclassname, "tf_weapon_sniperrifle_", 22, false) < 0 && 
+                    if (!StrStarts(wepclassname, "tf_weapon_sniperrifle_") && 
                         (wepindex != 230 && wepindex != 526 && wepindex != 752 && wepindex != 30665))
                     {
                         if (VSHRoundState != VSHRState_End)
