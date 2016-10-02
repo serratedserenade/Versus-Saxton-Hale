@@ -7935,6 +7935,9 @@ stock bool:RemoveDemoShield(iClient)
         if (GetEntPropEnt(iEnt, Prop_Send, "m_hOwnerEntity") == iClient && !GetEntProp(iEnt, Prop_Send, "m_bDisguiseWearable"))
         {
             TF2_RemoveWearable(iClient, iEnt);
+#if defined _tf2attributes_included
+			TF2Attrib_RemoveByDefIndex(iClient, 54);
+#endif
             return true;
         }
     }
@@ -8390,13 +8393,15 @@ stock IncrementHeadCount(iClient)
     InsertCond(iClient, TFCond_DemoBuff);
     SetEntProp(iClient, Prop_Send, "m_iDecapitations", GetEntProp(iClient, Prop_Send, "m_iDecapitations") + 1);
     AddPlayerHealth(iClient, 15, 300, true);             //  The old version of this allowed infinite health gain... so ;v
-    if (IsValidEntity(FindPlayerBack(iClient, { 405, 608 }, 2)) && TF2_GetPlayerClass(iClient) == TFClass_DemoMan && GetEntProp(iClient, Prop_Send, "m_iDecapitations") >= 3)
+#if defined _tf2attributes_included
+    if (IsValidEntity(FindPlayerBack(iClient, { 405, 608 }, 2)) && TF2_GetPlayerClass(iClient) == TFClass_DemoMan && GetEntProp(iClient, Prop_Send, "m_iDecapitations") >= 3 && GetEntProp(iClient, Prop_Send, "m_bShieldEquipped"))
     {
         if (GetEntProp(iClient, Prop_Send, "m_iDecapitations") == 3)
             TF2Attrib_SetByDefIndex(iClient, 54, 0.95);
         if (GetEntProp(iClient, Prop_Send, "m_iDecapitations") >= 4)
             TF2Attrib_SetByDefIndex(iClient, 54, 0.91); //Prevents sanic speed Demomen
     }
+#endif
     TF2_AddCondition(iClient, TFCond_SpeedBuffAlly, 0.01);  //  Recalculate their speed
 }
 
