@@ -2877,7 +2877,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         }
         case 327: //Claidheamh Mòr - Restored to Pre-Tough Break behaviour (increased charge duration).
         {
-            hItemOverride = PrepareItemHandle(hItem, _, _, "781 ; 72 ; 202 ; 0.5 ; 2034 ; 0.25 ; 125 ; -15 ; 15 ; 0.0", true);
+            hItemOverride = PrepareItemHandle(hItem, _, _, "781 ; 72 ; 202 ; 0.5 ; 2034 ; 0.25 ; 125 ; -15 ; 15 ; 0.0 ; 547 ; 0.75 ; 199 ; 0.75", true);
         }
         case 220: // Shortstop - Effects are no longer 'only while active'. Otherwise acts like post-gunmettle shortstop.
         {
