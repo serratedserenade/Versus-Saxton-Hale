@@ -9,7 +9,7 @@
     
     New plugin thread on AlliedMods: https://forums.alliedmods.net/showthread.php?p=2167912
 */
-#define PLUGIN_VERSION "1.55d"
+#define PLUGIN_VERSION "1.55e"
 #pragma semicolon 1
 #include <tf2_stocks>
 #include <tf2items>
@@ -542,7 +542,8 @@ static const String:haleversiontitles[][] =     //the last line of this is what 
     "1.55c",
     "1.55c",
     "1.55c",
-    "1.55c"
+    "1.55c",
+	"1.55d"
     ,PLUGIN_VERSION
 };
 static const String:haleversiondates[][] =
@@ -561,7 +562,8 @@ static const String:haleversiondates[][] =
     "6 Feb 2016",  // 1.55c update
     "6 Feb 2016",  // 1.55c update
     "6 Feb 2016",  // 1.55c update
-    "15 Jun 2016"  // 1.55d update
+    "15 Jun 2016",  // 1.55d update
+    "2 Oct 2016"  // 1.55e update
 };
 static const maxversion = (sizeof(haleversiontitles) - 1);
 new Handle:OnHaleJump;
@@ -6599,6 +6601,12 @@ FindVersionData(Handle:panel, versionindex)
 {
     switch (versionindex) // DrawPanelText(panel, "1) .");
     {
+        case 82: //1.55e
+        {
+            DrawPanelText(panel, "1) Added missing switch to/from speed bonus attributes to the Claidheamh Mòr.");
+            DrawPanelText(panel, "2) Updated the Demoman boots + Eyelander speed nerf to apply only to Demomen with shields.");
+            DrawPanelText(panel, "--) Unofficial 1.55 sub-versions by Starblaster64.");
+        }
         case 81: //1.55d
         {
             DrawPanelText(panel, "1) Maps that trigger SpawnRandomHealth/Ammo() will now generate at least 1 of the required pickup.");
