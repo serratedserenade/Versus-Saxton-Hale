@@ -14,9 +14,7 @@
 #include <tf2_stocks>
 #include <tf2items>
 #include <regex>
-#if SOURCEMOD_V_MINOR > 7
-  #pragma newdecls required
-#endif
+#pragma newdecls optional
 #include <clientprefs>
 #include <sdkhooks>
 #include <morecolors>
