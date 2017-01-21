@@ -2889,6 +2889,10 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         {
             hItemOverride = PrepareItemHandle(hItem, _, _, "252 ; 0.25"); //125 ; -10
         }
+        case 133: // The Gunboats
+        {
+            hItemOverride = PrepareItemHandle(hItem, _, _, "135 ; 0.25"); //-75% self blast damagem, buffed from the stock -60%.
+        }
         case 305, 1079: // Medic Xbow
         {
             hItemOverride = PrepareItemHandle(hItem, _, _, "17 ; 0.15 ; 2 ; 1.45"); // ; 266 ; 1.0");
@@ -5968,7 +5972,10 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
 
         if (item <= 0 || !IsValidEntity(item))
         {
-            damage /= 10.0;
+            if (FindPlayerBack(client, { 133 }, 1 ))
+                damage *= 0.8; //20% reduction for Gunboats
+            else
+                damage /= 10.0; //90% Fall damage reduction for all other boots
 
             return Plugin_Changed;
         }
