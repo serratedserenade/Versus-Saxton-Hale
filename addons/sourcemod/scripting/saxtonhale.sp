@@ -2555,7 +2555,7 @@ SkipHalePanelNotify(client) // , bool:newchoice = true
     decl String:s[256];
 
     SetPanelTitle(panel, "[VSH] You're Hale next!");
-    Format(s, sizeof(s), "%t\nAlternatively, use !resetq.", "vsh_to0_near");
+    Format(s, sizeof(s), "%t\nAlternatively, use !resetq/!nohale.", "vsh_to0_near");
     CRemoveTags(s, sizeof(s));
 
     ReplaceString(s, sizeof(s), "{olive}", "");
@@ -4638,7 +4638,7 @@ public Action:DoSuicide(client, const String:command[], argc)
     {
         if (client == Hale && !IsNextTime(e_flNextAllowBossSuicide))
         {
-            CPrintToChat(client, "Do not suicide as Hale. Use !resetq instead.");
+            CPrintToChat(client, "Do not suicide as Hale. Use !resetq/!nohale {unique}BEFORE YOUR ROUND{default} instead!");
             return Plugin_Handled;
             //KickClient(client, "Next time, please remember to !hale_resetq");
             //if (VSHRoundState == VSHRState_Waiting) return Plugin_Handled;
