@@ -2190,8 +2190,8 @@ CalcScores()
             }
             else if (!IsFakeClient(i) && (GetEntityTeamNum(i) > _:TFTeam_Spectator))
             {
-                CPrintToChat(i, "{olive}[VSH]{default} %t", "vsh_add_points", 10);
-                SetClientQueuePoints(i, GetClientQueuePoints(i)+10);
+                CPrintToChat(i, "{olive}[VSH]{default} %t", "vsh_add_points", 10+j);
+                SetClientQueuePoints(i, GetClientQueuePoints(i)+10+j); //Add 10 points plus points earned for damage dealt this round.
             }
         }
     }
