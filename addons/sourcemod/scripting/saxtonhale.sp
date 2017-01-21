@@ -3983,6 +3983,10 @@ public Action:ClientTimer(Handle:hTimer)
                     addthecrit = true;
                     cond = TFCond_Buffed;
                 }
+                case 442: //Righteous Bison
+                {
+                    addthecrit = true;
+                }
             }
             if (validwep && weapon == GetPlayerWeaponSlot(client, TFWeaponSlot_Primary)) // Primary weapon crit list
             {
