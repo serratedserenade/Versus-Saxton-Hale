@@ -3989,7 +3989,7 @@ public Action:ClientTimer(Handle:hTimer)
                 if (StrStarts(wepclassname, "tf_weapon_compound_bow") || // Sniper bows
                    StrStarts(wepclassname, "tf_weapon_crossbow") || // Medic crossbows
                    StrEqual(wepclassname, "tf_weapon_shotgun_building_rescue") || // Engineer Rescue Ranger
-                   StrEqual(wepclassname, "tf_weapon_drg_pom")) // Engineer Pomson
+                   StrEqual(wepclassname, "tf_weapon_drg_pomson")) // Engineer Pomson
                     addthecrit = true;
             }
             if (validwep && weapon == GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary)) // Secondary weapon crit list
