@@ -828,6 +828,7 @@ public OnPluginStart()
     RegAdminCmd("sm_halereset", ResetQueuePointsCmd, 0);
     RegAdminCmd("sm_resetq", ResetQueuePointsCmd, 0);
     RegAdminCmd("sm_hale_special", Command_MakeNextSpecial, 0, "Call a special to next round.");
+    RegAdminCmd("sm_nohale", Command_SetNoHale, 0);
     AddCommandListener(DoTaunt, "taunt");
     AddCommandListener(DoTaunt, "+taunt");
     AddCommandListener(cdVoiceMenu, "voicemenu");
@@ -6387,6 +6388,25 @@ public Action:ResetQueuePointsCmd(client, args)
         TurnToZeroPanel(client);
     else
         TurnToZeroPanelH(INVALID_HANDLE, MenuAction_Select, client, 1);
+    return Plugin_Handled;
+}
+public Action Command_SetNoHale(client, args)
+{
+    if (!IsValidClient(client))
+        return Plugin_Handled;
+    int iQpoints = GetClientQueuePoints(client);
+    if (iQpoints > -99999)
+    {
+        iQpoints -= GetRandomInt(1000, 9999);
+        CPrintToChat(client, "{olive}[VSH]{default} You've set your Queue Points to: {olive}%i{default}!", iQpoints);
+        CPrintToChat(client, "{olive}---{default} Please note, if everyone has negative points, you may still be selected as Hale.");
+    }
+    if (iQpoints < -99999)
+        CPrintToChat(client, "{olive}[VSH]{default} You cannot set your points any lower, {unique}%N{default}!", client); //Minor easter egg for the curious player.
+    SetClientQueuePoints(client, iQpoints);
+    int cl = FindNextHaleEx();
+    if (IsValidClient(cl)) SkipHalePanelNotify(cl);
+    
     return Plugin_Handled;
 }
 public Action:TurnToZeroPanel(client)
