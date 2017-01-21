@@ -5967,11 +5967,12 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
             }
         }
     }
-    else if (attacker == 0 && client != Hale && IsValidClient(client) && (damagetype & DMG_FALL) && (TF2_GetPlayerClass(client) == TFClass_Soldier || TF2_GetPlayerClass(client) == TFClass_DemoMan)) // IsValidClient(client, false)
+    else if (attacker == 0 && client != Hale && IsValidClient(client) && (damagetype & DMG_FALL) && (TF2_GetPlayerClass(client) == TFClass_Soldier || TF2_GetPlayerClass(client) == TFClass_DemoMan || TF2_GetPlayerClass(client) == TFClass_Sniper)) // IsValidClient(client, false)
     {
         new item = GetPlayerWeaponSlot(client, (TF2_GetPlayerClass(client) == TFClass_DemoMan ? TFWeaponSlot_Primary:TFWeaponSlot_Secondary));
 
-        if (item <= 0 || !IsValidEntity(item))
+        if (!IsValidEntity(item) || //Checking for Demo/Soldier boots
+            IsValidEntity(FindPlayerBack(client, { 231 }, 1))) //Checking for Darwin's Danger Shield
         {
             if (FindPlayerBack(client, { 133 }, 1 ))
                 damage *= 0.8; //20% reduction for Gunboats
