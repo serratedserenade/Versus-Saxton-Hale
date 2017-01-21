@@ -2912,7 +2912,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         }
         case 442: //Righteous Bison
         {
-            hItemOverride = PrepareItemHandle(hItem, _, _, "114 ; 1.0");
+            hItemOverride = PrepareItemHandle(hItem, _, _, "135 ; 0.6"); //-40% self blast damage
         }
         case 415: // Reserve Shooter
         {
