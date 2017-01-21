@@ -2960,6 +2960,10 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
             {
                 hItemOverride = PrepareItemHandle(hItem, _, _, "547 ; 0.75 ; 199 ; 0.75"); // All Sword weapons are returned (close) to the old default switch time of 0.67s
             }
+            else if (StrStarts(classname, "tf_weapon_grenadelauncher", false))
+            {
+                hItemOverride = PrepareItemHandle(hItem, _, _, "114 ; 1.0"); //Mini-crit airborne targets
+            }
         }
         case TFClass_Soldier: // TODO if (TF2_GetPlayerClass(client) == TFClass_Soldier && (strncmp(classname, "tf_weapon_rocketlauncher", 24, false) == 0 || strncmp(classname, "tf_weapon_particle_cannon", 25, false) == 0 || strncmp(classname, "tf_weapon_shotgun", 17, false) == 0 || strncmp(classname, "tf_weapon_raygun", 16, false) == 0))
         {
