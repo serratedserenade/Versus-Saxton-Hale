@@ -224,7 +224,7 @@
 	}
 	"vsh_help_soldier"
 	{
-		"en"    "The Battalion's Backup will fill to 100%% on taking a hit from boss.\nThe Half-Zatoichi heals 35HP on hit and can overheal to +25. Honorbound is removed on hit.\nBoot weapons lessen fall damage by 90%%.\nAll shotguns minicrit midair bosses, and reduce self rocket jump damage by 40%%.\nDirect Hit crits instead of minicrit.\nMantreads boost rocket jumps and deal 1024 stomp damage.\nAirstrike gains an extra clip every 200 damage dealt to Hale.\nMarket Gardens deal massive damage."
+		"en"    "The Half-Zatoichi heals 35HP on hit and can overheal. Honorbound is removed on hit.\nShotguns minicrit airbone targets and reduce self blast damage by 40%%.\nRighteous Bison has 100%% crits and +33% damage.\nDirect Hit crits instead of minicrit. Gunboats have -20%% fall damage.\nMantreads have -90%% fall damage, boost RJs by 1.8x and deal 1024 damage.\nAirstrike gains a clip every 200 damage.\nMarket Gardens deal a %% of Hale's HP, no crits."
 	}
 	"vsh_help_pyro"
 	{
@@ -236,7 +236,7 @@
 	}
 	"vsh_help_heavy"
 	{
-		"en"	"Natascha, the KGB, and the Fists of Steel are replaced with the\nMinigun, Gloves of Running, and Fists, respectively.\nThe Gloves of Running are quite quick but cause you to lose more health.\nThe Holiday Punch will remove any stun on you if you hit Hale while stunned, they are only minicrit boosted."
+		"en"	"Natascha, the KGB, and the Fists of Steel are replaced with the\nMinigun, Gloves of Running, and Fists, respectively.\nThe Gloves of Running are quite quick but cause you to lose more health.\nThe Holiday Punch will remove any stun on you and grant some escape buffs if you hit Hale while stunned, they are only minicrit boosted."
 	}
 	"vsh_help_eggineer"
 	{
@@ -248,7 +248,7 @@
 	}
 	"vsh_help_sniper"
 	{
-		"en"	"Jarate removes 8%% rage.\nSMGs have crits.\nRazorback is replaced with SMG.\nAll rifles do 3x dmg bodyshots.\nSniper Rifle causes the boss to glow. Glow time scales with charge.\nHitman's Heatmaker gains focus from dmg dealt.\nSydney Sleeper doesn't apply jarate to the boss, but adds only half its dmg to the boss's rage meter.\nBazaar Bargain is disabled.\nAll sniper melees climbs walls, but block healing while in use.\nCozy Camper has an SMG that deals -15%% damage, 1.5s bleed on hit and has no crits."
+		"en"	"Jarate removes 8%% rage.\nSMGs have crits.\nRazorback is replaced with SMG.\nAll rifles do 3x dmg bodyshots.\nSniper Rifle causes the boss to glow. Glow time scales with charge.\nHitman's Heatmaker gains focus from dmg dealt.\nSydney Sleeper doesn't apply jarate to the boss, but adds only half its dmg to the boss's rage meter.\nDarwin's Danger Shield has -90% fall damage.\nAll sniper melees climbs walls, but block healing while in use.\nCozy Camper has an SMG that deals -15%% damage, 1.5s bleed on hit and has no crits."
 	}
 	"vsh_help_spie"
 	{
@@ -256,7 +256,7 @@
 	}
 	"vsh_help_melee"
 	{
-		"en"	"All melee weapons (except spy knives, market gardeners, and heavy mittens) deal critical hits."
+		"en"	"All Melee weapons (except Knives, or otherwise stated) deal critical hits."
 	}
 	"vsh_thequeue"
 	{
