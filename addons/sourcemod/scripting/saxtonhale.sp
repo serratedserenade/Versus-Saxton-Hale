@@ -435,6 +435,7 @@ static Damage[TF_MAX_PLAYERS];
 static AirDamage[TF_MAX_PLAYERS]; // Air Strike
 static curHelp[TF_MAX_PLAYERS];
 static uberTarget[TF_MAX_PLAYERS];
+static float ChargeAdd[TF_MAX_PLAYERS];
 #define VSHFLAG_HELPED          (1 << 0)
 #define VSHFLAG_UBERREADY       (1 << 1)
 #define VSHFLAG_NEEDSTODUCK (1 << 2)
@@ -863,6 +864,7 @@ public OnPluginStart()
         Damage[client] = 0;
         AirDamage[client] = 0;
         uberTarget[client] = -1;
+        ChargeAdd[client] = 0.0;
         if (IsClientInGame(client)) // IsValidClient(client, false)
         {
             SDKHook(client, SDKHook_OnTakeDamage, OnTakeDamage);
@@ -1683,6 +1685,7 @@ public Action:event_round_start(Handle:event, const String:name[], bool:dontBroa
         Damage[ionplay] = 0;
         AirDamage[ionplay] = 0;
         uberTarget[ionplay] = -1;
+        ChargeAdd[ionplay] = 0.0;
         if (IsClientInGame(ionplay))
         {
 #if defined _tf2attributes_included
@@ -3669,12 +3672,14 @@ public OnClientPostAdminCheck(client)
     Damage[client] = 0;
     AirDamage[client] = 0;
     uberTarget[client] = -1;
+    ChargeAdd[client] = 0.0;
 }
 public OnClientDisconnect(client)
 {
     Damage[client] = 0;
     AirDamage[client] = 0;
     uberTarget[client] = -1;
+    ChargeAdd[client] = 0.0;
     VSHFlags[client] = 0;
     if (g_bEnabled)
     {
@@ -5835,6 +5840,13 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                         bIsBackstab = true;
                     }
                 }*/
+                if (damagecustom == TF_CUSTOM_CHARGE_IMPACT)
+                {
+                    damage *= 3.0; //Triple bash damage
+                    FillChargeMeter(attacker, damage/1.5); //Takes 150 damage to fill a charge meter in one shot
+                    
+                    return Plugin_Changed;
+                }
                 if (damagecustom == TF_CUSTOM_BACKSTAB)
                 {
                     /*
@@ -9186,4 +9198,17 @@ stock bool:StrStarts(const String:szStr[], const String:szSubStr[], bool:bCaseSe
 stock bool:IsWeaponSlotActive(iClient, iSlot)
 {
     return GetPlayerWeaponSlot(iClient, iSlot) == GetEntPropEnt(iClient, Prop_Send, "m_hActiveWeapon");
+}
+
+stock void FillChargeMeter(int iClient, float flAmount)
+{
+    if (flAmount > 100.0)
+        flAmount = 100.0;
+    ChargeAdd[iClient] = flAmount;
+    RequestFrame(Frame_FillChargeMeter, iClient);
+}
+public void Frame_FillChargeMeter(int iClient)
+{
+    SetEntPropFloat(iClient, Prop_Send, "m_flChargeMeter", ChargeAdd[iClient]);
+    ChargeAdd[iClient] = 0.0;
 }
