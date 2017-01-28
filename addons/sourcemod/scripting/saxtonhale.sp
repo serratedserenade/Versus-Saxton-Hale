@@ -4604,13 +4604,13 @@ public Action:DoTaunt(client, const String:command[], argc)
                     Format(s, PLATFORM_MAX_PATH, "%s", CBS3);
                 EmitSoundToAll(s, _, _, SNDLEVEL_TRAFFIC, SND_NOFLAGS, SNDVOL_NORMAL, 100, _, pos, NULL_VECTOR, false, 0.0);
                 TF2_RemoveWeaponSlot(client, TFWeaponSlot_Primary);
-                SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", SpawnWeapon(client, "tf_weapon_compound_bow", 1005, 100, 5, "2 ; 2.1 ; 6 ; 0.5 ; 37 ; 0.0 ; 280 ; 19 ; 551 ; 1 ; 377 ; 0.6"));
+                SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", SpawnWeapon(client, "tf_weapon_compound_bow", 1005, 100, 5, "2 ; 2.1 ; 6 ; 0.5 ; 37 ; 0.0 ; 280 ; 19 ; 551 ; 1 ; 377 ; 0.75"));
                 //2 - Damage Bonus (+110%)
                 //6 - Fire Rate Bonus (+50%)
                 //37 - Hidden primary max ammo bonus (+-100%)
                 //280 - Override projectile type (Festive arrows, 19)
                 //551 - Special taunt (probably not necessary)
-                //377 - Aiming knockback resistance (-40%)
+                //377 - Aiming knockback resistance (-25%)
                 SetAmmo(client, TFWeaponSlot_Primary, ((RedAlivePlayers >= CBS_MAX_ARROWS) ? CBS_MAX_ARROWS : RedAlivePlayers));
                 CreateTimer(0.6, UseRage, dist);
                 CreateTimer(0.1, UseBowRage);
