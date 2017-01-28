@@ -5726,10 +5726,14 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                             EmitSoundToClient(client, "weapons/barret_arm_zap.wav");
                         }
                     }*/
-                    case 656: // Mittens
+                    case 656: // Mittens - Removes Spook and grants some escape buffs if you hit Hale while Raged.
                     {
-                        CreateTimer(0.1, Timer_StopTickle, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
-                        RemoveCond(attacker, TFCond_Dazed);
+                        CreateTimer(0.1, Timer_StopTickle, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE); //Tickles only last 0.1s on Hale
+                        if (RemoveCond(attacker, TFCond_Dazed))
+                        {
+                            InsertCond(attacker, TFCond_PasstimeInterception, 5.0);
+                            InsertCond(attacker, TFCond_SpeedBuffAlly, 5.0);
+                        }
                     }
                 }
                 new String:wepclassname[32];
