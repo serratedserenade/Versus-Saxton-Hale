@@ -2912,7 +2912,11 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         }
         case 442: //Righteous Bison
         {
-            hItemOverride = PrepareItemHandle(hItem, _, _, "135 ; 0.6"); //-40% self blast damage
+            hItemOverride = PrepareItemHandle(hItem, _, _, "135 ; 0.6 ; 2 ; 1.33"); //-40% self blast damage, +33% damage bonus
+        }
+        case 414: //Liberty Launcher
+        {
+            hItemOverride = PrepareItemHandle(hItem, _, _, "114 ; 1 ; 99 ; 1.25"); //Minicrits airborne targets, +25% blast radius
         }
         case 415: // Reserve Shooter
         {
