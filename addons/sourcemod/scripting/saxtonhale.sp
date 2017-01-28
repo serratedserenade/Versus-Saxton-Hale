@@ -5969,6 +5969,11 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                     return Plugin_Changed;
                 }
             }
+            if (damagecustom == TF_CUSTOM_PLASMA && wepindex != 441)
+            {
+                damage *= 1.33; //+33% damage for righteous bison, since attributes don't seem to affect its damage
+                return Plugin_Changed;
+            }
             if (TF2_GetPlayerClass(attacker) == TFClass_Scout)
             {
                 if (wepindex == 45 || ((wepindex == 209 || wepindex == 294 || wepindex == 23 || wepindex == 160 || wepindex == 449) && (TF2_IsPlayerCritBuffed(client) || TF2_IsPlayerInCondition(client, TFCond_CritCola) || TF2_IsPlayerInCondition(client, TFCond_Buffed) || TF2_IsPlayerInCondition(client, TFCond_CritHype))))
