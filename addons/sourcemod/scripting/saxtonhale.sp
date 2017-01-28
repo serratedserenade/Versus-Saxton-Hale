@@ -6027,12 +6027,15 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
         new item = GetPlayerWeaponSlot(client, (TF2_GetPlayerClass(client) == TFClass_DemoMan ? TFWeaponSlot_Primary:TFWeaponSlot_Secondary));
 
         if (!IsValidEntity(item) || //Checking for Demo/Soldier boots
-            IsValidEntity(FindPlayerBack(client, { 231 }, 1))) //Checking for Darwin's Danger Shield
+            IsValidEntity(FindPlayerBack(client, { 231 }, 1 ))) //Checking for Darwin's Danger Shield
         {
-            if (FindPlayerBack(client, { 133 }, 1 ))
+            if (IsValidEntity(FindPlayerBack(client, { 133 }, 1 )))
+            {
                 damage *= 0.8; //20% reduction for Gunboats
-            else
-                damage /= 10.0; //90% Fall damage reduction for all other boots
+                return Plugin_Changed;
+            }
+            
+            damage *= 0.1; //90% Fall damage reduction for all other boots
 
             return Plugin_Changed;
         }
