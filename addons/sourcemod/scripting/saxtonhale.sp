@@ -2711,7 +2711,7 @@ EquipSaxton(client)
         {
             SaxtonWeapon = SpawnWeapon(client, "tf_weapon_sword", 266, 100, TFQual_Unusual, "68 ; 2.0 ; 2 ; 3.1 ; 259 ; 1.0 ; 252 ; 0.6 ; 551 ; 1");
             SetEntPropFloat(SaxtonWeapon, Prop_Send, "m_flModelScale", 0.0001);
-            HaleCharge = -1000;
+            HaleCharge = -825; //HHH Jr. must wait 40s before their first teleport.
         }
         case VSHSpecial_CBS:
         {
@@ -2725,7 +2725,7 @@ EquipSaxton(client)
             SaxtonWeapon = SpawnWeapon(client, "tf_weapon_shovel", 5, 100, TFQual_Strange, attribs);
         }
     }
-
+    HaleCharge -= 175; //Hale must wait 7s after the the round starts to use their first superjump.
     SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", SaxtonWeapon);
 }
 public Action:MakeHale(Handle:hTimer)
