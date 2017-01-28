@@ -9,7 +9,7 @@
     
     New plugin thread on AlliedMods: https://forums.alliedmods.net/showthread.php?p=2167912
 */
-#define PLUGIN_VERSION "1.55e"
+#define PLUGIN_VERSION "1.55f Beta"
 #pragma semicolon 1
 #include <tf2_stocks>
 #include <tf2items>
@@ -544,7 +544,10 @@ static const String:haleversiontitles[][] =     //the last line of this is what 
     "1.55c",
     "1.55c",
     "1.55c",
-	"1.55d"
+    "1.55d",
+    "1.55e",
+    "1.55f Beta",
+    "1.55f Beta"
     ,PLUGIN_VERSION
 };
 static const String:haleversiondates[][] =
@@ -564,7 +567,10 @@ static const String:haleversiondates[][] =
     "6 Feb 2016",  // 1.55c update
     "6 Feb 2016",  // 1.55c update
     "15 Jun 2016",  // 1.55d update
-    "2 Oct 2016"  // 1.55e update
+    "2 Oct 2016",  // 1.55e update
+    "28 Jan 2017",  // 1.55f Beta update
+    "28 Jan 2017",  // 1.55f Beta update
+    "28 Jan 2017"  // 1.55f Beta update
 };
 static const maxversion = (sizeof(haleversiontitles) - 1);
 new Handle:OnHaleJump;
@@ -6696,6 +6702,33 @@ FindVersionData(Handle:panel, versionindex)
 {
     switch (versionindex) // DrawPanelText(panel, "1) .");
     {
+        case 85: //1.55f Beta
+        {
+            DrawPanelText(panel, "1) Added crits, -40% self blast damage and +33% damage to the Righteous Bison.");
+            DrawPanelText(panel, "2) Added -90% fall damage to Darwin's Danger Shield.");
+            DrawPanelText(panel, "3) Reduced Gunboats fall damage reduction from 90% to 20%. Increased self blast damage reduction from 60% to 75%.");
+            DrawPanelText(panel, "4) CBS's bow now grants -25% knockback while charging the bow up.");
+            DrawPanelText(panel, "5) Added new !nohale command to avoid being selected as the Hale.");
+            DrawPanelText(panel, "6) Superjump has an initial 7s cooldown at the start of the round.");
+        }
+        case 84: //1.55f Beta
+        {
+            DrawPanelText(panel, "7) All Grenade Launchers except the Loose Cannon now mini-crit airborne targets.");
+            DrawPanelText(panel, "8) All Stickybomb Launchers now have -25% self blast damage.");
+            DrawPanelText(panel, "9) Liberty Launcher now has +25% explosion radius.");
+            DrawPanelText(panel, "10) Holiday Punch grants some escape buffs for 5s if you hit Hale while Raged.");
+            DrawPanelText(panel, "11) Points earned for damage dealt are now added to your queue points at the end of the round.");
+            DrawPanelText(panel, "12) Fixed Pomson 6000 not being critboosted.");
+        }
+        case 83: //1.55f Beta
+        {
+            DrawPanelText(panel, "13) Buff Banner now grants Crits to the Soldier wearing it while it's active.");
+            DrawPanelText(panel, "14) Raged non-Scout players are now given a speed boost to help them escape Hale.");
+            DrawPanelText(panel, "15) Demoman shield bash damage is now tripled. Bash damage grants charge meter based on damage dealt.");
+            DrawPanelText(panel, "16) Persian Persuader now spawns a medium ammo pack on hit.");
+            DrawPanelText(panel, "17) Updated English translations file to bring it up to date with (some) recent changes.");
+            DrawPanelText(panel, "--) Unofficial 1.55 sub-versions by Starblaster64.");
+        }
         case 82: //1.55e
         {
             DrawPanelText(panel, "1) Added missing switch to/from speed bonus attributes to the Claidheamh Mòr.");
