@@ -4718,7 +4718,11 @@ public Action:UseRage(Handle:hTimer, any:dist)
                     flags |= TF_STUNFLAG_NOSOUNDOREFFECT;
                     AttachParticle(i, "yikes_fx", 5.0, Float:{0.0,0.0,75.0}, true);
                 }
-                if (VSHRoundState != VSHRState_Waiting) TF2_StunPlayer(i, 5.0, _, flags, (Special == VSHSpecial_HHH ? 0 : Hale));
+                if (VSHRoundState != VSHRState_Waiting)
+                {
+                    TF2_StunPlayer(i, 5.0, _, flags, (Special == VSHSpecial_HHH ? 0 : Hale));
+                    if (TF2_GetPlayerClass(i) != TFClass_Scout) TF2_AddCondition(i, TFCond_SpeedBuffAlly, 5.0);
+                }
             }
         }
     }
