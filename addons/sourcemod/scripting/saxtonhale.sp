@@ -7994,7 +7994,7 @@ stock bool:RemoveDemoShield(iClient)
         {
             TF2_RemoveWearable(iClient, iEnt);
 #if defined _tf2attributes_included
-			TF2Attrib_RemoveByDefIndex(iClient, 54);
+            TF2Attrib_RemoveByDefIndex(iClient, 54);
 #endif
             return true;
         }
