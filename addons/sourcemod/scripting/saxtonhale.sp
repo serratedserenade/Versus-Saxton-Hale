@@ -4043,6 +4043,17 @@ public Action:ClientTimer(Handle:hTimer)
                 }
             }
 
+            if (GetEntProp(client, Prop_Send, "m_bRageDraining")) //Handle weapons with Rage meters (e.g. Buff Banner)
+            {
+                switch (GetIndexOfWeaponSlot(client, TFWeaponSlot_Secondary))
+                {
+                    case 129, 1001:
+                    {
+                        addthecrit = true; //Buff Banner will critboost the wearer while Rage is active.
+                    }
+                }
+            }
+            
 /*          if (Special != VSHSpecial_HHH && index != 56 && index != 1005 && weapon == GetPlayerWeaponSlot(client, TFWeaponSlot_Primary))
             {
                 new meleeindex = GetIndexOfWeaponSlot(client, TFWeaponSlot_Melee);
