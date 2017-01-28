@@ -49,7 +49,7 @@ static bool:g_bTF2AttributesIsRunning = false;
 #define HALEHHH_TELEPORTCHARGE (25 * HALEHHH_TELEPORTCHARGETIME)
 #define HALE_JUMPCHARGE (25 * HALE_JUMPCHARGETIME)
        
-#define TF_MAX_PLAYERS          34             //  Sourcemod supports up to 64 players? Too bad TF2 doesn't. 33 player server +1 for 0 (console/world)
+#define TF_MAX_PLAYERS          MAXPLAYERS+1             //  Sourcemod supports up to 64 players? Too bad TF2 doesn't. 33 player server +1 for 0 (console/world)
 #define MAX_ENTITIES            2049           //  This is probably TF2 specific
 #define MAX_CENTER_TEXT         192            //  PrintCenterText()
 
