@@ -2872,7 +2872,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         }
         case 1150: //Quickiebomb Launcher
         {
-            hItemOverride = PrepareItemHandle(hItem, _, _, "114 ; 1.0");
+            hItemOverride = PrepareItemHandle(hItem, _, _, "114 ; 1.0 ; 135 ; 0.75"); //Minicrits airborne targets, -25% self blast damage
         }
         case 307: //Caber
         {
@@ -2959,6 +2959,10 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
             if (StrStarts(classname, "tf_weapon_sword", false) || StrStarts(classname, "tf_weapon_katana", false))
             {
                 hItemOverride = PrepareItemHandle(hItem, _, _, "547 ; 0.75 ; 199 ; 0.75"); // All Sword weapons are returned (close) to the old default switch time of 0.67s
+            }
+            if (StrStarts(classname, "tf_weapon_pipebomblauncher", false))
+            {
+                hItemOverride = PrepareItemHandle(hItem, _, _, "135 ; 0.75"); //-25% self blast damage
             }
             else if (StrStarts(classname, "tf_weapon_grenadelauncher", false))
             {
