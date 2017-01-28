@@ -1048,6 +1048,8 @@ AddToDownload()
     PrecacheSound("vo/announcer_am_capincite01.mp3", true);
     PrecacheSound("vo/announcer_am_capincite03.mp3", true);
     PrecacheSound("vo/announcer_am_capenabled02.mp3", true);
+    
+    PrecacheModel("models/items/ammopack_medium.mdl", true);
 
     //PrecacheSound("weapons/barret_arm_zap.wav", true);
     PrecacheSound("player/doubledonk.wav", true);
@@ -5052,7 +5054,7 @@ public Action:event_player_death(Handle:event, const String:name[], bool:dontBro
     }
     return Plugin_Continue;
 }
-stock SpawnManyAmmoPacks(client, String:model[], skin=0, num=14, Float:offsz = 30.0)
+stock SpawnManyAmmoPacks(client, String:model[], skin=0, num=14, Float:offsz = 30.0, teamnum=2, critcandy=true)
 {
 //  if (hSetAmmoVelocity == INVALID_HANDLE) return;
     decl Float:pos[3], Float:vel[3], Float:ang[3];
@@ -5081,14 +5083,14 @@ stock SpawnManyAmmoPacks(client, String:model[], skin=0, num=14, Float:offsz = 3
         SetEntProp(ent, Prop_Send, "m_triggerBloat", 24);
         SetEntProp(ent, Prop_Send, "m_CollisionGroup", 1);
         SetEntPropEnt(ent, Prop_Send, "m_hOwnerEntity", client);
-        SetEntProp(ent, Prop_Send, "m_iTeamNum", 2);
+        SetEntProp(ent, Prop_Send, "m_iTeamNum", teamnum);
         TeleportEntity(ent, pos, ang, vel);
         DispatchSpawn(ent);
         TeleportEntity(ent, pos, ang, vel);
 //      SDKCall(hSetAmmoVelocity, ent, vel);
         SetEntProp(ent, Prop_Data, "m_iHealth", 900);
         new offs = GetEntSendPropOffs(ent, "m_vecInitialVelocity", true);
-        SetEntData(ent, offs-4, 1, _, true);    //Sets to crit candy, offs-8 sets crit candy duration (is a float, 3*float = duration)
+        if (critcandy) SetEntData(ent, offs-4, 1, _, true);    //Sets to crit candy, offs-8 sets crit candy duration (is a float, 3*float = duration)
         //1358 is offs-14, that byte is for being a sandwich with +50hp, +75 for scouts. The byte after that, 1359, is to... not give the health? I don't know.
 /*      SetEntData(ent, offs-13, 0, 1, true);
         SetEntData(ent, offs-11, 1, 1, true);
@@ -5670,6 +5672,10 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                         }
                     }
                     case 317: SpawnSmallHealthPackAt(client, GetEntityTeamNum(attacker));
+                    case 404: //Persian Persuader
+                    {
+                        SpawnManyAmmoPacks(client, "models/items/ammopack_medium.mdl", 0, 1, 120.0, 4, false);
+                    }
                     case 214: // Powerjack
                     {
                         AddPlayerHealth(attacker, 25, 50);
