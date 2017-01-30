@@ -9,7 +9,7 @@
     
     New plugin thread on AlliedMods: https://forums.alliedmods.net/showthread.php?p=2167912
 */
-#define PLUGIN_VERSION "1.55f Beta"
+#define PLUGIN_VERSION "1.55f"
 #pragma semicolon 1
 #include <tf2_stocks>
 #include <tf2items>
@@ -546,8 +546,8 @@ static const String:haleversiontitles[][] =     //the last line of this is what 
     "1.55c",
     "1.55d",
     "1.55e",
-    "1.55f Beta",
-    "1.55f Beta"
+    "1.55f",
+    "1.55f"
     ,PLUGIN_VERSION
 };
 static const String:haleversiondates[][] =
@@ -568,9 +568,9 @@ static const String:haleversiondates[][] =
     "6 Feb 2016",  // 1.55c update
     "15 Jun 2016",  // 1.55d update
     "2 Oct 2016",  // 1.55e update
-    "28 Jan 2017",  // 1.55f Beta update
-    "28 Jan 2017",  // 1.55f Beta update
-    "28 Jan 2017"  // 1.55f Beta update
+    "28 Jan 2017",  // 1.55f update
+    "28 Jan 2017",  // 1.55f update
+    "28 Jan 2017"  // 1.55f update
 };
 static const maxversion = (sizeof(haleversiontitles) - 1);
 new Handle:OnHaleJump;
@@ -6702,7 +6702,7 @@ FindVersionData(Handle:panel, versionindex)
 {
     switch (versionindex) // DrawPanelText(panel, "1) .");
     {
-        case 85: //1.55f Beta
+        case 85: //1.55f
         {
             DrawPanelText(panel, "1) Added crits, -40% self blast damage and +33% damage to the Righteous Bison.");
             DrawPanelText(panel, "2) Added -90% fall damage to Darwin's Danger Shield.");
@@ -6711,7 +6711,7 @@ FindVersionData(Handle:panel, versionindex)
             DrawPanelText(panel, "5) Added new !nohale command to avoid being selected as the Hale.");
             DrawPanelText(panel, "6) Superjump has an initial 7s cooldown at the start of the round.");
         }
-        case 84: //1.55f Beta
+        case 84: //1.55f
         {
             DrawPanelText(panel, "7) All Grenade Launchers except the Loose Cannon now mini-crit airborne targets.");
             DrawPanelText(panel, "8) All Stickybomb Launchers now have -25% self blast damage.");
@@ -6720,7 +6720,7 @@ FindVersionData(Handle:panel, versionindex)
             DrawPanelText(panel, "11) Points earned for damage dealt are now added to your queue points at the end of the round.");
             DrawPanelText(panel, "12) Fixed Pomson 6000 not being critboosted.");
         }
-        case 83: //1.55f Beta
+        case 83: //1.55f
         {
             DrawPanelText(panel, "13) Buff Banner now grants Crits to the Soldier wearing it while it's active.");
             DrawPanelText(panel, "14) Raged non-Scout players are now given a speed boost to help them escape Hale.");
