@@ -843,6 +843,7 @@ public OnPluginStart()
     AddCommandListener(DoSuicide, "kill");
     AddCommandListener(DoSuicide2, "jointeam");
     AddCommandListener(Destroy, "destroy");
+    AddCommandListener(EurekaTeleport, "eureka_teleport");
     RegAdminCmd("sm_hale_select", Command_HaleSelect, ADMFLAG_CHEATS, "hale_select <target> - Select a player to be next boss");
     //RegAdminCmd("sm_hale_special", Command_MakeNextSpecial, ADMFLAG_CHEATS, "Call a special to next round.");
     RegAdminCmd("sm_hale_addpoints", Command_Points, ADMFLAG_CHEATS, "hale_addpoints <target> <points> - Add queue points to user.");
@@ -4466,6 +4467,62 @@ public Action:Destroy(client, const String:command[], argc)
         return Plugin_Continue;
     if (IsValidClient(client) && TF2_GetPlayerClass(client) == TFClass_Engineer && TF2_IsPlayerInCondition(client, TFCond_Taunting) && GetIndexOfWeaponSlot(client, TFWeaponSlot_Melee) == 589)
         return Plugin_Handled;
+    return Plugin_Continue;
+}
+public Action EurekaTeleport(int client, const char[] command, int argc)
+{
+    if (!g_bEnabled || client == Hale || VSHRoundState != VSHRState_Active)
+        return Plugin_Continue;
+    if (IsValidClient(client) && IsPlayerAlive(client))
+    {
+        bool bTeleport = true;
+        
+        int iFlags = GetEntityFlags(client);
+        if (!((iFlags & (FL_ONGROUND)) == (FL_ONGROUND)) || GetEntProp(client, Prop_Send, "m_nWaterLevel") > 1) //If the Engineer is not in a position where he can taunt, deny teleport
+            bTeleport = false;
+        if (TF2_IsPlayerInCondition(client, TFCond_Taunting) || 
+            TF2_IsPlayerInCondition(client, TFCond_Sapped) || 
+            TF2_IsPlayerInCondition(client, TFCond_Teleporting) || 
+            GetIndexOfWeaponSlot(client, TFWeaponSlot_Melee) != 589) //If the player is already teleporting/teleported recently, or not holding the Eureka Effect out, deny teleport
+            bTeleport = false;
+        
+        if (!bTeleport)
+        {
+            EmitSoundToClient(client, "common/wpn_denyselect.wav", client, SNDCHAN_AUTO, SNDLEVEL_TRAFFIC);
+            return Plugin_Handled;
+        }
+            
+        char arg[8]; GetCmdArg(1, arg, sizeof(arg));
+        int iArg = StringToInt(arg);
+        int iMetal = TF2_GetMetal(client);
+        
+        if (iMetal < 110)
+        {
+            EmitSoundToClient(client, "common/wpn_denyselect.wav", client, SNDCHAN_AUTO, SNDLEVEL_TRAFFIC);
+            return Plugin_Handled;
+        }
+        else if (iMetal > 110)
+            TF2_SetMetal(client, iMetal-110);
+            
+        if (!iArg) //If Engineer teleported to Spawn, regen his HP and Ammo
+        {
+            //TF2_RegeneratePlayer(client);
+            CreateTimer(2.2, Timer_EurekaRegen, client, TIMER_FLAG_NO_MAPCHANGE);
+        }
+        TF2_AddCondition(client, TFCond_Sapped, 2.8); //Prevent teleporting for a short while after a teleport, to avoid some exploits
+    }
+    return Plugin_Continue;
+}
+public Action Timer_EurekaRegen(Handle hTimer, any iClient)
+{
+    if (!g_bEnabled || iClient == Hale)
+        return Plugin_Continue;
+    if (IsValidClient(iClient) && IsPlayerAlive(iClient))
+    {
+        TF2_RegeneratePlayer(iClient);
+        TF2_AddCondition(iClient, TFCond_Sapped, 15.0); //Prevent another teleport for 15s after teleporting to spawn
+    }
+    
     return Plugin_Continue;
 }
 
