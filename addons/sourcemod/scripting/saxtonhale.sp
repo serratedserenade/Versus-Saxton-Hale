@@ -4471,7 +4471,7 @@ public Action:Destroy(client, const String:command[], argc)
 }
 public Action EurekaTeleport(int client, const char[] command, int argc)
 {
-    if (!g_bEnabled || client == Hale || VSHRoundState != VSHRState_Active)
+    if (!g_bEnabled || client == Hale || VSHRoundState != VSHRState_Active || !GetConVarBool(cvarEnableEurekaEffect))
         return Plugin_Continue;
     if (IsValidClient(client) && IsPlayerAlive(client))
     {
