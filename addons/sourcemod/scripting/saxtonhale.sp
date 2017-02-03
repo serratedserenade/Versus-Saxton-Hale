@@ -2860,7 +2860,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         }
         case 648: // Wrap assassin
         {
-            hItemOverride = PrepareItemHandle(hItem, _, _, "279 ; 2.0");
+            hItemOverride = PrepareItemHandle(hItem, _, _, "279 ; 2.0 ; 278 ; 0.50");
         }
         case 224: // Letranger
         {
