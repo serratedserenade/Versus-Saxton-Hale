@@ -2848,7 +2848,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
     {
         case 39, 351, 1081: // Mega Detonator
         {
-            hItemOverride = PrepareItemHandle(hItem, _, _, "551 ; 1 ; 25 ; 0.5 ; 207 ; 1.33 ; 144 ; 1 ; 58 ; 3.2", true);
+            hItemOverride = PrepareItemHandle(hItem, _, _, "551 ; 1 ; 25 ; 0.5 ; 207 ; 1.5 ; 144 ; 1 ; 58 ; 3.2 ; 20 ; 1.0", true);
         }
         case 740: // Mega Scorch shot
         {
