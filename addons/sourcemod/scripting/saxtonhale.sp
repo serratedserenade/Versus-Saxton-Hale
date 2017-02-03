@@ -2930,6 +2930,30 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         {
             hItemOverride = PrepareItemHandle(hItem, _, _, "114 ; 1 ; 99 ; 1.25"); //Minicrits airborne targets, +25% blast radius
         }
+        case 1103: //Back Scatter
+        {
+            hItemOverride = PrepareItemHandle(hItem, _, _, "179 ; 1.0"); //Crits whenever it would normally minicrit (e.g. backside crits)
+        }
+        case 773: //Pretty Boy's Pocket Pistol
+        {
+            hItemOverride = PrepareItemHandle(hItem, _, _, "16 ; 10.0"); //10HP per hit, up from 5.
+        }
+        case 426: //Eviction Notice
+        {
+            hItemOverride = PrepareItemHandle(hItem, _, _, "6 ; 0.25 ; 107 ; 1.25 ; 737 ; 5.0"); //Swing speed increased to +75%, speed boost increased to +25%, speed buff duration increased to 5s.
+        }
+        case 25, 737: //Engineer Build PDA
+        {
+            hItemOverride = PrepareItemHandle(hItem, _, _, "345 ; 2.0 ; 321 ; 0.75"); //+100% Dispenser range, +25% faster build rate
+        }
+        case 460: //Enforcer
+        {
+            hItemOverride = PrepareItemHandle(hItem, _, _, "2 ; 1.2"); //+20% damage
+        }
+        // case 589: //Eureka Effect
+        // {
+            // hItemOverride = PrepareItemHandle(hItem, _, _, "276 ; 1.0"); //Allows two-way teleporters
+        // }
         case 415: // Reserve Shooter
         {
             if (iClass == TFClass_Soldier) // Soldier shotguns get 40% rocket jump
