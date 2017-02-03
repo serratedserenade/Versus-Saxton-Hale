@@ -4535,7 +4535,8 @@ public Action EurekaTeleport(int client, const char[] command, int argc)
         if (TF2_IsPlayerInCondition(client, TFCond_Taunting) || 
             TF2_IsPlayerInCondition(client, TFCond_Sapped) || 
             TF2_IsPlayerInCondition(client, TFCond_Teleporting) || 
-            GetIndexOfWeaponSlot(client, TFWeaponSlot_Melee) != 589) //If the player is already teleporting/teleported recently, or not holding the Eureka Effect out, deny teleport
+            !(GetPlayerWeaponSlot(client, TFWeaponSlot_Melee) == GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon") &&
+            GetIndexOfWeaponSlot(client, TFWeaponSlot_Melee) == 589)) //If the player is already teleporting/teleported recently, or not holding the Eureka Effect out, deny teleport
             bTeleport = false;
         
         if (!bTeleport)
