@@ -3185,7 +3185,7 @@ public Action:MakeNoHale(Handle:hTimer, any:clientid)
                 TF2_RemoveWeaponSlot(client, TFWeaponSlot_Primary);
                 SpawnWeapon(client, "tf_weapon_sniperrifle", 14, 1, 0, "");
             }
-            case 772, 448: // Block BFB and Soda Popper
+            case 772: // Block BFB //448 - Soda popper
             {
                 TF2_RemoveWeaponSlot(client, TFWeaponSlot_Primary);
                 SpawnWeapon(client, "tf_weapon_scattergun", 13, 1, 0, "");
