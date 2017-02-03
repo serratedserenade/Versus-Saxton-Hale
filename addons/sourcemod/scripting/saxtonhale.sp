@@ -5807,7 +5807,7 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                     {
                         if (!TF2_IsPlayerInCondition(attacker, TFCond_CritMmmph))
                         {
-                            damage /= 2.0;
+                            damage *= 0.75;
                             return Plugin_Changed;
                         }
                     }
