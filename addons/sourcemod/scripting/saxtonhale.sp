@@ -2977,6 +2977,20 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
 
     switch (iClass)
     {
+        case TFClass_Spy:
+        {
+            if (StrEqual(classname, "tf_weapon_revolver", false))
+            {
+                if (iItemDefinitionIndex != 61 &&
+                    iItemDefinitionIndex != 224 &&
+                    iItemDefinitionIndex != 460 &&
+                    iItemDefinitionIndex != 525 &&
+                    iItemDefinitionIndex != 1006)
+                    {
+                        hItemOverride = PrepareItemHandle(hItem, _, _, "78 ; 2.0"); //Stock revolver gets 2x max ammo.
+                    }
+            }
+        }
         case TFClass_Sniper:
         {
             if (StrEqual(classname, "tf_weapon_club", false) || StrEqual(classname, "saxxy", false))
