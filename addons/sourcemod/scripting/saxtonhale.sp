@@ -4602,6 +4602,7 @@ public TF2_OnConditionAdded(client, TFCond:cond)
             case TFCond_CritMmmph: //Phlogistinator
             {
                 AddPlayerHealth(client, 175);
+                SetAmmo(client, TFWeaponSlot_Primary, 200);
             }
         }
     }
