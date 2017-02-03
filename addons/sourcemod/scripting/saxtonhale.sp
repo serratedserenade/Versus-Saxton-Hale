@@ -491,6 +491,7 @@ static Handle:cvarForceHaleTeam;
 static Handle:PointCookie;
 static Handle:MusicCookie;
 static Handle:VoiceCookie;
+static Handle VersionCookie;
 static Handle:ClasshelpinfoCookie;
 static Handle:doorchecktimer;
 static Handle:jumpHUD;
@@ -854,6 +855,7 @@ public OnPluginStart()
     PointCookie = RegClientCookie("hale_queuepoints1", "Amount of VSH Queue points player has", CookieAccess_Protected);
     MusicCookie = RegClientCookie("hale_music_setting", "HaleMusic setting", CookieAccess_Public);
     VoiceCookie = RegClientCookie("hale_voice_setting", "HaleVoice setting", CookieAccess_Public);
+    VersionCookie = RegClientCookie("hale_lastplayed_version", "Last version of VSH client has played", CookieAccess_Protected);
     ClasshelpinfoCookie = RegClientCookie("hale_classinfo", "HaleClassinfo setting", CookieAccess_Public);
     jumpHUD = CreateHudSynchronizer();
     rageHUD = CreateHudSynchronizer();
@@ -1749,6 +1751,11 @@ public Action:event_round_start(Handle:event, const String:name[], bool:dontBroa
         if (!IsClientInGame(i)) continue;
         if (!IsPlayerAlive(i)) continue;
         if (!(VSHFlags[i] & VSHFLAG_HASONGIVED)) TF2_RespawnPlayer(i);
+        if (CheckClientVersionNumber(i) == 0)
+        {
+            //CPrintToChat(i, "{olive}[VSH]{default} %t", "vsh_new_update", PLUGIN_VERSION); //Doesn't work. Just displays a Russian translation line instead???
+            CPrintToChat(i, "{olive}[VSH]{default} A new update ({olive}%s{default}) has been released since the last time you played {olive}VSH{default}! Check it out with {olive}/halenew{default}", PLUGIN_VERSION);
+        }
     }
     new bool:see[TF_MAX_PLAYERS];
     new tHale = FindNextHale(see);
@@ -6607,6 +6614,20 @@ public Action:TurnToZeroPanel(client)
     CloseHandle(panel);
     return Plugin_Continue;
 }
+CheckClientVersionNumber(iClient)
+{
+    if (!IsValidClient(iClient))
+        return -1;
+    if (IsFakeClient(iClient))
+        return -1;
+    if (!(AreClientCookiesCached(iClient)))
+        return 0;
+    char strCookie[MAX_DIGITS];
+    GetClientCookie(iClient, VersionCookie, strCookie, sizeof(strCookie));
+    if (StrEqual(strCookie, PLUGIN_VERSION, true))
+        return 1;
+    else return 0; //-1 = error, 0 = client hasn't played new version, 1 = client has played new version
+}
 bool:GetClientClasshelpinfoCookie(client)
 {
     if (!IsValidClient(client)) return false;
@@ -6752,6 +6773,8 @@ public Action:NewPanelCmd(client, args)
 {
     if (!client) return Plugin_Handled;
     NewPanel(client, maxversion);
+    if (CheckClientVersionNumber(client) == 0)
+        SetClientCookie(client, VersionCookie, PLUGIN_VERSION);
     return Plugin_Handled;
 }
 public Action:NewPanel(client, versionindex)
