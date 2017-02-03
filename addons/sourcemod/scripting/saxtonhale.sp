@@ -6569,7 +6569,7 @@ public Action Command_SetNoHale(client, args)
     {
         iQpoints -= GetRandomInt(1000, 9999);
         CPrintToChat(client, "{olive}[VSH]{default} You've set your Queue Points to: {olive}%i{default}!", iQpoints);
-        CPrintToChat(client, "{olive}---{default} Please note, if everyone has negative points, you may still be selected as Hale.");
+        CPrintToChat(client, "{olive}[VSH]{default} Please note, if everyone has negative points, you may still be selected as Hale.");
     }
     if (iQpoints < -99999)
         CPrintToChat(client, "{olive}[VSH]{default} You cannot set your points any lower, {unique}%N{default}!", client); //Minor easter egg for the curious player.
