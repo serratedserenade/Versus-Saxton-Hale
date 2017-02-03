@@ -3053,9 +3053,19 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         case TFClass_Medic:
         {
             //Medic mediguns
-            if (StrStarts(classname, "tf_weapon_medigun", false) || GunmettleToIndex(iItemDefinitionIndex) == TFWeapon_Medigun)
+            if (StrStarts(classname, "tf_weapon_medigun", false))
             {
-                hItemOverride = PrepareItemHandle(hItem, _, _, "10 ; 1.25 ; 18 ; 0 ; 144 ; 2", true);
+                switch (iItemDefinitionIndex)
+                {
+                    case 411, 998: //Non-stock/non-Kritzkrieg Mediguns have their attributes completely wiped
+                    {
+                        hItemOverride = PrepareItemHandle(hItem, _, _, "10 ; 1.25 ; 18 ; 0 ; 144 ; 2", true);
+                    }
+                    case 35: //Kritskrieg has only attributes that VSH alters, so we don't need to override it completely.
+                        hItemOverride = PrepareItemHandle(hItem, _, _, "10 ; 1.25 ; 18 ; 0 ; 144 ; 2");
+                    default: //Stock Mediguns already begin with no gameplay altering stats, so we just add the VSH stats on-top to preserve econ attributes.
+                        hItemOverride = PrepareItemHandle(hItem, _, _, "10 ; 1.25 ; 18 ; 0 ; 144 ; 2");
+                }
             }
         }
 #endif
