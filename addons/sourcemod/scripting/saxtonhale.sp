@@ -2878,9 +2878,9 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         {
             hItemOverride = PrepareItemHandle(hItem, _, _, "125 ; -60");
         }
-        case 405, 608: // Demo boots have falling stomp damage
+        case 405, 608: // Demo boots have falling stomp damage, +300% turning control while charging
         {
-            hItemOverride = PrepareItemHandle(hItem, _, _, "259 ; 1 ; 252 ; 0.25");
+            hItemOverride = PrepareItemHandle(hItem, _, _, "259 ; 1 ; 252 ; 0.25 ; 246 ; 4.0");
         }
         case 1150: //Quickiebomb Launcher
         {
