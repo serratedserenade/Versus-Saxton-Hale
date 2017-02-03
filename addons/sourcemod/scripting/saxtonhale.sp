@@ -9,7 +9,7 @@
     
     New plugin thread on AlliedMods: https://forums.alliedmods.net/showthread.php?p=2167912
 */
-#define PLUGIN_VERSION "1.55f"
+#define PLUGIN_VERSION "1.55g"
 #pragma semicolon 1
 #include <tf2_stocks>
 #include <tf2items>
@@ -548,7 +548,11 @@ static const String:haleversiontitles[][] =     //the last line of this is what 
     "1.55d",
     "1.55e",
     "1.55f",
-    "1.55f"
+    "1.55f",
+    "1.55f",
+    "1.55g",
+    "1.55g",
+    "1.55g"
     ,PLUGIN_VERSION
 };
 static const String:haleversiondates[][] =
@@ -571,7 +575,11 @@ static const String:haleversiondates[][] =
     "2 Oct 2016",  // 1.55e update
     "28 Jan 2017",  // 1.55f update
     "28 Jan 2017",  // 1.55f update
-    "28 Jan 2017"  // 1.55f update
+    "28 Jan 2017",  // 1.55f update
+    "31 Jan 2017",  // 1.55g update
+    "31 Jan 2017",  // 1.55g update
+    "31 Jan 2017",  // 1.55g update
+    "31 Jan 2017"  // 1.55g update
 };
 static const maxversion = (sizeof(haleversiontitles) - 1);
 new Handle:OnHaleJump;
@@ -4845,7 +4853,12 @@ public Action:UseRage(Handle:hTimer, any:dist)
                 if (VSHRoundState != VSHRState_Waiting)
                 {
                     TF2_StunPlayer(i, 5.0, _, flags, (Special == VSHSpecial_HHH ? 0 : Hale));
-                    if (TF2_GetPlayerClass(i) != TFClass_Scout) TF2_AddCondition(i, TFCond_SpeedBuffAlly, 5.0);
+                    if (TF2_GetPlayerClass(i) != TFClass_Scout &&
+                        (GetIndexOfWeaponSlot(i, TFWeaponSlot_Melee) != 132 && //Eyelander
+                        GetIndexOfWeaponSlot(i, TFWeaponSlot_Melee) != 482 && //Nessie's Nine Iron
+                        GetIndexOfWeaponSlot(i, TFWeaponSlot_Melee) != 266 && //Headtaker
+                        GetIndexOfWeaponSlot(i, TFWeaponSlot_Melee) != 1082)) //Festive Eyelander
+                        TF2_AddCondition(i, TFCond_SpeedBuffAlly, 5.0);
                 }
             }
         }
@@ -6836,6 +6849,41 @@ FindVersionData(Handle:panel, versionindex)
 {
     switch (versionindex) // DrawPanelText(panel, "1) .");
     {
+        case 89: //1.55g
+        {
+            DrawPanelText(panel, "1) The Enforcer now has a standard +20% bonus damage.");
+            DrawPanelText(panel, "2) Stock Revolvers now have +100% ammo.");
+            DrawPanelText(panel, "3) Added -40% self blast damage to Soldier backpack items, doesn't apply to the Battalion's Backup.");
+            DrawPanelText(panel, "4) Fixed Stock Mediguns/Kritzkriegs having their economy attributes overriden (e.g. Strange parts etc).");
+            DrawPanelText(panel, "5) Added new chat notification for new versions of VSH. Will be disabled after using /halenew at least once.");
+            DrawPanelText(panel, "6) Updated more lines in the English translations file.");
+        }
+        case 88: //1.55g
+        {
+            DrawPanelText(panel, "7) Backscatter now crits whenever it would normally minicrit.");
+            DrawPanelText(panel, "8) Soda-Popper has been unblacklisted now that it requires damage not distance to build Hype.");
+            DrawPanelText(panel, "9) Shortstop attributes updated, still grants +20% bonus healing, but must be the active weapon.");
+            DrawPanelText(panel, "10) PBP Pistol health on hit increased from +5 to +10.");
+            DrawPanelText(panel, "11) Wrap Assassin now has +50% faster recharge rate.");
+        }
+        case 87: //1.55g
+        {
+            DrawPanelText(panel, "12) Eviction Notice now provides while active: +75% faster swing speed, +25% movespeed, 5s speed boost on hit.");
+            DrawPanelText(panel, "13) Phlogistinator now restores ammo on MMMPH activation.");
+            DrawPanelText(panel, "14) Phlogistinator non-MMMPH damage penalty reduced from -50% to -25%.");
+            DrawPanelText(panel, "15) Flaregun/Detonator now crits burning targets, will also affect afterburn (mostly only affects Phlog users).");
+            DrawPanelText(panel, "16) Flaregun/Detonator self damage increased from +33% to +50%.");
+            DrawPanelText(panel, "17) Rage speed boost no longer applies to players with the Eyelander.");
+        }
+        case 86: //1.55g
+        {
+            DrawPanelText(panel, "18) Engineer Build PDAs now grant +100% Dispenser range, +25% faster build speed.");
+            DrawPanelText(panel, "19) Demoman Boots charge turn control bonus increased from +200% to +300%.");
+            DrawPanelText(panel, "20) Eureka Effect reworked:");
+            DrawPanelText(panel, "--) Teleporting requires at least 110 metal.");
+            DrawPanelText(panel, "--) Teleporting to Spawn will restore your HP and ammo/metal. You cannot teleport again for 15s.");
+            DrawPanelText(panel, "--) Teleporting to your Exit Teleporter will act as normal, no cooldown.");
+        }
         case 85: //1.55f
         {
             DrawPanelText(panel, "1) Added crits, -40% self blast damage and +33% damage to the Righteous Bison.");
