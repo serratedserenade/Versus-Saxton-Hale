@@ -2955,7 +2955,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         }
         case 426: //Eviction Notice
         {
-            hItemOverride = PrepareItemHandle(hItem, _, _, "6 ; 0.25 ; 107 ; 1.25 ; 737 ; 5.0"); //Swing speed increased to +75%, speed boost increased to +25%, speed buff duration increased to 5s.
+            hItemOverride = PrepareItemHandle(hItem, _, _, "1 ; 0.25 ; 6 ; 0.25 ; 107 ; 1.25 ; 737 ; 5.0"); //Swing speed increased to +75%, speed boost increased to +25%, speed buff duration increased to 5s. 
         }
         case 25, 737: //Engineer Build PDA
         {
