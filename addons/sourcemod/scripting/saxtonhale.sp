@@ -1072,6 +1072,7 @@ AddToDownload()
 
     //PrecacheSound("weapons/barret_arm_zap.wav", true);
     PrecacheSound("player/doubledonk.wav", true);
+    PrecacheSound("items/gift_drop.wav", true);
 #if defined EASTER_BUNNY_ON
     PrecacheSound("items/pumpkin_pickup.wav", true); // Only necessary for servers that don't have halloween holiday mode enabled.
 #endif
@@ -2969,6 +2970,10 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         // {
             // hItemOverride = PrepareItemHandle(hItem, _, _, "276 ; 1.0"); //Allows two-way teleporters
         // }
+        case 317: //Candy Cane
+        {
+            hItemOverride = PrepareItemHandle(hItem, _, _, "412 ; 1.25"); //+25% damage vulnerability (affects fall damage, bunny eggs, and CBS arrows)
+        }
         case 415: // Reserve Shooter
         {
             if (iClass == TFClass_Soldier) // Soldier shotguns get 40% rocket jump
@@ -4012,7 +4017,7 @@ public Action:ClientTimer(Handle:hTimer)
                 }
             }
 
-            if (class == TFClass_Soldier)
+            if (class == TFClass_Soldier || class == TFClass_Scout)
             {
                 if (GetIndexOfWeaponSlot(client, TFWeaponSlot_Primary) == 1104)
                 {
@@ -4022,6 +4027,16 @@ public Action:ClientTimer(Handle:hTimer)
                     if (!(GetClientButtons(client) & IN_SCORE))
                     {
                         ShowSyncHudText(client, jumpHUD, "Air Strike Damage: %i", AirDamage[client]);
+                    }
+                }
+                if (GetIndexOfWeaponSlot(client, TFWeaponSlot_Melee) == 317)
+                {
+                    bHudAdjust = true;
+                    SetHudTextParams(-1.0, 0.83, 0.35, 255, 225, 225, 255, 0, 0.2, 0.0, 0.1);
+
+                    if (!(GetClientButtons(client) & IN_SCORE))
+                    {
+                        ShowSyncHudText(client, jumpHUD, "Candy Cane Damage: %i/250", AirDamage[client]);
                     }
                 }
             }
@@ -5447,9 +5462,27 @@ public Action:event_hurt(Handle:event, const String:name[], bool:dontBroadcast)
         if (weapon == TF_WEAPON_ROCKETLAUNCHER)
         {
             AirDamage[attacker] += damage;
+            if (AirDamage[attacker] >= 200)
+            {
+                AirDamage[attacker] -= 200;
+                SetEntProp(attacker, Prop_Send, "m_iDecapitations", GetEntProp(attacker, Prop_Send, "m_iDecapitations") + 1);
+            }
+        }
+    }
+    
+    if (TF2_GetPlayerClass(attacker) == TFClass_Scout && GetIndexOfWeaponSlot(attacker, TFWeaponSlot_Melee) == 317)
+    {
+        if (weapon != TF_WEAPON_BAT) //Don't count Candy Cane damage for spawning small health packs
+        {
+            AirDamage[attacker] += damage;
+            if (AirDamage[attacker] >= 250)
+            {
+                AirDamage[attacker] -= 250;
+                SpawnHealthPackAt(attacker, GetEntityTeamNum(attacker), 0); //Spawn a small health pack every 200 damage dealt.
+                EmitSoundToAll("items/gift_drop.wav", attacker);
+            }
         }
 
-        SetEntProp(attacker, Prop_Send, "m_iDecapitations", AirDamage[attacker]/200);
     }
 
     new healers[TF_MAX_PLAYERS];
@@ -5817,7 +5850,7 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                             return Plugin_Changed;
                         }
                     }
-                    case 317: SpawnSmallHealthPackAt(client, GetEntityTeamNum(attacker));
+                    case 317: SpawnHealthPackAt(client, GetEntityTeamNum(attacker), 1); //Candy Cane
                     case 404: //Persian Persuader
                     {
                         SpawnManyAmmoPacks(client, "models/items/ammopack_medium.mdl", 0, 1, 120.0, 4, false);
@@ -6233,10 +6266,16 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
 }*/
 
 
-SpawnSmallHealthPackAt(client, ownerteam = 0)
+SpawnHealthPackAt(client, ownerteam = 0, size = 0) //0 - small. 1 - Medium. 2 - Full.
 {
     if (!IsValidClient(client) || !IsPlayerAlive(client)) return; // IsValidClient(client, false)
-    new healthpack = CreateEntityByName("item_healthkit_small");
+    new healthpack;
+    switch (size)
+    {
+        case 0: healthpack = CreateEntityByName("item_healthkit_small");
+        case 1: healthpack = CreateEntityByName("item_healthkit_medium");
+        case 2: healthpack = CreateEntityByName("item_healthkit_full");
+    }
     decl Float:pos[3];
     GetClientAbsOrigin(client, pos);
     pos[2] += 20.0;
