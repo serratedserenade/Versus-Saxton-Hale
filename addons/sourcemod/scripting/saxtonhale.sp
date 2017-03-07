@@ -2975,6 +2975,10 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         {
             hItemOverride = PrepareItemHandle(hItem, _, _, "412 ; 1.25"); //+25% damage vulnerability (affects fall damage, bunny eggs, and CBS arrows)
         }
+        case 349: //Sun-on-a-Stick
+        {
+            hItemOverride = PrepareItemHandle(hItem, _, _, "5 ; 6.0"); //500% slower firing speed (once every 3 seconds). Shoots slow fireballs.
+        }
         case 42, 863, 1002: //Sandvich
         {
             hItemOverride = PrepareItemHandle(hItem, _, _, "144 ; 5.0"); //Restores ammo in addition to health. Can be shared with teammates to give ammo as well.
@@ -4123,6 +4127,10 @@ public Action:ClientTimer(Handle:hTimer)
                 case 442: //Righteous Bison
                 {
                     addthecrit = true;
+                }
+                case 349: //Sun-on-a-Stick
+                {
+                    addthecrit = false;
                 }
                 case 43: //Killing Gloves of Boxing (KGB)
                 {
@@ -6250,6 +6258,15 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                 damage *= 1.33; //+33% damage for righteous bison, since attributes don't seem to affect its damage
                 return Plugin_Changed;
             }
+            if (damagecustom == TF_CUSTOM_SPELL_FIREBALL)
+            {
+                damage = (65.0 / 3.0) * 0.5; //Fireball damage from the Sun-on-a-Stick reduced from 100 to 50.
+                damagetype |= DMG_CRIT;
+                RemoveCond(client, TFCond_OnFire);
+                if (TF2_IsPlayerInCondition(client, TFCond_Milked))
+                    AddPlayerHealth(attacker, 33, 1.0, _, true);
+                return Plugin_Changed;
+            }
             if (TF2_GetPlayerClass(attacker) == TFClass_Scout)
             {
                 if (wepindex == 45 || ((wepindex == 209 || wepindex == 294 || wepindex == 23 || wepindex == 160 || wepindex == 449) && (TF2_IsPlayerCritBuffed(client) || TF2_IsPlayerInCondition(client, TFCond_CritCola) || TF2_IsPlayerInCondition(client, TFCond_Buffed) || TF2_IsPlayerInCondition(client, TFCond_CritHype))))
@@ -6498,6 +6515,16 @@ public Action:TF2_CalcIsAttackCritical(client, weapon, String:weaponname[], &boo
         if (TF2_GetPlayerClass(client) == TFClass_Sniper && IsWeaponSlotActive(client, TFWeaponSlot_Melee)) // index == 232 && StrEqual(weaponname, "tf_weapon_club", false)
         {
             SickleClimbWalls(client, weapon);
+        }
+        if (TF2_GetPlayerClass(client) == TFClass_Scout && IsWeaponSlotActive(client, TFWeaponSlot_Melee) && GetIndexOfWeaponSlot(client, TFWeaponSlot_Melee) == 349)
+        {
+            float vPosition[3];
+            float vAngles[3];
+            vAngles[2] += 25.0;
+            int iTeam = GetClientTeam(client);
+            GetClientEyePosition(client, vPosition);
+            GetClientEyeAngles(client, vAngles);
+            SpawnFireBall(client, vPosition, vAngles, _, _, iTeam, true);
         }
     }
     return Plugin_Continue;
@@ -9641,4 +9668,37 @@ public void Frame_FillChargeMeter(int iClient)
 {
     SetEntPropFloat(iClient, Prop_Send, "m_flChargeMeter", ChargeAdd[iClient]);
     ChargeAdd[iClient] = 0.0;
+}
+//Taken from PyroTaunt plugin, by TonyBaretta
+stock SpawnFireBall(int client, float vPosition[3], float vAngles[3], float flSpeed = 650.0, float flDamage = 100.0, int iTeam, bool bCritical = false)
+{
+    char strClassname[32] = "CTFProjectile_Rocket";
+    int iRocket = CreateEntityByName("tf_projectile_spellfireball");
+    if(!IsValidEntity(iRocket))
+        return -0;
+        
+    float vVelocity[3];
+    float vBuffer[3];
+    
+    GetAngleVectors(vAngles, vBuffer, NULL_VECTOR, NULL_VECTOR);
+    
+    vVelocity[0] = vBuffer[0]*flSpeed;
+    vVelocity[1] = vBuffer[1]*flSpeed;
+    vVelocity[2] = vBuffer[2]*flSpeed;
+    
+    TeleportEntity(iRocket, vPosition, vAngles, vVelocity);
+    
+    SetEntData(iRocket, FindSendPropInfo("CTFProjectile_Rocket", "m_iTeamNum"), GetClientTeam(client), true);
+    SetEntData(iRocket, FindSendPropInfo(strClassname, "m_bCritical"), bCritical, true);
+    SetEntPropEnt(iRocket, Prop_Send, "m_hOwnerEntity", client);
+    SetEntDataFloat(iRocket, FindSendPropInfo(strClassname, "m_iDeflected") + 4, flDamage, true);
+    
+    SetVariantInt(iTeam);
+    AcceptEntityInput(iRocket, "TeamNum", -1, -1, 0);
+
+    SetVariantInt(iTeam);
+    AcceptEntityInput(iRocket, "SetTeam", -1, -1, 0); 
+    
+    DispatchSpawn(iRocket);
+    return iRocket;
 }
