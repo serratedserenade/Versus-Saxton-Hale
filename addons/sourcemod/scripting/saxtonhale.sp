@@ -4607,16 +4607,24 @@ public Action EurekaTeleport(int client, const char[] command, int argc)
         int iArg = StringToInt(arg);
         int iMetal = TF2_GetMetal(client);
         
-        if (iMetal < 110)
+        if (iArg) //If Engineer teleported to his exit teleporter
         {
-            EmitSoundToClient(client, "common/wpn_denyselect.wav", client, SNDCHAN_AUTO, SNDLEVEL_TRAFFIC);
-            return Plugin_Handled;
-        }
-        else if (iMetal > 110)
-            TF2_SetMetal(client, iMetal-110);
-            
+            if (iMetal < 25)
+            {
+                EmitSoundToClient(client, "common/wpn_denyselect.wav", client, SNDCHAN_AUTO, SNDLEVEL_TRAFFIC);
+                return Plugin_Handled;
+            }
+            else TF2_SetMetal(client, iMetal-25);
+        }   
         if (!iArg) //If Engineer teleported to Spawn, regen his HP and Ammo
         {
+            if (iMetal < 100)
+            {
+                EmitSoundToClient(client, "common/wpn_denyselect.wav", client, SNDCHAN_AUTO, SNDLEVEL_TRAFFIC);
+                return Plugin_Handled;
+            }
+            else TF2_SetMetal(client, iMetal-100);
+                
             //TF2_RegeneratePlayer(client);
             CreateTimer(2.2, Timer_EurekaRegen, client, TIMER_FLAG_NO_MAPCHANGE);
         }
