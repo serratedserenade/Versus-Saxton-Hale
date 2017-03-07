@@ -6294,7 +6294,7 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                     return Plugin_Changed;
                 }
             }
-            if (damagecustom == TF_CUSTOM_PLASMA && wepindex != 441)
+            if (damagecustom == TF_CUSTOM_PLASMA && wepindex == 442)
             {
                 damage *= 1.33; //+33% damage for righteous bison, since attributes don't seem to affect its damage
                 return Plugin_Changed;
