@@ -6308,7 +6308,7 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
         {
             if (IsValidEntity(FindPlayerBack(client, { 133 }, 1 )))
             {
-                damage *= 0.8; //20% reduction for Gunboats
+                damage *= 0.7; //30% reduction for Gunboats
                 return Plugin_Changed;
             }
             
