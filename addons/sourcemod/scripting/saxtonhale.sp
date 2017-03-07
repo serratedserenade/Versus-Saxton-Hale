@@ -4711,6 +4711,10 @@ public TF2_OnConditionAdded(client, TFCond:cond)
                             SDKHooks_TakeDamage(client, client, client, -2.0, DMG_CLUB, 0); //Trigger even on full HP
                             // AddPlayerHealth(client, 300, 50, false);
                         }
+                        case 159, 433: //Dalokoh's Bar/Fishcake
+                        {
+                            AddPlayerHealth(client, 600, 200.0, true, true);
+                        }
                     }
                 }
             }
