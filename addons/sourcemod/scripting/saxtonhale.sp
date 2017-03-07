@@ -9,7 +9,7 @@
     
     New plugin thread on AlliedMods: https://forums.alliedmods.net/showthread.php?p=2167912
 */
-#define PLUGIN_VERSION "1.55g"
+#define PLUGIN_VERSION "1.55h"
 #pragma semicolon 1
 #include <tf2_stocks>
 #include <tf2items>
@@ -552,7 +552,10 @@ static const String:haleversiontitles[][] =     //the last line of this is what 
     "1.55f",
     "1.55g",
     "1.55g",
-    "1.55g"
+    "1.55g",
+    "1.55g",
+    "1.55h",
+    "1.55h"
     ,PLUGIN_VERSION
 };
 static const String:haleversiondates[][] =
@@ -579,7 +582,10 @@ static const String:haleversiondates[][] =
     "31 Jan 2017",  // 1.55g update
     "31 Jan 2017",  // 1.55g update
     "31 Jan 2017",  // 1.55g update
-    "31 Jan 2017"  // 1.55g update
+    "31 Jan 2017",  // 1.55g update
+    "7 Mar 2017",  // 1.55h update
+    "7 Mar 2017",  // 1.55h update
+    "7 Mar 2017"  // 1.55h update
 };
 static const maxversion = (sizeof(haleversiontitles) - 1);
 new Handle:OnHaleJump;
@@ -7072,6 +7078,34 @@ FindVersionData(Handle:panel, versionindex)
 {
     switch (versionindex) // DrawPanelText(panel, "1) .");
     {
+        case 92: //1.55h
+        {
+            DrawPanelText(panel, "1) Eviction Notice damage penalty increased from -60% to -75%.");
+            DrawPanelText(panel, "2) Eureka Effect tweaked:");
+            DrawPanelText(panel, "--) Teleporting to spawn metal cost changed from 110 -> 100.");
+            DrawPanelText(panel, "--) Teleporting to exit teleporter metal cost changed from 110 -> 25.");
+            DrawPanelText(panel, "3) Candy Cane now spawns a Medium health pack on hit. Passive +25% damage vulnerability.");
+            DrawPanelText(panel, "4) Candy Cane now spawns a Small health pack every 250 damage dealt by non-melee damage.");
+        }
+        case 91: //1.55h
+        {
+            DrawPanelText(panel, "5) Updated Air Strike damage HUD. Now shows progress towards next clip size.");
+            DrawPanelText(panel, "6) Gunboats fall damage resistance increased from -20% to -30%.");
+            DrawPanelText(panel, "7) Sun-on-a-Stick can now cast a 66 damage fireball every 3s. Extinguishes Hale on hit. Deals very little knockback.");
+            DrawPanelText(panel, "8) Sandvich now restores Ammo as well as HP. Will be consumed even at full Health.");
+            DrawPanelText(panel, "9) Dalokoh's Bar/Fishcake now provides overheal up to 550HP.");
+            DrawPanelText(panel, "10) Buffalo Steak Sandvich no longer restricts Heavies to only melee weapons.");
+        }
+        case 90: //1.55h
+        {
+            DrawPanelText(panel, "11) Soldier Shotguns (minus the Reserve Shooter) now deal crits while rocket jumping.");
+            DrawPanelText(panel, "12) Heavy shotguns now give 50% of damage back as health.");
+            DrawPanelText(panel, "--) Stock: Overheal up to 600HP.");
+            DrawPanelText(panel, "--) All Others: Overheal up to 450HP.");
+            DrawPanelText(panel, "13) Family Business now has +15% faster movespeed, +20% faster reload speed.");
+            DrawPanelText(panel, "14) Killing Gloves of Boxing now grant 5s of crits on hit. No longer replaced with GRU, nor critboosted.");
+            DrawPanelText(panel, "15) Updated English translations file.");
+        }
         case 89: //1.55g
         {
             DrawPanelText(panel, "1) The Enforcer now has a standard +20% bonus damage.");
