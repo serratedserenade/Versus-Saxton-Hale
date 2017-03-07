@@ -885,6 +885,7 @@ public OnPluginStart()
         if (IsClientInGame(client)) // IsValidClient(client, false)
         {
             SDKHook(client, SDKHook_OnTakeDamage, OnTakeDamage);
+            SDKHook(client, SDKHook_OnTakeDamageAlive, OnTakeDamageAlive);
             SDKHook(client, SDKHook_PreThinkPost, OnPreThinkPost);
 
 #if defined _tf2attributes_included
@@ -3001,6 +3002,24 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
 
     switch (iClass)
     {
+        case TFClass_Heavy:
+        {
+            if (StrStarts(classname, "tf_weapon_shotgun", false))
+            {
+                if (iItemDefinitionIndex == 425) //Family Business
+                {
+                    hItemOverride = PrepareItemHandle(hItem, _, _, "318 ; 0.8 ; 107 ; 1.15");
+                }
+                // if (iItemDefinitionIndex == 1153) //Panic Attack
+                // {
+                    // hItemOverride = PrepareItemHandle(hItem, _, _, "");
+                // }
+                // else
+                // {
+                    // hItemOverride = PrepareItemHandle(hItem, _, _, ""); // Heavy shotguns
+                // }
+            }
+        }
         case TFClass_Spy:
         {
             if (StrEqual(classname, "tf_weapon_revolver", false))
@@ -3750,6 +3769,7 @@ public OnClientPostAdminCheck(client)
 //  MusicDisabled[client] = false;
 //  VoiceDisabled[client] = false;
     SDKHook(client, SDKHook_OnTakeDamage, OnTakeDamage);
+    SDKHook(client, SDKHook_OnTakeDamageAlive, OnTakeDamageAlive);
     SDKHook(client, SDKHook_PreThinkPost, OnPreThinkPost);
     //bSkipNextHale[client] = false;
     Damage[client] = 0;
@@ -4650,7 +4670,7 @@ public TF2_OnConditionAdded(client, TFCond:cond)
             }
             case TFCond_CritMmmph: //Phlogistinator
             {
-                AddPlayerHealth(client, 175);
+                AddPlayerHealth(client, 175, 1.0, _, true);
                 SetAmmo(client, TFWeaponSlot_Primary, 200);
             }
             case TFCond_Taunting: //Taunting
@@ -5600,6 +5620,46 @@ public Action:OnStomp(attacker, victim, &Float:damageMultiplier, &Float:damageAd
 }
 #endif
 
+public Action OnTakeDamageAlive(int client, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon,
+        float damageForce[3], float damagePosition[3], int damagecustom)
+{
+    if (!g_bEnabled || !IsValidEdict(attacker) || ((attacker <= 0) && (client == Hale)) || TF2_IsPlayerInCondition(client, TFCond_Ubercharged))
+        return Plugin_Continue;
+    
+    if (attacker != Hale && client == Hale)
+    {
+        char wepclassname[24];
+        int wepindex;
+        if (IsValidEdict(weapon))
+        {
+            GetEdictClassname(weapon, wepclassname, sizeof(wepclassname));
+            wepindex = (IsValidEntity(weapon) && weapon > MaxClients ? GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex") : -1);
+        }
+        
+        if (TF2_GetPlayerClass(attacker) == TFClass_Heavy)
+        {
+            if (StrStarts(wepclassname, "tf_weapon_shotgun")) //Heavy shotguns
+            {
+                switch (wepindex)
+                {
+                    case 425: //Family Business
+                    {
+                        AddPlayerHealth(attacker, RoundToCeil(damage/2.0), _, _, true);
+                    }
+                    case 1153: //Panic Attack
+                    {
+                        AddPlayerHealth(attacker, RoundToCeil(damage/2.0), _, _, true);
+                    }
+                    default: //Shotgun
+                    {
+                        AddPlayerHealth(attacker, RoundToCeil(damage/2.0), 2.0, _, true);
+                    }
+                }
+            }
+        }
+    }
+    return Plugin_Continue;
+}
 public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damagetype, &weapon, Float:damageForce[3], Float:damagePosition[3], damagecustom)
 {
     if (!g_bEnabled || !IsValidEdict(attacker) || ((attacker <= 0) && (client == Hale)) || TF2_IsPlayerInCondition(client, TFCond_Ubercharged))
@@ -5884,13 +5944,13 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                     }
                     case 214: // Powerjack
                     {
-                        AddPlayerHealth(attacker, 25, 50);
+                        AddPlayerHealth(attacker, 25, 50.0, true, true);
                         RemoveCond(attacker, TFCond_OnFire);
                         return Plugin_Changed;
                     }
                     case 310: // Warrior's Spirit
                     {
-                        AddPlayerHealth(attacker, 50, 150);
+                        AddPlayerHealth(attacker, 50, 1.5, _, true);
                         RemoveCond(attacker, TFCond_OnFire);
                         return Plugin_Changed;
                     }
@@ -5913,7 +5973,7 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                         if (GetEntProp(attacker, Prop_Send, "m_iKillCountSinceLastDeploy") < 1)
                             SetEntProp(attacker, Prop_Send, "m_iKillCountSinceLastDeploy", 1);
 
-                        AddPlayerHealth(attacker, 35, 25);
+                        AddPlayerHealth(attacker, 35, 25.0, true, true);
                         RemoveCond(attacker, TFCond_OnFire);
                     }
                     case 61, 1006:  //Ambassador does 2.5x damage on headshot
@@ -6105,7 +6165,7 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
 
                     if (wepindex == 356) // Kunai
                     {
-                        AddPlayerHealth(attacker, 180, 270, true);
+                        AddPlayerHealth(attacker, 180, 270.0, true, true);
                     }
                     if (wepindex == 461) // Big Earner gives full cloak on backstab and speed boost for 3 seconds
                     {
@@ -8781,7 +8841,7 @@ stock IncrementHeadCount(iClient)
 {
     InsertCond(iClient, TFCond_DemoBuff);
     SetEntProp(iClient, Prop_Send, "m_iDecapitations", GetEntProp(iClient, Prop_Send, "m_iDecapitations") + 1);
-    AddPlayerHealth(iClient, 15, 300, true);             //  The old version of this allowed infinite health gain... so ;v
+    AddPlayerHealth(iClient, 15, 300.0, true);             //  The old version of this allowed infinite health gain... so ;v
 #if defined _tf2attributes_included
     if (IsValidEntity(FindPlayerBack(iClient, { 405, 608 }, 2)) && TF2_GetPlayerClass(iClient) == TFClass_DemoMan && GetEntProp(iClient, Prop_Send, "m_iDecapitations") >= 3 && GetEntProp(iClient, Prop_Send, "m_bShieldEquipped"))
     {
@@ -8970,20 +9030,78 @@ stock ChangeTeam(iClient, iTeam) // iTeam should never be less than 2
 stock any:min(any:a,any:b) { return (a < b) ? a : b; }
 
 /*
-    Player health adder
+    Player health stocks
     By: Chdata
 */
-stock AddPlayerHealth(iClient, iAdd, iOverheal = 0, bStaticMax = false)
+stock bool:ReadyToOverheal(iClient, iAdd = 0, bool:bAdd = false)
+{
+    return (bAdd) ? ((TF2_GetMaxHealth(iClient) - GetClientHealth(iClient)) < iAdd) : (GetClientHealth(iClient) >= TF2_GetMaxHealth(iClient));
+}
+
+/*
+    Adds health to a player until they reach a certain amount of overheal.
+
+    Does not go above the overheal amount.
+
+    Defaults to normal medigun overheal amount.
+*/
+stock AddPlayerHealth(iClient, iAdd, Float:flOverheal = 1.5, bAdditive = false, bool:bEvent = false)
 {
     new iHealth = GetClientHealth(iClient);
     new iNewHealth = iHealth + iAdd;
-    new iMax = bStaticMax ? iOverheal : GetEntProp(iClient, Prop_Data, "m_iMaxHealth") + iOverheal;
+    new iMax = bAdditive ? (TF2_GetMaxHealth(iClient) + RoundFloat(flOverheal)) : TF2_GetMaxOverHeal(iClient, flOverheal);
     if (iHealth < iMax)
     {
         iNewHealth = min(iNewHealth, iMax);
+        if (bEvent)
+        {
+            ShowHealthGain(iClient, iNewHealth-iHealth);
+        }
         SetEntityHealth(iClient, iNewHealth);
     }
 }
+
+stock ShowHealthGain(iPatient, iHealth, iHealer = -1)
+{
+    new iUserId = GetClientUserId(iPatient);
+    new Handle:hEvent = CreateEvent("player_healed", true);
+    SetEventBool(hEvent, "sourcemod", true);
+    SetEventInt(hEvent, "patient", iUserId);
+    SetEventInt(hEvent, "healer", IsValidClient(iHealer) ? GetClientUserId(iHealer) : iUserId);
+    SetEventInt(hEvent, "amount", iHealth);
+    FireEvent(hEvent);
+
+    hEvent = CreateEvent("player_healonhit", true);
+    SetEventBool(hEvent, "sourcemod", true);
+    SetEventInt(hEvent, "amount", iHealth);
+    SetEventInt(hEvent, "entindex", iPatient);
+    FireEvent(hEvent);
+}
+
+stock TF2_GetMaxHealth(iClient)
+{
+    new maxhealth = GetEntProp(GetPlayerResourceEntity(), Prop_Send, "m_iMaxHealth", _, iClient);
+    return ((maxhealth == -1 || maxhealth == 80896) ? GetEntProp(iClient, Prop_Data, "m_iMaxHealth") : maxhealth);
+}
+
+// Returns a client's max health if fully overhealed
+stock TF2_GetMaxOverHeal(iClient, Float:flOverHeal = 1.5) // Quick-Fix would be 1.25
+{
+    return RoundFloat(float(TF2_GetMaxHealth(iClient)) * flOverHeal);
+}
+
+// Returns the amount of overheal a client can receive
+stock TF2_GetOverHeal(iClient, Float:flOverHeal = 1.5)
+{
+    return RoundFloat(float(TF2_GetMaxHealth(iClient)) * (flOverHeal-1.0));
+}
+
+// SetEntityHealth works the same
+stock TF2_SetHealth(iClient, NewHealth)
+{
+    SetEntProp(iClient, Prop_Send, "m_iHealth", NewHealth);
+    SetEntProp(iClient, Prop_Data, "m_iHealth", NewHealth);
+}  
 
 stock PrepareSound(const String:szSoundPath[])
 {
