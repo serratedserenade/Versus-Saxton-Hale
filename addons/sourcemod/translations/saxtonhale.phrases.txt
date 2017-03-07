@@ -220,7 +220,7 @@
 	}
 	"vsh_help_scout"
 	{
-		"en"	"The Crit-a-Cola grants criticals instead of minicrits.\nThe Fan O' War removes 5%% rage on hit.\nPistols gain minicrits.\nCleaver gains crits.\nCandycane drops a mini health pack on hit.\nBFB is replaced with a Scattergun, Bonk! is replaced with Crit-a-Cola.\nWrap Assassin has 2 ornaments and charges +50%% faster."
+		"en"	"The Crit-a-Cola grants criticals instead of minicrits.\nThe Fan O' War removes 5%% rage on hit.\nPistols gain minicrits.\nCleaver gains crits.\nSun-on-a-Stick casts a 66 damage fireball every 3s.\nBFB is replaced with a Scattergun, Bonk! is replaced with Crit-a-Cola.\nWrap Assassin has 2 ornaments and charges +50%% faster.\nCandy Cane drops a Medium HP kit on hit. Passively spawns a Small HP kit every 250 damage dealt."
 	}
 	"vsh_help_soldier"
 	{
@@ -228,7 +228,7 @@
 	}
 	"vsh_help_pyro"
 	{
-		"en"	"The Axtinguisher acts like the Fire Axe.\nFlare Gun, Detonator, and Scorch Shot are replaced by the MegaDetonator.\nAirblasting the boss builds rage and lengthens the Vagineer's uber by ~1s.\nThird Degree gains 10%% uber for medics on hit.\Phlog restores HP and ammo on Mmmph activation, and has a 75%% defence buff during Crit Mmmph,\nbut disables flare crits at all times, and has a 25%% damage penalty when Mmmph isn't active."
+		"en"	"The Axtinguisher acts like the Fire Axe.\nFlare Gun, Detonator, and Scorch Shot are replaced by the MegaDetonator.\nAirblasting the boss builds rage and lengthens the Vagineer's uber by ~1s.\nThird Degree gains 10%% uber for medics on hit.\nPhlog restores HP and ammo on Mmmph activation, and has a 75%% defence buff during Crit Mmmph,\nbut disables flare crits at all times, and has a 25%% damage penalty when Mmmph isn't active."
 	}
 	"vsh_help_demo"
 	{
@@ -236,7 +236,7 @@
 	}
 	"vsh_help_heavy"
 	{
-		"en"	"Natascha, the KGB, and the Fists of Steel are replaced with the\nMinigun, Gloves of Running, and Fists, respectively.\nThe GRU are faster, but cause you to lose more health.\nThe Holiday Punch will remove any stun on you and grant some escape buffs if you hit Hale while stunned, they are only minicrit boosted.\nEviction Notice swings +75%% faster, and has +25% movespeed while active."
+		"en"	"Natascha, and the Fists of Steel are blacklisted.\nAll shotguns heal for 50%% of damage dealt.\nThe GRU are faster, but cause you to lose 7HP per second.\nThe Holiday Punch will remove any stun on you and grant some escape buffs if you hit Hale while stunned, they are only minicrit boosted.\nEviction Notice swings +75%% faster, has -75%% damage and +25%% movespeed while active.\nKGB grants 5s of crits on hit.\nLunchbox items are buffed."
 	}
 	"vsh_help_eggineer"
 	{
