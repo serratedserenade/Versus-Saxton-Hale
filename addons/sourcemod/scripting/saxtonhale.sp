@@ -3074,7 +3074,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
             }
             if (StrStarts(classname, "tf_weapon_shotgun", false) || GunmettleToIndex(iItemDefinitionIndex) == TFWeapon_Shotgun)
             {
-                hItemOverride = PrepareItemHandle(hItem, _, _, "135 ; 0.6 ; 114 ; 1.0"); // Soldier shotguns get 40% rocket jump dmg reduction     ; 265 ; 99999.0
+                hItemOverride = PrepareItemHandle(hItem, _, _, "267 ; 1.0 ; 135 ; 0.6 ; 114 ; 1.0"); // Soldier shotguns get 40% rocket jump dmg reduction     ; 265 ; 99999.0
             }
             if (StrStarts(classname, "tf_weapon_buff_item", false))
             {
