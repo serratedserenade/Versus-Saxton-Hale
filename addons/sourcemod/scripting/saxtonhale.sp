@@ -4088,7 +4088,7 @@ public Action:ClientTimer(Handle:hTimer)
             if (RedAlivePlayers == 2 && !TF2_IsPlayerInCondition(client, TFCond_Cloaked))
                 TF2_AddCondition(client, TFCond_Buffed, 0.3);
             new TFCond:cond = TFCond_HalloweenCritCandy;
-            if (TF2_IsPlayerInCondition(client, TFCond_CritCola) && (class == TFClass_Scout || class == TFClass_Heavy))
+            if (TF2_IsPlayerInCondition(client, TFCond_CritCola) && (class == TFClass_Scout || (class == TFClass_Heavy && weapon == GetPlayerWeaponSlot(client, TFWeaponSlot_Melee))))
             {
                 TF2_AddCondition(client, cond, 0.3);
                 continue;
@@ -4682,6 +4682,10 @@ public TF2_OnConditionAdded(client, TFCond:cond)
             {
                 AddPlayerHealth(client, 175, 1.0, _, true);
                 SetAmmo(client, TFWeaponSlot_Primary, 200);
+            }
+            case TFCond_RestrictToMelee: //Steak consumption
+            {
+                TF2_RemoveCondition(client, cond);
             }
             case TFCond_Taunting: //Taunting
             {
