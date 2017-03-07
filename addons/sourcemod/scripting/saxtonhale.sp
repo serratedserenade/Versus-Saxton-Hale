@@ -4648,6 +4648,8 @@ public TF2_OnConditionAdded(client, TFCond:cond)
 
     if (client != Hale)
     {
+        int ActiveWeapon = GetWeaponIndex(GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon"));
+        int ActiveWeaponEnt = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
         switch (cond)
         {
             case TFCond_Cloaked:
