@@ -4050,7 +4050,7 @@ public Action:ClientTimer(Handle:hTimer)
 
                     if (!(GetClientButtons(client) & IN_SCORE))
                     {
-                        ShowSyncHudText(client, jumpHUD, "Air Strike Damage: %i", AirDamage[client]);
+                        ShowSyncHudText(client, jumpHUD, "Air Strike Damage: %i/200", AirDamage[client]);
                     }
                 }
                 if (GetIndexOfWeaponSlot(client, TFWeaponSlot_Melee) == 317)
