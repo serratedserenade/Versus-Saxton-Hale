@@ -2974,6 +2974,10 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         {
             hItemOverride = PrepareItemHandle(hItem, _, _, "412 ; 1.25"); //+25% damage vulnerability (affects fall damage, bunny eggs, and CBS arrows)
         }
+        case 42, 863, 1002: //Sandvich
+        {
+            hItemOverride = PrepareItemHandle(hItem, _, _, "144 ; 5.0"); //Restores ammo in addition to health. Can be shared with teammates to give ammo as well.
+        }
         case 415: // Reserve Shooter
         {
             if (iClass == TFClass_Soldier) // Soldier shotguns get 40% rocket jump
@@ -4644,6 +4648,25 @@ public TF2_OnConditionAdded(client, TFCond:cond)
             {
                 AddPlayerHealth(client, 175);
                 SetAmmo(client, TFWeaponSlot_Primary, 200);
+            }
+            case TFCond_Taunting: //Taunting
+            {
+                int iTauntIndex = GetEntProp(client, Prop_Send, "m_iTauntIndex");
+                char szWepClass[128];
+                if (IsValidEnt(ActiveWeaponEnt))
+                    GetEntityClassname(ActiveWeaponEnt, szWepClass, sizeof(szWepClass));
+
+                if (TF2_GetPlayerClass(client) == TFClass_Heavy && StrStarts(szWepClass, "tf_weapon_lunchbox") && !iTauntIndex)
+                {
+                    switch (ActiveWeapon)
+                    {
+                        case 42, 863, 1002: //Sandvich
+                        {
+                            SDKHooks_TakeDamage(client, client, client, -2.0, DMG_CLUB, 0); //Trigger even on full HP
+                            // AddPlayerHealth(client, 300, 50, false);
+                        }
+                    }
+                }
             }
         }
     }
