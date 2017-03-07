@@ -2934,7 +2934,7 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         {
             hItemOverride = PrepareItemHandle(hItem, _, _, "", true);
         }
-        case 43, 239, 1100, 1084: // GRU
+        case 239, 1100, 1084: // GRU
         {
             hItemOverride = PrepareItemHandle(hItem, _, _, "107 ; 1.5 ; 1 ; 0.5 ; 128 ; 1 ; 191 ; -7", true);
         }
@@ -4103,6 +4103,10 @@ public Action:ClientTimer(Handle:hTimer)
                 case 442: //Righteous Bison
                 {
                     addthecrit = true;
+                }
+                case 43: //Killing Gloves of Boxing (KGB)
+                {
+                    addthecrit = false;
                 }
             }
             if (validwep && weapon == GetPlayerWeaponSlot(client, TFWeaponSlot_Primary)) // Primary weapon crit list
@@ -5888,6 +5892,11 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
                     {
                         AddPlayerHealth(attacker, 50, 150);
                         RemoveCond(attacker, TFCond_OnFire);
+                        return Plugin_Changed;
+                    }
+                    case 43: // Killing Gloves of Boxing (KGB)
+                    {
+                        TF2_AddCondition(attacker, TFCond_HalloweenCritCandy, 5.0);
                         return Plugin_Changed;
                     }
                     case 594: // Phlog
