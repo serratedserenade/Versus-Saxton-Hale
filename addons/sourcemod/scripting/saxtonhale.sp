@@ -6301,11 +6301,21 @@ public Action:OnTakeDamage(client, &attacker, &inflictor, &Float:damage, &damage
             }
             if (damagecustom == TF_CUSTOM_SPELL_FIREBALL)
             {
-                damage = (65.0 / 3.0) * 0.5; //Fireball damage from the Sun-on-a-Stick reduced from 100 to 50.
-                damagetype |= DMG_CRIT;
+                if (damage < 11.0)
+                {
+                    damage = 0.0; //Ignore non-impact damage.
+                    return Plugin_Changed;
+                }
+                damage = 66.0 / 3.0; //Fireball damage from the Sun-on-a-Stick reduced from 100 to 66.
+                damagetype |= DMG_CRIT|DMG_PREVENT_PHYSICS_FORCE; //Ensure damage is consistent, also prevent knockback because Scouts are annoying enough already.
+                
                 RemoveCond(client, TFCond_OnFire);
+                
                 if (TF2_IsPlayerInCondition(client, TFCond_Milked))
-                    AddPlayerHealth(attacker, 33, 1.0, _, true);
+                    AddPlayerHealth(attacker, RoundToCeil((damage*3.0)*0.5), 1.0, _, true);
+                
+                if (TF2_IsPlayerInCondition(attacker, TFCond_RegenBuffed))
+                    AddPlayerHealth(attacker, RoundToCeil((damage*3.0)*0.35), 1.0, _, true);
                 return Plugin_Changed;
             }
             if (TF2_GetPlayerClass(attacker) == TFClass_Scout)
@@ -9711,7 +9721,7 @@ public void Frame_FillChargeMeter(int iClient)
     ChargeAdd[iClient] = 0.0;
 }
 //Taken from PyroTaunt plugin, by TonyBaretta
-stock SpawnFireBall(int client, float vPosition[3], float vAngles[3], float flSpeed = 650.0, float flDamage = 100.0, int iTeam, bool bCritical = false)
+stock SpawnFireBall(int client, float vPosition[3], float vAngles[3], float flSpeed = 500.0, float flDamage = 100.0, int iTeam, bool bCritical = false)
 {
     char strClassname[32] = "CTFProjectile_Rocket";
     int iRocket = CreateEntityByName("tf_projectile_spellfireball");
@@ -9729,16 +9739,10 @@ stock SpawnFireBall(int client, float vPosition[3], float vAngles[3], float flSp
     
     TeleportEntity(iRocket, vPosition, vAngles, vVelocity);
     
-    SetEntData(iRocket, FindSendPropInfo("CTFProjectile_Rocket", "m_iTeamNum"), GetClientTeam(client), true);
-    SetEntData(iRocket, FindSendPropInfo(strClassname, "m_bCritical"), bCritical, true);
+    SetEntProp(iRocket, Prop_Send, "m_iTeamNum", GetClientTeam(client));
+    SetEntProp(iRocket, Prop_Send, "m_bCritical", bCritical);
     SetEntPropEnt(iRocket, Prop_Send, "m_hOwnerEntity", client);
     SetEntDataFloat(iRocket, FindSendPropInfo(strClassname, "m_iDeflected") + 4, flDamage, true);
-    
-    SetVariantInt(iTeam);
-    AcceptEntityInput(iRocket, "TeamNum", -1, -1, 0);
-
-    SetVariantInt(iTeam);
-    AcceptEntityInput(iRocket, "SetTeam", -1, -1, 0); 
     
     DispatchSpawn(iRocket);
     return iRocket;
