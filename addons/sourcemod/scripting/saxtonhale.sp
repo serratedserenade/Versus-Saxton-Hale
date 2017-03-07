@@ -2979,6 +2979,10 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
         {
             hItemOverride = PrepareItemHandle(hItem, _, _, "5 ; 6.0"); //500% slower firing speed (once every 3 seconds). Shoots slow fireballs.
         }
+        // case 811, 832: //Huo-Long Heater
+        // {
+            // hItemOverride = PrepareItemHandle(hItem, _, _, "209 ; 1.0"); //Minicrits against burning targets.
+        // }
         case 42, 863, 1002: //Sandvich
         {
             hItemOverride = PrepareItemHandle(hItem, _, _, "144 ; 5.0"); //Restores ammo in addition to health. Can be shared with teammates to give ammo as well.
@@ -4713,14 +4717,47 @@ public TF2_OnConditionAdded(client, TFCond:cond)
                         }
                         case 159, 433: //Dalokoh's Bar/Fishcake
                         {
+                            /* if (!TF2Attrib_GetByDefIndex(ActiveWeaponEnt, 140))
+                            {
+                                TF2Attrib_SetByDefIndex(ActiveWeaponEnt, 140, 100.0); //Add 100 max HP (+50hp from standard dalokohs) for 30s.
+                                TF2Attrib_ClearCache(client);
+                                AddPlayerHealth(client, 450, 150, false);
+                                CreateTimer(30.0, Timer_LunchBox, client, TIMER_FLAG_NO_MAPCHANGE);
+                            } */
                             AddPlayerHealth(client, 600, 200.0, true, true);
                         }
+                        /* case 311: //Buffalo Steak Sandvich
+                        {
+                            
+                        } */
                     }
                 }
             }
         }
     }
 }
+
+/* public Action Timer_LunchBox(Handle hTimer, int iClient)
+{
+    if (!g_bEnabled || VSHRoundState != VSHRState_Active)
+    {
+        return Plugin_Continue;
+    }
+    
+    int iLunchboxIndex = GetIndexOfWeaponSlot(iClient, TFWeaponSlot_Secondary);
+    int iLunchboxEnt = GetPlayerWeaponSlot(iClient, TFWeaponSlot_Secondary);
+    
+    switch (iLunchboxIndex)
+    {
+        case 159, 433: //Dalokoh's Bar/Fishcake
+        {
+            TF2Attrib_RemoveByDefIndex(iLunchboxEnt, 140);
+            // TF2Attrib_ClearCache(iClient);
+        }
+    }
+    
+    return Plugin_Handled;
+} */
 
 public Frame_AllowDeadringEffects(any:client)
 {
