@@ -114,6 +114,7 @@ bool ClientViews(int Viewer, int Target, float fMaxDistance=0.0, float fThreshol
 
 int GetCurrentWeaponIndex(int player)
 {
+    if (!IsValidEntity(player)) return -1;
     int activeWeaponEnt = GetEntPropEnt(player, Prop_Send, "m_hActiveWeapon");
     return IsValidEntity(player)
         ? IsValidEntity(activeWeaponEnt)
@@ -135,6 +136,7 @@ void ACY_HaleTimerLogic(int Hale)
 {
     for (int player = 1; player <= MaxClients; player++)
     {
+        if (!IsValidEntity(player)) return -1;
         if (player == Hale) continue;
         int currentWeaponIndex = GetCurrentWeaponIndex(player);
         float playerPosition[3];
@@ -155,7 +157,13 @@ void ACY_HaleTimerLogic(int Hale)
             {
                 switch (currentWeaponIndex)
                 {
-                    case 225: TF2_AddCondition(player, TFCond_SpeedBuffAlly, 0.3); //YER
+                    case 225:
+                    {
+                        if (!SeenByHale[player])
+                        {
+                            TF2_AddCondition(player, TFCond_SpeedBuffAlly, 0.3); //YER
+                        }
+                    }
                 }
             }
             if (class == TFClass_Scout)
@@ -164,7 +172,7 @@ void ACY_HaleTimerLogic(int Hale)
                 {
                     case 1103:
                     {
-                        if (HaleProximity[player] <= 250000 && !SeenByHale[player])
+                        if (HaleProximity[player] <= 40000 && !SeenByHale[player])
                         {
                             TF2_AddCondition(player, TFCond_Buffed, 0.3);
                         }
