@@ -4,7 +4,7 @@ const int VSH_ACY_SCOUT_HYPE_SCATTERGUN = 300;
 const int VSH_ACY_SCOUT_HYPE_FANOWAR = 300;
 const int VSH_ACY_SCOUT_HYPE_CANDYCANE = 250;
 
-int HaleProximity[TF_MAX_PLAYERS];
+float HaleProximity[TF_MAX_PLAYERS];
 int SeenByHale[TF_MAX_PLAYERS];
 
 enum
@@ -112,6 +112,16 @@ bool ClientViews(int Viewer, int Target, float fMaxDistance=0.0, float fThreshol
     return true;
 }
 
+int GetCurrentWeaponIndex(int player)
+{
+    int activeWeaponEnt = GetEntPropEnt(player, Prop_Send, "m_hActiveWeapon");
+    return IsValidEntity(player)
+        ? IsValidEntity(activeWeaponEnt)
+            ? GetEntProp(activeWeaponEnt, Prop_Send, "m_iItemDefinitionIndex")
+            : -1
+        : -1;
+}
+
 // ----------------------------------------------------------------------------
 // ClientViewsFilter()
 // ----------------------------------------------------------------------------
@@ -126,25 +136,44 @@ void ACY_HaleTimerLogic(int Hale)
     for (int player = 1; player <= MaxClients; player++)
     {
         if (player == Hale) continue;
-        if (IsClientInGame(player))
+        int currentWeaponIndex = GetCurrentWeaponIndex(player);
+        float playerPosition[3];
+        float halePosition[3];
+        GetEntPropVector(EntRefToEntIndex(player), Prop_Send, "m_vecOrigin", playerPosition);
+        GetEntPropVector(EntRefToEntIndex(Hale), Prop_Send, "m_vecOrigin", halePosition);
+        HaleProximity[player] = GetVectorDistance(
+            playerPosition, 
+            halePosition, 
+            true
+        );
+        SeenByHale[player] = ClientViews(Hale, player);
+
+        if (IsClientInGame(player) && IsValidEntity(player))
         {
             TFClassType class = TF2_GetPlayerClass(player);
             if (class == TFClass_Spy)
             {
-
+                switch (currentWeaponIndex)
+                {
+                    case 225: TF2_AddCondition(player, TFCond_SpeedBuffAlly, 0.3); //YER
+                }
+            }
+            if (class == TFClass_Scout)
+            {
+                switch (currentWeaponIndex)
+                {
+                    case 1103:
+                    {
+                        if (HaleProximity[player] <= 250000 && !SeenByHale[player])
+                        {
+                            TF2_AddCondition(player, TFCond_Buffed, 0.3);
+                        }
+                    }
+                }
             }
         }
     } 
 }
-
-void SpotTheSpy(int Hale, int Spy)
-{
-    if (!ClientViews(Hale, Spy))
-    {
-        TF2_AddCondition(Spy, TFCond_SpeedBuffAlly, 0.3);
-    }
-}
-
 /*
     Draw ray from client vision to hit first player
 */
