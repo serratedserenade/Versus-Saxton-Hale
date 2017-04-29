@@ -1,0 +1,1 @@
+#pragma newdecls required
