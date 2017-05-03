@@ -48,7 +48,7 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
         }
         case 225, 574: // YER
         {
-            hItemOverride = PrepareItemHandle(hItem, _, _, "155 ; 1 ; 160 ; 1", true);
+            hItemOverride = PrepareItemHandle(hItem, _, _, "155 ; 1 ; 160 ; 1 ; 54 ; 0.9", true);
         }
         /*case 232, 401: // Bushwacka + Shahanshah
         {
@@ -170,6 +170,10 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
         {
             hItemOverride = PrepareItemHandle(hItem, _, _, "208 ; 1 ; 1 ; 0.02 ; 74 ; 0.3 ; 71 ; 3.5 ; 20 ; 1");
         }
+        case 772: // BFB
+		{
+			hItemOverride = PrepareItemHandle(hItem, _, _, "16 ; 20 ; 69 ; 0 ; 109 ; 0");
+		}
     }
 
     if (hItemOverride != null) // This has to be here, else stuff below can overwrite what's above

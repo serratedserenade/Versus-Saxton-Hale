@@ -416,13 +416,6 @@ static const char BunnyRandomVoice[][] = {
 //#define ReloadEggModel          "models/player/saxton_hale/c_easter_cannonball.mdl"
 #endif
 
-// Acylus File Definitions
-#pragma newdecls required
-#include "acy_vsh/acy_vsh.sp"
-#include "acy_vsh/acy_items.sp"
-#include "acy_vsh/starblaster_vsh.sp"
-#include "acy_vsh/updates.sp"
-#pragma newdecls optional
 
 // END FILE DEFINTIONS
 
@@ -599,6 +592,15 @@ static defaulttakedamagetype;
 //     "7 Mar 2017",  // 1.55h update
 //     "7 Mar 2017"  // 1.55h update
 // };
+
+// Acylus File Definitions
+#pragma newdecls required
+#include "acy_vsh/acy_vsh.sp"
+#include "acy_vsh/acy_items.sp"
+#include "acy_vsh/starblaster_vsh.sp"
+#include "acy_vsh/updates.sp"
+#pragma newdecls optional
+
 static const maxversion = (sizeof(haleversiontitles) - 1);
 Handle OnHaleJump;
 Handle OnHaleRage;
@@ -618,6 +620,9 @@ Handle OnGetHealth;
 Handle OnGetHealthMax;
 Handle OnGetDamage;
 Handle OnGetRoundState;*/
+
+
+
 
 //new bool:ACH_Enabled;
 public Plugin:myinfo = {
@@ -817,6 +822,9 @@ public OnPluginStart()
     HookEvent("player_hurt", event_hurt, EventHookMode_Pre);
     HookEvent("object_destroyed", event_destroy, EventHookMode_Pre);
     HookEvent("object_deflected", event_deflect, EventHookMode_Pre);
+    
+    //Acylus Events
+    HookEvent("player_healed", ACY_event_healed, EventHookMode_Pre);
 
     OnPluginStart_TeleportToMultiMapSpawn(); // Setup adt_array
 
@@ -2332,6 +2340,10 @@ public Action StartHaleTimer(Handle:hTimer)
     CreateTimer(0.2, HaleTimer, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
     CreateTimer(0.2, StartRound);
     CreateTimer(0.2, ClientTimer, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+
+    // Acylus Timers
+    CreateTimer(1.0, ACY_SecondIntervalTimer, Hale, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+
     if (!PointType && playing > GetConVarInt(cvarAliveToEnable))
     {
         SetControlPoint(false);
@@ -2933,7 +2945,7 @@ public Action MakeHale(Handle:hTimer)
 //         {
 //             hItemOverride = PrepareItemHandle(hItem, _, _, "15 ; 0.0", true);
 //         }
-//         case 327: //Claidheamh Mòr - Restored to Pre-Tough Break behaviour (increased charge duration).
+//         case 327: //Claidheamh Mï¿½r - Restored to Pre-Tough Break behaviour (increased charge duration).
 //         {
 //             hItemOverride = PrepareItemHandle(hItem, _, _, "781 ; 72 ; 202 ; 0.5 ; 2034 ; 0.25 ; 125 ; -15 ; 15 ; 0.0 ; 547 ; 0.75 ; 199 ; 0.75", true);
 //         }
@@ -3272,11 +3284,11 @@ public Action MakeNoHale(Handle:hTimer, any:clientid)
                 SpawnWeapon(client, "tf_weapon_minigun", 15, 1, 0, "");
                 SetAmmo(client, 0, 200);
             }
-            case 772: // Block BFB //448 - Soda popper
-            {
-                TF2_RemoveWeaponSlot(client, TFWeaponSlot_Primary);
-                SpawnWeapon(client, "tf_weapon_scattergun", 13, 1, 0, "");
-            }
+            // case 772: // Block BFB //448 - Soda popper
+            // {
+            //     TF2_RemoveWeaponSlot(client, TFWeaponSlot_Primary);
+            //     SpawnWeapon(client, "tf_weapon_scattergun", 13, 1, 0, "");
+            // }
             /*case 237:
             {
                 TF2_RemoveWeaponSlot(client, TFWeaponSlot_Primary);
@@ -5678,17 +5690,22 @@ public Action event_hurt(Handle event, const char[] name, bool dontBroadcast)
         }
         // char wepclassname[24];
         // GetEdictClassname(GetEntPropEnt(attacker, Prop_Send, "m_hActiveWeapon"), wepclassname, sizeof(wepclassname));
-        if (SkinToDefault(GetIndexOfWeaponSlot(attacker, TFWeaponSlot_Primary)) == TFWeapon_Scattergun) // accumulate for crit if attacker is using scattergun
+        if (SkinToDefault(GetWeaponSlotItemDef(attacker, TFWeaponSlot_Primary)) == TFWeapon_Scattergun) // accumulate for crit if attacker is using scattergun
         {
             EnablerDamage2[attacker] += damage;
-            if (EnablerDamage2[attacker] >= 250)
+            if (EnablerDamage2[attacker] >= VSH_ACY_SCOUT_HYPE_SCATTERGUN)
             {
                 EnablerDamage2[attacker] = 0;
-                TF2_AddCondition(attacker, TFCond_Buffed, 2.0);
+                TF2_AddCondition(attacker, TFCond_Buffed, 5.0);
                 EmitSoundToAll("items/gift_drop.wav", attacker);
             }
         }
         
+        if (GetWeaponSlotItemDef(attacker, TFWeaponSlot_Secondary) == 163) // crit a cola
+        {
+            int cola = GetPlayerWeaponSlot(attacker, TFWeaponSlot_Secondary);
+            PrintToChat(attacker, "Your Crit a Cola meter from m_flEnergyDrinkMeter (?) was %f full", GetEntPropFloat(attacker, Prop_Send, "m_flEnergyDrinkMeter"));
+        }
     }
 
     int healers[TF_MAX_PLAYERS];
@@ -7381,14 +7398,14 @@ public Action NewPanel(client, versionindex)
 //         }
 //         case 82: //1.55e
 //         {
-//             DrawPanelText(panel, "1) Added missing switch to/from speed bonus attributes to the Claidheamh Mòr.");
+//             DrawPanelText(panel, "1) Added missing switch to/from speed bonus attributes to the Claidheamh Mï¿½r.");
 //             DrawPanelText(panel, "2) Updated the Demoman boots + Eyelander speed nerf to apply only to Demomen with shields.");
 //             DrawPanelText(panel, "--) Unofficial 1.55 sub-versions by Starblaster64.");
 //         }
 //         case 81: //1.55d
 //         {
 //             DrawPanelText(panel, "1) Maps that trigger SpawnRandomHealth/Ammo() will now generate at least 1 of the required pickup.");
-//             DrawPanelText(panel, "2) Fixed Claidheamh Mòr having a wrong attribute.");
+//             DrawPanelText(panel, "2) Fixed Claidheamh Mï¿½r having a wrong attribute.");
 //             DrawPanelText(panel, "3) Added IsValidEdict check on Sniper Rifle damage to prevent errors.");
 //             DrawPanelText(panel, "4) Minor code cleanup of addthecrit.");
 //             DrawPanelText(panel, "--) Unofficial 1.55 sub-versions by Starblaster64.");
@@ -7414,7 +7431,7 @@ public Action NewPanel(client, versionindex)
 //         case 78: //1.55c
 //         {
 //             DrawPanelText(panel, "12) Re-added Quick-Fix 'match heal target speed' attribute to Mediguns.");
-//             DrawPanelText(panel, "13) Claidheamh Mòr reverted to old attributes. (0.5s longer charge duration, -15HP)");
+//             DrawPanelText(panel, "13) Claidheamh Mï¿½r reverted to old attributes. (0.5s longer charge duration, -15HP)");
 //             DrawPanelText(panel, "14) Ullapool Caber penalties removed.");
 //             DrawPanelText(panel, "15) Phlogistinator fully heals on MMMPH activation again.");
 //             DrawPanelText(panel, "16) Weapon switch speed nerfs were reverted/modified, with the exception of the Degreaser.");

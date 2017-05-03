@@ -112,76 +112,6 @@ bool ClientViews(int Viewer, int Target, float fMaxDistance=0.0, float fThreshol
     return true;
 }
 
-int GetCurrentWeaponIndex(int player)
-{
-    if (!IsValidEntity(player)) return -1;
-    int activeWeaponEnt = GetEntPropEnt(player, Prop_Send, "m_hActiveWeapon");
-    return IsValidEntity(player)
-        ? IsValidEntity(activeWeaponEnt)
-            ? GetEntProp(activeWeaponEnt, Prop_Send, "m_iItemDefinitionIndex")
-            : -1
-        : -1;
-}
-
-// ----------------------------------------------------------------------------
-// ClientViewsFilter()
-// ----------------------------------------------------------------------------
-public bool ClientViewsFilter(int Entity, int Mask, any Junk)
-{
-    if (Entity >= 1 && Entity <= MaxClients) return false;
-    return true;
-}
-
-void ACY_HaleTimerLogic(int Hale)
-{
-    for (int player = 1; player <= MaxClients; player++)
-    {
-        if (!IsValidEntity(player)) return -1;
-        if (player == Hale) continue;
-        int currentWeaponIndex = GetCurrentWeaponIndex(player);
-        float playerPosition[3];
-        float halePosition[3];
-        GetEntPropVector(EntRefToEntIndex(player), Prop_Send, "m_vecOrigin", playerPosition);
-        GetEntPropVector(EntRefToEntIndex(Hale), Prop_Send, "m_vecOrigin", halePosition);
-        HaleProximity[player] = GetVectorDistance(
-            playerPosition, 
-            halePosition, 
-            true
-        );
-        SeenByHale[player] = ClientViews(Hale, player);
-
-        if (IsClientInGame(player) && IsValidEntity(player))
-        {
-            TFClassType class = TF2_GetPlayerClass(player);
-            if (class == TFClass_Spy)
-            {
-                switch (currentWeaponIndex)
-                {
-                    case 225:
-                    {
-                        if (!SeenByHale[player])
-                        {
-                            TF2_AddCondition(player, TFCond_SpeedBuffAlly, 0.3); //YER
-                        }
-                    }
-                }
-            }
-            if (class == TFClass_Scout)
-            {
-                switch (currentWeaponIndex)
-                {
-                    case 1103:
-                    {
-                        if (HaleProximity[player] <= 40000 && !SeenByHale[player])
-                        {
-                            TF2_AddCondition(player, TFCond_Buffed, 0.3);
-                        }
-                    }
-                }
-            }
-        }
-    } 
-}
 /*
     Draw ray from client vision to hit first player
 */
@@ -201,6 +131,206 @@ int TraceClientViewEntity(int client)
 
     delete tr;
     return pEntity;
+}
+
+int GetCurrentWeaponIndex(int player)
+{
+    if (!IsValidEntity(player)) return -1;
+    int activeWeaponEnt = GetEntPropEnt(player, Prop_Send, "m_hActiveWeapon");
+    return IsValidEntity(player)
+        ? IsValidEntity(activeWeaponEnt)
+            ? GetEntProp(activeWeaponEnt, Prop_Send, "m_iItemDefinitionIndex")
+            : -1
+        : -1;
+}
+
+int GetWeaponSlotItemDef(int player, int slot)
+{
+    if (!IsValidEntity(player)) return -1;
+    int weapon = GetPlayerWeaponSlot(player, slot);
+    if (!IsValidEdict(weapon)) return -1;
+    return GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex");
+}
+
+// ----------------------------------------------------------------------------
+// ClientViewsFilter()
+// ----------------------------------------------------------------------------
+public bool ClientViewsFilter(int Entity, int Mask, any Junk)
+{
+    if (Entity >= 1 && Entity <= MaxClients) return false;
+    return true;
+}
+
+public Action ACY_event_healed(Handle event, const char[] name, bool dontBroadcast)
+{
+    int patient = GetClientOfUserId(GetEventInt(event, "patient"));
+    int healer = GetClientOfUserId(GetEventInt(event, "healer"));
+    int amount = GetEventInt(event, "amount");
+
+    PrintToChat(healer, "You've healed %i for %i", patient, amount);
+}
+
+Action ACY_SecondIntervalTimer(Handle timer, int Hale)
+{
+    if (VSHRoundState == VSHRState_End)
+    {
+        if (IsValidClient(Hale) && IsPlayerAlive(Hale)) TF2_AddCondition(Hale, TFCond_SpeedBuffAlly, 14.0); // IsValidClient(Hale, false)
+        return Plugin_Stop;
+    }
+    for (int player = 1; player <= MaxClients; player++)
+    {
+        if (!IsValidEntity(player) || player == Hale) {
+            HaleProximity[player] = -1;
+            SeenByHale[player] = -1;
+            continue;
+        }
+        int currentWeaponIndex = GetCurrentWeaponIndex(player);
+
+        if (IsClientInGame(player) && IsValidEntity(player))
+        {
+            TFClassType class = TF2_GetPlayerClass(player);
+            switch (class)
+            {
+                // case TFClass_Spy:
+                // {
+                //     switch (currentWeaponIndex)
+                //     {
+                //         case 225:
+                //         {
+                //             if (SeenByHale[player])
+                //             {
+                //                 TF2_AddCondition(player, TFCond_SpeedBuffAlly, 0.3); //YER
+                //             }
+                //         }
+                //     }
+                // }
+                case TFClass_Scout:
+                {
+                    if (GetWeaponSlotItemDef(player, TFWeaponSlot_Primary) == 772 && SeenByHale[player])
+                    {
+                                PrintToChat(player, "The hale sees you, you will take damage");
+                                SDKHooks_TakeDamage(player, player, player, 10.0, DMG_CLUB, 0);
+                    }
+                    switch (currentWeaponIndex)
+                    {
+                        // case 1103:
+                        // {
+                        //     if (HaleProximity[player] <= 40000)
+                        //     {
+                        //         if (SeenByHale[player])
+                        //             TF2_AddCondition(player, TFCond_Buffed, 0.3);
+                        //         else
+                        //             TF2_AddCondition(player, TFCond_HalloweenCritCandy, 0.3);
+                        //     }
+                        // }
+                        // case 772:
+                        // {
+                        //     if (SeenByHale[player])
+                        //     {
+                        //         PrintToChat(player, "The hale sees you, you will take damage");
+                        //         SDKHooks_TakeDamage(player, player, player, 10.0, DMG_CLUB, 0);
+                        //     }
+                        // }
+                    }
+                }
+                case TFClass_Heavy:
+                {
+                    switch (currentWeaponIndex)
+                    {
+                        case 811, 832:
+                        {
+                            if (HaleProximity[player] <= 250000 && SeenByHale[player] && ClientViews(player, Hale))
+                            {
+                                TF2_IgnitePlayer(Hale, player);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return Plugin_Continue;
+}
+
+void ACY_HaleTimerLogic(int Hale)
+{
+    for (int player = 1; player <= MaxClients; player++)
+    {
+        if (!IsValidEntity(player) || player == Hale) {
+            HaleProximity[player] = -1;
+            SeenByHale[player] = -1;
+            continue;
+        }
+        int currentWeaponIndex = GetCurrentWeaponIndex(player);
+        float playerPosition[3];
+        float halePosition[3];
+        GetEntPropVector(EntRefToEntIndex(player), Prop_Send, "m_vecOrigin", playerPosition);
+        GetEntPropVector(EntRefToEntIndex(Hale), Prop_Send, "m_vecOrigin", halePosition);
+        HaleProximity[player] = GetVectorDistance(
+            playerPosition, 
+            halePosition, 
+            true
+        );
+        SeenByHale[player] = ClientViews(Hale, player);
+
+        if (IsClientInGame(player) && IsValidEntity(player))
+        {
+            TFClassType class = TF2_GetPlayerClass(player);
+            switch (class)
+            {
+                case TFClass_Spy:
+                {
+                    switch (currentWeaponIndex)
+                    {
+                        case 225, 574:
+                        {
+                            if ((!SeenByHale[player] || TF2_IsPlayerInCondition(player, TFCond_Cloaked)) && HaleProximity[player] >= 250000)
+                            {
+                                TF2_AddCondition(player, TFCond_SpeedBuffAlly, 0.3); //YER
+                            }
+                        }
+                    }
+                }
+                case TFClass_Scout:
+                {
+                    switch (currentWeaponIndex)
+                    {
+                        case 1103:
+                        {
+                            if (HaleProximity[player] <= 40000)
+                            {
+                                if (SeenByHale[player])
+                                    TF2_AddCondition(player, TFCond_Buffed, 0.3);
+                                else
+                                    TF2_AddCondition(player, TFCond_HalloweenCritCandy, 0.3);
+                            }
+                        }
+                        // case 772:
+                        // {
+                        //     if (SeenByHale[player])
+                        //     {
+                        //         SDKHooks_TakeDamage(player, Hale, Hale, -0.5, DMG_CLUB, 0);
+                        //     }
+                        // }
+                    }
+                }
+                // case TFClass_Heavy:
+                // {
+                //     switch (currentWeaponIndex)
+                //     {
+                //         case 811, 832:
+                //         {
+                //             if (HaleProximity[player] <= 250000 && SeenByHale[player] && ClientViews(player, Hale))
+                //             {
+                //                 TF2_IgnitePlayer(Hale, player);
+                //             }
+                //         }
+                //     }
+                // }
+            }
+        }
+    }
+    return; 
 }
 
 void SniperHealAlly(int[] HealingScore, int client, int weapon)
